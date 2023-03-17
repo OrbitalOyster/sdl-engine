@@ -1,13 +1,13 @@
 CC = gcc
 
-OUTPUT = game
+OUTPUT = test
 
 WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Warith-conversion -Wfloat-equal -Werror
 OPTIMIZATION = -O2
 STANDART = -std=c11
 CFLAGS = ${OPTIMIZATION} ${WARNINGS} ${STANDART}
 LDFLAGS = -o ${OUTPUT}
-OBJ = main.o dmath/dmath.o
+OBJ = ../dmath/dmath.o test.o 
 
 all: ${OUTPUT}
 
