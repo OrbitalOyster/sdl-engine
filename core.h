@@ -1,8 +1,9 @@
-#ifndef _CORE_H_
-#define _CORE_H_
+#ifndef CORE_H
+#define CORE_H
 
 #include <SDL2/SDL.h>
 
+// TODO Config file
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 #define WINDOW_POSX SDL_WINDOWPOS_CENTERED

@@ -1,5 +1,5 @@
-#ifndef _GEOMETRY_H_
-#define _GEOMETRY_H
+#ifndef POINT_H
+#define POINT_H
 
 typedef struct {
   double x;
