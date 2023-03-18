@@ -1,7 +1,7 @@
-#include "sdl_core.h"
+#include "core.h"
 
-sdl_core_t* init_sdl_core() {
-  sdl_core_t* result = calloc(1, sizeof(sdl_core_t));
+Core* initCore() {
+  Core* result = calloc(1, sizeof(Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     printf("Unable to initilize SDL: %s\n", SDL_GetError());
@@ -26,7 +26,7 @@ sdl_core_t* init_sdl_core() {
   return result;
 }
 
-void close_core(sdl_core_t* core) {
+void destroyCore(Core* core) {
   SDL_DestroyRenderer(core->renderer);
   core->renderer = NULL;
   SDL_DestroyWindow(core->window);

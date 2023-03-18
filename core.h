@@ -1,5 +1,5 @@
-#ifndef _SDL_CORE_H_
-#define _SDL_CORE_H_
+#ifndef _CORE_H_
+#define _CORE_H_
 
 #include <SDL2/SDL.h>
 
@@ -14,9 +14,9 @@
 typedef struct {
   SDL_Window* window;
   SDL_Renderer* renderer;
-} sdl_core_t;
+} Core;
 
-sdl_core_t* init_sdl_core();
-void close_core(sdl_core_t* core);
+Core* initCore();
+void destroyCore(Core* core);
 
 #endif

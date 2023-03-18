@@ -1,12 +1,12 @@
 #include <stdio.h>
 
-#include "sdl_core.h"
+#include "core.h"
 
 int main() {
   printf("Starting engine...\n");
-  sdl_core_t* core = init_sdl_core();
+  Core* core = initCore();
   SDL_Delay(1000);
-  close_core(core);
+  destroyCore(core);
   printf("Engine closed\n");
   return 0;
 }
