@@ -6,13 +6,14 @@ WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Warith-conversion -Wfloat-equal -W
 OPTIMIZATION = -O2
 STANDART = -std=c11
 CFLAGS = ${OPTIMIZATION} ${WARNINGS} ${STANDART}
+LDLIBS = -lSDL2
 LDFLAGS = -o ${OUTPUT}
-OBJ = main.o dmath/dmath.o
+OBJ = main.o sdl_core.o dmath/dmath.o
 
 all: ${OUTPUT}
 
-${OUTPUT}: ${OBJ} 
-	${CC} ${OBJ} ${LDFLAGS} ${CFLAGS}
+${OUTPUT}: ${OBJ}
+	${CC} ${OBJ} ${LDLIBS} ${LDFLAGS} ${CFLAGS}
 
 clean:
 	rm *.o
