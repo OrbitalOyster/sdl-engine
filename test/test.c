@@ -11,7 +11,8 @@ bool compare_test() {
   return result;
 }
 
-int main() {
+int test() {
   compare_test();
+  return 0;
 }
 

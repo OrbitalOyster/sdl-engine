@@ -1,22 +1,37 @@
-CC = gcc
+# Generic Makefile
 
-OUTPUT = game
+OUTPUT := game
+WARNINGS := -Wall -Wextra -Wshadow -Wconversion -Warith-conversion -Wfloat-equal -Werror
+STANDART := -std=c11
+OPTIMIZATION := -O2
+DEBUG :=
 
-WARNINGS = -Wall -Wextra -Wpedantic -Wshadow -Warith-conversion -Wfloat-equal -Werror
-OPTIMIZATION = -O2
-STANDART = -std=c11
-CFLAGS = ${OPTIMIZATION} ${WARNINGS} ${STANDART}
-LDLIBS = -lSDL2
-LDFLAGS = -o ${OUTPUT}
-OBJ = main.o core.o dmath/dmath.o geometry/point.o geometry/ortholine.o geometry/orthosegment.o geometry/orthorect.o
+# Implicit variables
+CC := gcc
+CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DEBUG)
+LDLIBS := -lSDL2
 
-all: ${OUTPUT}
+# All .c files
+C_FILES := $(wildcard *.c) $(wildcard **/*.c)
 
-${OUTPUT}: ${OBJ}
-	${CC} ${OBJ} ${LDLIBS} ${LDFLAGS} ${CFLAGS}
+# TODO: Header dependencies
 
+# All .o files
+OBJS := $(C_FILES:.c=.o)
+
+# Final result
+all: $(OUTPUT)
+$(OUTPUT): $(OBJS)
+	$(CC) $(OBJS) $(LDLIBS) -o $(OUTPUT)
+
+# Compile all .c files
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+# Clear working directory
 clean:
-	rm *.o
-	rm geometry/*.o
-	rm dmath/*.o
+	-rm *.o
+	-rm **/*.o
+	-rm $(OUTPUT)
 
+.PHONY: all clean
