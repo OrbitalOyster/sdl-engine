@@ -1,7 +1,7 @@
 # Generic Makefile
 
 OUTPUT := game
-WARNINGS := -Wall -Wextra -Wshadow -Wconversion -Warith-conversion -Wfloat-equal -Werror
+WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion -Wfloat-equal -Werror
 STANDART := -std=c11
 OPTIMIZATION := -O2
 DEBUG :=
@@ -35,3 +35,4 @@ clean:
 	-rm $(OUTPUT)
 
 .PHONY: all clean
+
