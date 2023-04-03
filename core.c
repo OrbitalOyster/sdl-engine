@@ -6,7 +6,7 @@ Core* initCore() {
   Core* result = calloc(1, sizeof(Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    ERRF(200, "Unable to initilize SDL: %s\n", SDL_GetError());
+    ERRF(200, "Unable to initilize SDL: %s", SDL_GetError());
     return NULL;
   }
   // Init window
