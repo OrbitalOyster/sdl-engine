@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 
-#include "build.h"
 #include "core.h"
 #include "input.h"
 #include "debug.h"

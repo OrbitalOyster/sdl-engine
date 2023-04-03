@@ -4,11 +4,12 @@ OUTPUT := game
 WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion -Wfloat-equal -Werror
 STANDART := -std=c11
 OPTIMIZATION := -O2
-DEBUG :=
+DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
+DEBUG := -ggdb3 
 
 # Implicit variables
 CC := gcc
-CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DEBUG)
+CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
 LDLIBS := -lSDL2
 
 # All .c files
