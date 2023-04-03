@@ -5,6 +5,7 @@
 
 void registerOnKeyDownFunc(void (*func)());
 void registerOnKeyUpFunc(void (*func)());
-bool processInput();
+bool processInput(bool *quit);
 
 #endif
+

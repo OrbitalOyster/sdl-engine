@@ -1,10 +1,12 @@
 #include "core.h"
 
+#include "debug.h"
+
 Core* initCore() {
   Core* result = calloc(1, sizeof(Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    printf("Unable to initilize SDL: %s\n", SDL_GetError());
+    ERRF(1, "Unable to initilize SDL: %s\n", SDL_GetError());
     return NULL;
   }
   // Init window

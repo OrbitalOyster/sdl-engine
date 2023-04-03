@@ -4,7 +4,7 @@
 #include "ortholine.h"
 #include "point.h"
 
-typedef struct OrthoSegment {
+typedef struct {
   Point *p1;
   Point *p2;
   OrthoLine *line;

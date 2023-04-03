@@ -4,7 +4,7 @@
 #include "orthosegment.h"
 #include "point.h"
 
-typedef struct OrthoRect {
+typedef struct {
   double x;
   double y;
   double w;
@@ -14,3 +14,4 @@ typedef struct OrthoRect {
 } OrthoRect;
 
 #endif
+
