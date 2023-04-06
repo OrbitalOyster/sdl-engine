@@ -12,4 +12,3 @@ Point *createHeapPoint(double x, double y);
 bool comparePoints(Point p1, Point p2);
 
 #endif
-

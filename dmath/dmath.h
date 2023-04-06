@@ -16,4 +16,3 @@ bool more_than(double a, double b);
 bool less_than(double a, double b);
 
 #endif
-

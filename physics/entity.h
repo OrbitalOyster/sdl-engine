@@ -1,0 +1,25 @@
+#ifndef ENTITY_H
+#define ENTITY_H
+
+#include <stdint.h>
+
+#include "../geometry/orthorect.h"
+
+typedef struct {
+  // Dimensions
+  double x;
+  double y;
+  double w;
+  double h;
+  OrthoRect *rect;
+  // Velocity
+  double _vx;
+  double _vy;
+  // Collision parameters
+  uint8_t collisionId;
+  uint8_t collisionGroup;
+} Entity;
+
+Entity *createEntity(double x, double y, double w, double h);
+
+#endif

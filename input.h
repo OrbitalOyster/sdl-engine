@@ -8,4 +8,3 @@ void registerOnKeyUpFunc(void (*func)());
 bool processInput(bool *quit);
 
 #endif
-

@@ -13,5 +13,7 @@ typedef struct {
   OrthoSegment *edges[4];
 } OrthoRect;
 
-#endif
+OrthoRect *createOrthoRect(double x, double y, double w, double h);
+void freeOrthoRect(OrthoRect *rect);
 
+#endif

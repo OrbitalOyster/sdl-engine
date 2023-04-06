@@ -3,37 +3,35 @@
 
 #include <SDL2/SDL.h>
 
-#include "core.h"
-#include "input.h"
 #include "debug.h"
+#include "input.h"
+#include "physics/entity.h"
+#include "physics/prop.h"
+#include "game.h"
 
-bool quit = false;
+Entity *player = NULL;
+Prop *ground = NULL;
 
 void onKeyDown(SDL_Scancode key) {
   INFOF("Key pressed: %i/%c", key, SDL_GetKeyFromScancode(key));
-  if (key == 20) quit = true;
+  if (key == 20)
+    stopGame();
 }
 
 int main() {
-  printf("Starting engine...\n");
-
-  INFO("Info test");
-  WARN("Warn test");
-
-  Core* core = initCore();
-
+  GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
+  if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
 
-  while (!quit) {
-    processInput(&quit);
-    SDL_SetRenderDrawColor(core->renderer, 0x77, 0x77, 0xCC, 0xFF);
-    SDL_RenderClear(core->renderer);
-    SDL_RenderPresent(core->renderer);
-    SDL_Delay(10);
-  }
+  player = createEntity(100, 200, 48, 48);
+  player->collisionId = 1;
 
-  destroyCore(core);
-  printf("Engine closed\n");
+  ground = createProp(10, 300, 100, 32);
+
+  INFOF("Player position: %lf %lf", player->x, player->y);
+  INFOF("Ground position: %lf %lf", ground->x, ground->y);
+
+  startGame();
   return 0;
 }
 

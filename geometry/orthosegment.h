@@ -13,4 +13,3 @@ typedef struct {
 OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2);
 
 #endif
-

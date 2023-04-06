@@ -13,4 +13,3 @@ typedef struct {
 OrthoLine *createHeapOrthoLine(Point p1, Point p2);
 
 #endif
-
