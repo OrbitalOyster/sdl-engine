@@ -53,7 +53,6 @@ void startGame() {
     // Render
     SDL_SetRenderDrawColor(core->renderer, 0x77, 0x77, 0xCC, 0xFF);
     SDL_RenderClear(core->renderer);
-    SDL_RenderPresent(core->renderer);
     renderScene(mainScene, core->renderer);
     SDL_RenderPresent(core->renderer);
 
