@@ -21,6 +21,7 @@ void onKeyDown(SDL_Scancode key) {
     case 26: // w
       break;
     case 7: // d
+      player->_vx += .1;
       break;
     case 22: // s
       break;
@@ -37,6 +38,7 @@ void onKeyUp(SDL_Scancode key) {
     case 26: // w
       break;
     case 7: // d
+      player->_vx -= .1;
       break;
     case 22: // s
       break;

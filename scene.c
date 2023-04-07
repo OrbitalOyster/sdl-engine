@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "debug.h"
+#include "dmath/dmath.h"
 
 Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));
@@ -29,6 +30,19 @@ void addEntityToScene(Scene *scene, Entity *entity) {
   scene->numberOfEntities++;
 }
 
+void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
+  // Nothing to do
+  if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) return;
+
+  moveEntity(entity, entity->_vx * (double) ticksPassed, entity->_vy * (double) ticksPassed);
+
+  if (scene){};
+}
+
+void processScene(Scene* scene, uint64_t ticksPassed) {
+  for (uint32_t i = 0; i < scene->numberOfEntities; i++)
+    processEntity(scene->entities[i], scene, ticksPassed);
+}
 
 void destroyScene(Scene* scene) {
   free(scene);

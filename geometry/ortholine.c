@@ -27,3 +27,11 @@ OrthoLine *createHeapOrthoLine(Point p1, Point p2) {
   return result;
 }
 
+void jumpOrthoLine(OrthoLine *line, double x, double y) {
+  line->xy = line->isVertical ? x : y;
+}
+
+void moveOrthoLine(OrthoLine *line, double dx, double dy) {
+  line->xy += line->isVertical ? dx : dy;
+}
+

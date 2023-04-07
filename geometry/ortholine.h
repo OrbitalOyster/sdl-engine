@@ -11,5 +11,7 @@ typedef struct {
 } OrthoLine;
 
 OrthoLine *createHeapOrthoLine(Point p1, Point p2);
+void jumpOrthoLine(OrthoLine *line, double x, double y);
+void moveOrthoLine(OrthoLine *line, double dx, double dy);
 
 #endif

@@ -11,6 +11,7 @@ Core *core = NULL;
 Scene *mainScene = NULL;
 
 bool quit = false;
+uint64_t lastTick = 0;
 
 bool initGame(GameParameters *gameParameters) {
   core = initCore(gameParameters->screenWidth, gameParameters->screenHeight, gameParameters->title);
@@ -19,6 +20,7 @@ bool initGame(GameParameters *gameParameters) {
     WARN("Unable to start engine");
     return false;
   }
+  resetKeyInput();
   mainScene = initScene();
   return true;
 }
@@ -38,14 +40,24 @@ void renderScene(Scene *scene, SDL_Renderer *renderer) {
 
 void startGame() {
   while (!quit) {
+    // Input
     processInput(&quit);
+    const uint64_t currentTick = SDL_GetTicks();
+    const uint64_t ticksPassed = currentTick - lastTick;
+
+    // Process
+
+    processScene(mainScene, ticksPassed);
+    lastTick = currentTick;
+
+    // Render
     SDL_SetRenderDrawColor(core->renderer, 0x77, 0x77, 0xCC, 0xFF);
     SDL_RenderClear(core->renderer);
     SDL_RenderPresent(core->renderer);
-
     renderScene(mainScene, core->renderer);
-
     SDL_RenderPresent(core->renderer);
+
+    // Delay
     SDL_Delay(10);
   }
 

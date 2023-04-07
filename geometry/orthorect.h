@@ -14,6 +14,8 @@ typedef struct {
 } OrthoRect;
 
 OrthoRect *createOrthoRect(double x, double y, double w, double h);
+void jumpOrthoRect(OrthoRect *rect, double x, double y);
+void moveOrthoRect(OrthoRect *rect, double dx, double dy);
 void freeOrthoRect(OrthoRect *rect);
 
 #endif

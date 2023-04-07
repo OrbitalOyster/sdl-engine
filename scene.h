@@ -19,6 +19,7 @@ typedef struct {
 Scene *initScene();
 void addPropToScene(Scene *scene, Prop *prop);
 void addEntityToScene(Scene *scene, Entity *entity);
+void processScene(Scene* scene, uint64_t ticksPassed);
 void freeScene(Scene *scene);
 
 #endif
