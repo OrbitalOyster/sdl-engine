@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "physics/prop.h"
+#include "scene.h"
 
 typedef struct {
   int32_t screenWidth;
@@ -13,6 +14,7 @@ typedef struct {
 } GameParameters;
 
 bool initGame(GameParameters *gameParameters);
+Scene *getMainScene();
 void startGame();
 void stopGame();
 void destroyGame();

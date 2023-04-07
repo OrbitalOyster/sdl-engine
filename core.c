@@ -6,27 +6,35 @@
 
 Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title) {
   INFO("Initializing SDL");
-  Core *result = calloc(1, sizeof(Core));
+  Core *core = calloc(1, sizeof(Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     WARNF("Unable to initilize SDL: %s", SDL_GetError());
     return NULL;
   }
   // Init window
-  result->window = SDL_CreateWindow(title, WINDOW_POSX, WINDOW_POSY,
+  core->window = SDL_CreateWindow(title, WINDOW_POSX, WINDOW_POSY,
                                     windowWidth, windowHeight, WINDOW_FLAGS);
-  if (!result->window) {
+  if (!core->window) {
     WARNF("Unable to create window: %s", SDL_GetError());
     return NULL;
   }
   // Init renderer
-  result->renderer = SDL_CreateRenderer(result->window, -1, RENDERER_FLAGS);
-  if (!result->renderer) {
+  core->renderer = SDL_CreateRenderer(core->window, -1, RENDERER_FLAGS);
+  if (!core->renderer) {
     WARNF("Unable to create SDL renderer: %s", SDL_GetError());
     return NULL;
   }
   // Done
-  return result;
+  return core;
+}
+
+void drawRect(SDL_Renderer* renderer, double x, double y, double w, double h) {
+  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+  SDL_FRect *tmp = calloc(1, sizeof(SDL_FRect));
+  *tmp = (SDL_FRect) {.x = (float) x, .y = (float) y, .w = (float) w, .h = (float) h};
+  SDL_RenderDrawRectF(renderer, tmp);
+  free(tmp);
 }
 
 void destroyCore(Core *core) {
