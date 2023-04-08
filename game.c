@@ -57,7 +57,7 @@ void startGame() {
     SDL_RenderPresent(core->renderer);
 
     // Delay
-    SDL_Delay(10);
+    SDL_Delay(50);
   }
 
   destroyGame();

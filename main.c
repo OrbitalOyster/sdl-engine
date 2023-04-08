@@ -19,13 +19,16 @@ void onKeyDown(SDL_Scancode key) {
       stopGame();
       break;
     case 26: // w
+      player->_vy -= .13;
       break;
     case 7: // d
-      player->_vx += .1;
+      player->_vx += .13;
       break;
     case 22: // s
+      player->_vy += .13;
       break;
     case 4: // a
+      player->_vx -= .13;
       break;
     default:
       break;
@@ -36,13 +39,16 @@ void onKeyUp(SDL_Scancode key) {
   INFOF("Key released: %i/%c", key, SDL_GetKeyFromScancode(key));
   switch (key) {
     case 26: // w
+      player->_vy += .13;
       break;
     case 7: // d
-      player->_vx -= .1;
+      player->_vx -= .13;
       break;
     case 22: // s
+      player->_vy -= .13;
       break;
     case 4: // a
+      player->_vx += .13;
       break;
     default:
       break;
