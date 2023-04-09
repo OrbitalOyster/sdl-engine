@@ -23,3 +23,36 @@ OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2) {
   return result;
 }
 
+bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2, bool excludeEndPoints) {
+  /* Special case TODO: Isn't this an error? */
+//  if (compareOrthoSegments(s1, s2))
+//    return true;
+
+  return compareOrthoLines(*(s1.line), *(s2.line)) &&
+         (pointBelongsToOrthoSegment(*(s1.p1), s2, excludeEndPoints) ||
+          pointBelongsToOrthoSegment(*(s1.p2), s2, excludeEndPoints) ||
+          pointBelongsToOrthoSegment(*(s2.p1), s1, excludeEndPoints) ||
+          pointBelongsToOrthoSegment(*(s2.p2), s1, excludeEndPoints));
+}
+
+bool checkOrthoSegmentsIntersecting(OrthoSegment s1, OrthoSegment s2, bool excludeEndPoints) {
+  Point p = getOrthoLinesIntersection(*s1.line, *s2.line);
+
+  return pointBelongsToOrthoSegment(p, s1, excludeEndPoints) &&
+         pointBelongsToOrthoSegment(p, s2, excludeEndPoints);
+}
+
+bool pointBelongsToOrthoSegment(Point p, OrthoSegment s,
+                                bool excludeEndPoints) {
+  if (!pointBelongsToOrthoLine(p, *(s.line)))
+    return false;
+
+  // Check end points
+  if ((comparePoints(p, *(s.p1)) || comparePoints(p, *(s.p2))))
+    return !excludeEndPoints;
+
+  // Complicated math
+  return lessThan((s.p1->x - p.x) * (s.p2->x - p.x), 0) &&
+         lessThan((s.p1->y - p.y) * (s.p2->y - p.y), 0);
+}
+

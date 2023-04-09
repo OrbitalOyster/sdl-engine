@@ -11,5 +11,7 @@ typedef struct {
 } OrthoSegment;
 
 OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2);
+bool checkOrthoSegmentsIntersecting(OrthoSegment s1, OrthoSegment s2, bool excludeEndPoints);
+bool pointBelongsToOrthoSegment(Point p, OrthoSegment s, bool excludeEndPoints);
 
 #endif

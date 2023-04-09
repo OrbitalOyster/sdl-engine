@@ -12,7 +12,9 @@
 #define DMATH_MIN -1000000000.0
 
 bool compare(double a, double b);
-bool more_than(double a, double b);
-bool less_than(double a, double b);
+bool moreThan(double a, double b);
+bool lessThan(double a, double b);
+bool moreEqThan(double a, double b);
+bool lessEqThan(double a, double b);
 
 #endif

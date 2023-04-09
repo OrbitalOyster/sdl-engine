@@ -15,7 +15,7 @@ void jumpEntity(Entity *entity, double x, double y) {
   entity->x = x;
   entity->y = y;
   jumpOrthoRect(entity->rect, x, y);
-  INFOF("Jumped entity to (%.20f %.20f)", entity->x, entity->y);
+  INFOF("Jumped entity to (%.8f %.8f)", entity->x, entity->y);
 //  printf("Jumped rect: %.20f %.20f\n", entity->rect->x, entity->rect->y);
 }
 
@@ -23,7 +23,7 @@ void moveEntity(Entity *entity, double dx, double dy) {
   entity->x += dx;
   entity->y += dy;
   moveOrthoRect(entity->rect, dx, dy);
-  INFOF("Moved entity by (%.20f %.20f) to (%.20f %.20f)", dx, dy, entity->x, entity->y);
+  INFOF("Moved entity by (%.8f %.8f) to (%.8f %.8f)", dx, dy, entity->x, entity->y);
   //printf("Moved rect: %.20f %.20f\n", entity->rect->x, entity->rect->y);
 }
 

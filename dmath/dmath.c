@@ -8,7 +8,7 @@
 
 // TODO: Handle INFINITY and NAN
 
-void check_values(double a, double b) {
+void checkValues(double a, double b) {
   if (a > DMATH_MAX || b > DMATH_MAX)
     WARN("dmath out of bounds");
 
@@ -17,21 +17,35 @@ void check_values(double a, double b) {
 }
 
 bool compare(double a, double b) {
-  check_values(a, b);
+  checkValues(a, b);
   return fabs(a - b) < DMATH_EPSILON;
 }
 
-bool more_than(double a, double b) {
-  check_values(a, b);
+bool moreThan(double a, double b) {
+  checkValues(a, b);
   if (compare(a, b))
     return false;
   return a > b;
 }
 
-bool less_than(double a, double b) {
-  check_values(a, b);
+bool lessThan(double a, double b) {
+  checkValues(a, b);
   if (compare(a, b))
     return false;
+  return a < b;
+}
+
+bool moreEqThan(double a, double b) {
+  checkValues(a, b);
+  if (compare(a, b))
+    return true;
+  return a > b;
+}
+
+bool lessEqThan(double a, double b) {
+  checkValues(a, b);
+  if (compare(a, b))
+    return true;
   return a < b;
 }
 

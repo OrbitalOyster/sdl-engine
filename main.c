@@ -61,10 +61,12 @@ int main() {
   registerOnKeyDownFunc(onKeyDown);
   registerOnKeyUpFunc(onKeyUp);
 
-  player = createEntity(120, 100, 48, 48);
+  player = createEntity(120, 200 - 48, 48, 48);
   player->collisionId = 1;
+  player->collisionMask = 2;
 
   ground = createProp(100, 200, 250, 32);
+  ground->collisionId = 2;
 
   INFOF("Player position: %lf %lf", player->x, player->y);
   INFOF("Ground position: %lf %lf", ground->x, ground->y);

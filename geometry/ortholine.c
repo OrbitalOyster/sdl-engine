@@ -27,6 +27,10 @@ OrthoLine *createHeapOrthoLine(Point p1, Point p2) {
   return result;
 }
 
+bool compareOrthoLines(OrthoLine l1, OrthoLine l2) {
+  return l1.isVertical == l2.isVertical && compare(l1.xy, l2.xy);
+}
+
 void jumpOrthoLine(OrthoLine *line, double x, double y) {
   line->xy = line->isVertical ? x : y;
 }
@@ -35,3 +39,7 @@ void moveOrthoLine(OrthoLine *line, double dx, double dy) {
   line->xy += line->isVertical ? dx : dy;
 }
 
+bool pointBelongsToOrthoLine(Point p, OrthoLine l) {
+  // printf("DEBUG1: %.20f %.20f %.20f\n", p.x, p.y, l.xy);
+  return l.isVertical ? compare(p.x, l.xy) : compare(p.y, l.xy);
+}

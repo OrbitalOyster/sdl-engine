@@ -30,13 +30,25 @@ void addEntityToScene(Scene *scene, Entity *entity) {
   scene->numberOfEntities++;
 }
 
+uint64_t stepEntity(Entity* entity, Scene* scene, uint64_t ticksPassed) {
+  double vx = entity->_vx;
+  double vy = entity->_vy;
+  moveEntity(entity, vx * (double) ticksPassed, vy * (double) ticksPassed);
+  if (scene){};
+  return ticksPassed;
+}
+
+
 void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
   // Nothing to do
   if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) return;
 
-  moveEntity(entity, entity->_vx * (double) ticksPassed, entity->_vy * (double) ticksPassed);
-
-  if (scene){};
+  uint8_t steps = 5;
+  while (ticksPassed) {
+    if (!--steps)
+      ERR(1, "TOO MANY STEPS");
+    ticksPassed -= stepEntity(entity, scene, ticksPassed);
+  }
 }
 
 void processScene(Scene* scene, uint64_t ticksPassed) {

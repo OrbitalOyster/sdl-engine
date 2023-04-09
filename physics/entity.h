@@ -17,7 +17,7 @@ typedef struct {
   double _vy;
   // Collision parameters
   uint8_t collisionId;
-  uint8_t collisionGroup;
+  uint8_t collisionMask;
 } Entity;
 
 Entity *createEntity(double x, double y, double w, double h);

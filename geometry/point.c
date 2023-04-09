@@ -1,8 +1,9 @@
 #include "point.h"
 
-#include "../dmath/dmath.h"
-
 #include <stdlib.h>
+
+#include "ortholine.h"
+#include "../dmath/dmath.h"
 
 Point *createHeapPoint(double x, double y) {
   Point *result = calloc(1, sizeof(Point));
