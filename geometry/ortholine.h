@@ -15,5 +15,6 @@ bool compareOrthoLines(OrthoLine l1, OrthoLine l2);
 void jumpOrthoLine(OrthoLine *line, double x, double y);
 void moveOrthoLine(OrthoLine *line, double dx, double dy);
 bool pointBelongsToOrthoLine(Point p, OrthoLine l);
+Point getOrthoLinesIntersection(OrthoLine l1, OrthoLine l2);
 
 #endif

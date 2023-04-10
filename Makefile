@@ -10,7 +10,7 @@ DEBUG := -ggdb3
 # Implicit variables
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
-LDLIBS := -lSDL2
+LDLIBS := -lm -lSDL2
 
 # All .c files
 C_FILES := $(wildcard *.c) $(wildcard **/*.c)
