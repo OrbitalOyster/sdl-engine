@@ -17,8 +17,10 @@ typedef enum {
 
 typedef struct {
   OrtoRectCollisionType type;
-  uint8_t borderCollisionMask;
+  uint8_t edgeCollisionMask;
   uint16_t orthoCollisionMask;
 } OrthoRectCollision;
+
+OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2);
 
 #endif

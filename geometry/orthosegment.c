@@ -52,7 +52,7 @@ bool pointBelongsToOrthoSegment(Point p, OrthoSegment s,
     return !excludeEndPoints;
 
   // Complicated math
-  return lessThan((s.p1->x - p.x) * (s.p2->x - p.x), 0) &&
-         lessThan((s.p1->y - p.y) * (s.p2->y - p.y), 0);
+  return lessEqThan((s.p1->x - p.x) * (s.p2->x - p.x), 0) &&
+         lessEqThan((s.p1->y - p.y) * (s.p2->y - p.y), 0);
 }
 

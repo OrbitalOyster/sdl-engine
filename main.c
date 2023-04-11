@@ -9,6 +9,8 @@
 #include "physics/prop.h"
 #include "game.h"
 
+#include "geometry/collisions.h"
+
 Entity *player = NULL;
 Prop *ground = NULL;
 
