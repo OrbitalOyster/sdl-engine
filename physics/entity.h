@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../geometry/orthorect.h"
+// #include "../physics/collisions.h"
 
 typedef struct {
   // Dimensions
@@ -18,6 +19,8 @@ typedef struct {
   // Collision parameters
   uint8_t collisionId;
   uint8_t collisionMask;
+  
+  EntityCollisionState* collisionState;
 } Entity;
 
 Entity *createEntity(double x, double y, double w, double h);

@@ -39,6 +39,7 @@ void renderScene(Scene *scene, SDL_Renderer *renderer) {
 }
 
 void startGame() {
+  initSceneCollisions(mainScene);
   while (!quit) {
     // Input
     processInput(&quit);

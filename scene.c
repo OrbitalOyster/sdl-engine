@@ -30,6 +30,11 @@ void addEntityToScene(Scene *scene, Entity *entity) {
   scene->numberOfEntities++;
 }
 
+void initSceneCollisions(Scene *scene) {
+  for (uint32_t i = 0; i < scene->numberOfEntities; i++)                          
+    scene->entities[i]->collisionState = getEntityCollisionState(scene->entities[i], scene);
+}
+
 uint64_t stepEntity(Entity* entity, Scene* scene, uint64_t ticksPassed) {
   double vx = entity->_vx;
   double vy = entity->_vy;
