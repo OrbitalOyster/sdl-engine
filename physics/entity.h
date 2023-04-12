@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "../geometry/orthorect.h"
-// #include "../physics/collisions.h"
+#include "../physics/entitycollisions.h"
 
 typedef struct {
   // Dimensions

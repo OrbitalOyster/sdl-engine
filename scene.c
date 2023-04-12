@@ -4,6 +4,7 @@
 
 #include "debug.h"
 #include "dmath/dmath.h"
+#include "physics/collisions.h"
 
 Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));

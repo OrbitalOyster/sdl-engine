@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "input.h"
 #include "scene.h"
+#include "physics/collisions.h"
 
 Core *core = NULL;
 Scene *mainScene = NULL;
