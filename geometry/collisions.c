@@ -9,6 +9,33 @@
 
 // ============================================================================
 
+// Returns true if two interlasing segments will change collision state in next
+// moment
+bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
+                                       double vx, double vy) {
+#ifdef GEOMETRY_DEBUG
+  if (s1.line->isVertical != s2.line->isVertical)
+    WARN("Segments are not parallel");
+  if (!checkOrthoSegmentsInterlacing(s1, s2, false))
+    WARN("Segments are not interlacing");
+  if (compare(vx, 0) && compare(vy, 0))
+    printf("vx == 0 && vy == 0");
+#endif
+
+  if ((s1.line->isVertical && !compare(vx, 0)) ||
+      (!s1.line->isVertical && !compare(vy, 0)))
+    return true;
+
+  if (s1.line->isVertical)
+    return (s1.p1->y - s2.p1->y) * vy >= 0 && (s1.p1->y - s2.p2->y) * vy >= 0 &&
+           (s1.p2->y - s2.p1->y) * vy >= 0 && (s1.p2->y - s2.p2->y) * vy >= 0;
+  else
+    return (s1.p1->x - s2.p1->x) * vx >= 0 && (s1.p1->x - s2.p2->x) * vx >= 0 &&
+           (s1.p2->x - s2.p1->x) * vx >= 0 && (s1.p2->x - s2.p2->x) * vx >= 0;
+}
+
+// ============================================================================
+
 bool checkOrthoRectsSeparated(OrthoRect *r1, OrthoRect *r2) {
   return moreEqThan(r1->y, r2->y + r2->h) || lessEqThan(r1->x + r1->w, r2->x) ||
          lessEqThan(r1->y + r1->h, r2->y) || moreEqThan(r1->x, r2->x + r2->w);
@@ -92,6 +119,30 @@ OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
     }
   }
 
+  return result;
+}
+
+uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
+                                                    OrthoRect *r2, double vx1,
+                                                    double vy1, double vx2,
+                                                    double vy2) {
+  double vx = vx1 - vx2;
+  double vy = vy1 - vy2;
+  uint8_t result = 0;
+  if (compare(vx, 0) && compare(vy, 0))
+    return result;
+  for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t j = 0; j < 2; j++) {
+      uint8_t k = (uint8_t)(i + j * 2) % 4;
+      OrthoSegment *s1 = r1->edges[i];
+      OrthoSegment *s2 = r2->edges[k];
+      if (!checkOrthoSegmentsInterlacing(*s1, *s2, false))
+        continue;
+      if (checkOrthoSegmentsAboutToDecouple(*s1, *s2, vx, vy)) {
+        result |= (uint8_t)pow(2, i);
+        result |= (uint8_t)(pow(2, k) * 16);
+      }
+    }
   return result;
 }
 

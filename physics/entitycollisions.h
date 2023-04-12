@@ -1,17 +1,10 @@
 #ifndef ENTITY_COLLISIONS_H
 #define ENTITY_COLLISIONS_H
 
-#include "../geometry/collisions.h"
-#include "prop.h"
+#include "entitycollisionstate.h"
+#include "entity.h"
+#include "../scene.h"
 
-typedef struct {
-  Prop* prop;
-  OrthoRectCollision orthoRectCollision;
-} EntityCollision;
-
-typedef struct {
-  uint8_t size;
-  EntityCollision** collisions;
-} EntityCollisionState;
+EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
 
 #endif

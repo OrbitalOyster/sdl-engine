@@ -22,5 +22,9 @@ typedef struct {
 } OrthoRectCollision;
 
 OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2);
-
+uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
+                                                    OrthoRect *r2, double vx1,
+                                                    double vy1, double vx2,
+                                                    double vy2);
+ 
 #endif
