@@ -6,5 +6,6 @@
 #include "../scene.h"
 
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
+EntityNextCollisionChange getEntityImmediateCollisionChange(Entity *entity, double vx, double vy);
 
 #endif

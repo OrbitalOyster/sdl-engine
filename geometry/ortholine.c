@@ -31,6 +31,13 @@ bool compareOrthoLines(OrthoLine l1, OrthoLine l2) {
   return l1.isVertical == l2.isVertical && compare(l1.xy, l2.xy);
 }
 
+bool compareLineOrthoLine(Line l1, OrthoLine l2) {
+  if (l2.isVertical)
+    return compare(l2.xy, l1.x0);
+  else
+    return compare(l2.xy, l1.y0);
+}
+
 void jumpOrthoLine(OrthoLine *line, double x, double y) {
   line->xy = line->isVertical ? x : y;
 }
@@ -54,3 +61,16 @@ Point getOrthoLinesIntersection(OrthoLine l1, OrthoLine l2) {
   else
     return (Point) {.x = l2.xy, .y = l1.xy};
 }
+
+Point getOrthoLineLineIntersection(OrthoLine l1, Line l2) {
+#ifdef GEOMETRY_DEBUG
+  if ((l1.isVertical && l2.k == INFINITY) || (!l1.isVertical && l2.k == 0))
+    WARN("Parallel lines");
+#endif
+  if (l1.isVertical)
+    return (Point){.x = l1.xy, .y = getLineY(l2, l1.xy)};
+  else
+    return (Point){.x = getLineX(l2, l1.xy), .y = l1.xy};
+}
+
+

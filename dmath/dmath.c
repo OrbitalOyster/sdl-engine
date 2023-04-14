@@ -6,9 +6,11 @@
 
 #include "../debug.h"
 
-// TODO: Handle INFINITY and NAN
+// TODO: Handle NAN
 
 void checkValues(double a, double b) {
+  if (isnan(a) || isnan(b)) WARN("Unhandled NAN");
+
   if (a > DMATH_MAX || b > DMATH_MAX)
     WARN("dmath out of bounds");
 
@@ -17,8 +19,10 @@ void checkValues(double a, double b) {
 }
 
 bool compare(double a, double b) {
-  checkValues(a, b);
-  return fabs(a - b) < DMATH_EPSILON;
+  if (isfinite(a) && isfinite(b)) {
+    checkValues(a, b);
+    return fabs(a - b) < DMATH_EPSILON;
+  } else return isinf(a) && isinf(b);
 }
 
 bool moreThan(double a, double b) {

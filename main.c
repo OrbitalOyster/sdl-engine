@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 #include "debug.h"
+#include "dmath/dmath.h"
 #include "input.h"
 #include "physics/entity.h"
 #include "physics/prop.h"
@@ -59,6 +60,10 @@ void onKeyUp(SDL_Scancode key) {
 }
 
 int main() {
+
+  INFOF("DEBUG: %i", moreThan(1, INFINITY));
+  INFOF("DEBUG: %i", lessThan(-INFINITY, INFINITY));
+
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);

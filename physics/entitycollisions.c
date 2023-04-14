@@ -1,7 +1,9 @@
 #include "entitycollisions.h"
 
+#include <math.h>
 #include <stdlib.h>
 
+#include "../dmath/dmath.h"
 #include "../debug.h"
 
 EntityCollisionState *createEmptyHeapEntityCollisionState() {
@@ -50,23 +52,67 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
   return result;
 }
 
-EntityNextCollisionChange getEntityImmediateCollisionChange(Entity *entity,
-                                                                 double vx,
-                                                                 double vy) {
+EntityNextCollisionChange
+getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
   EntityNextCollisionChange result = {.time = 0, .size = 0, .changes = NULL};
 
   // TODO: Proper memory allocation
   result.changes = calloc(10, sizeof(EntityNextCollisionChange));
 
   for (uint8_t i = 0; i < entity->collisionState->size; i++) {
-    Prop* prop = entity->collisionState->collisions[i]->prop;
-    uint8_t mask = getMovingOrthoRectsImmediateCollisionChange(entity->rect, prop->rect, vx, vy, 0, 0);
+    Prop *prop = entity->collisionState->collisions[i]->prop;
+    uint8_t mask = getMovingOrthoRectsImmediateCollisionChange(
+        entity->rect, prop->rect, vx, vy, 0, 0);
     if (mask) {
-      EntityCollisionChange ncc = {.previous = entity->collisionState->collisions[i], .mask = mask, .prop = prop};
+      EntityCollisionChange ncc = {.previous =
+                                       entity->collisionState->collisions[i],
+                                   .mask = mask,
+                                   .prop = prop};
       result.changes[result.size++] = ncc;
     }
   }
 
   return result;
 }
+
+EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene *scene,
+                                                 double vx, double vy) {
+  EntityNextCollisionChange result = {
+      .time = INFINITY, .size = 0, .changes = NULL};
+
+  // TODO: Proper memory allocation
+  result.changes = calloc(10, sizeof(EntityCollisionChange));
+
+  for (uint32_t i = 0; i < scene->numberOfProps; i++) {
+    Prop *prop = scene->props[i];
+    OrthoRectCollisionChange cc = getMovingOrthoRectsNextCollisionChange(
+        entity->rect, prop->rect, vx, vy, 0, 0);
+    // Skip
+    // printf("EPSILON: %.20f, %.20f\n", cc.time, result.time);
+    if (compare(cc.time, INFINITY) || moreThan(cc.time,result.time)) {
+      // puts("> || INFINITY");
+      continue;
+    }
+    EntityCollisionChange ncc = {.mask = cc.mask, .prop = prop};
+    // New candidate
+    if (cc.time < result.time) {
+      // puts("<");
+      free(result.changes);
+      result.time = cc.time;
+      result.size = 1;
+      result.changes = calloc(10, sizeof(EntityCollisionChange));
+
+
+      ncc.previous = checkCollisionStateIncludesProp(entity->collisionState, prop);
+
+      result.changes[0] = ncc;
+    } else { // cc.time == result.time
+      // puts("==");
+      result.changes[result.size++] = ncc;
+    }
+  }
+
+  return result;
+}
+
 

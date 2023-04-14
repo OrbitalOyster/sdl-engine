@@ -6,6 +6,68 @@
 #include "../dmath/dmath.h"
 #include "orthosegment.h"
 #include "point.h"
+#include "line.h"
+
+// ============================================================================
+
+// Returns time before moving p1 will collide with static p2
+double getMovingPointPointCollisionTime(Point p1, Point p2, double vx, double vy) {
+
+// Special case
+if (comparePoints(p1, p2)) return 0;
+
+#ifdef GEOMETRY_DEBUG
+  double k1 = (p2.y - p1.y) / (p2.x - p1.x);
+  if (k1 == -INFINITY)
+    k1 = INFINITY;
+  double k2 = vy / vx;
+  if (k2 == -INFINITY)
+    k2 = INFINITY;
+  if (!(k1 == INFINITY && k2 == INFINITY) && !compare(k1, k2))
+    WARNF("Points are not alligned: %f, %f", k1, k2);
+#endif
+  double k = vy / vx;
+  double result = (fabs(k) > 1) ? (p2.y - p1.y) / vy : (p2.x - p1.x) / vx;
+  return result < 0 ? INFINITY : result;
+}
+
+double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
+                                              OrthoSegment s,
+                                              bool excludeEndPoints) {
+
+  // printf("DEBUG: p: %f %f, s: %f %f %f %f\n", p.x, p.y, s.p1->x, s.p1->y, s.p2->x, s.p2->y);
+
+  // Special case
+  if (pointBelongsToOrthoSegment(p, s, excludeEndPoints))
+    return 0;
+
+  // Point's velocity "vector"
+  Point vp = {.x = p.x + vx, .y = p.y + vy};
+  Line vl = createLineFromPoints(p, vp);
+
+  // Point is moving parallel to the segment
+  if ((s.line->isVertical && compare(vl.k, INFINITY)) ||
+      (!s.line->isVertical && compare(vl.k, 0))) {
+    if (!compareLineOrthoLine(vl, *s.line))
+      return INFINITY;
+    double t1 = getMovingPointPointCollisionTime(p, *s.p1, vx, vy);
+    double t2 = getMovingPointPointCollisionTime(p, *s.p2, vx, vy);
+    return t1 < t2 ? t1 : t2;
+  }
+
+  double result = INFINITY;
+
+  Point ip = getOrthoLineLineIntersection(*s.line, vl);
+
+  if (pointBelongsToOrthoSegment(ip, s, excludeEndPoints))
+    result = getMovingPointPointCollisionTime(p, ip, vx, vy);
+
+  // Point moving away from segment
+  if (lessThan(result, 0))
+    result = INFINITY;
+
+  return result;
+}
 
 // ============================================================================
 
@@ -34,7 +96,72 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
            (s1.p2->x - s2.p1->x) * vx >= 0 && (s1.p2->x - s2.p2->x) * vx >= 0;
 }
 
+double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2, double vx, double vy) {
+#ifdef GEOMETRY_DEBUG
+  if (s1.line->isVertical != s2.line->isVertical)
+    WARN("Segments are not parallel");
+  if (checkOrthoSegmentsInterlacing(s1, s2, false))
+    WARN("Segments are interlacing");
+#endif
+
+  double result = INFINITY;
+
+  double intermediate[4] = {
+      getMovingPointOrthoSegmentIntersection(*(s1.p1), vx, vy, s2, false),
+      getMovingPointOrthoSegmentIntersection(*(s1.p2), vx, vy, s2, false),
+      getMovingPointOrthoSegmentIntersection(*(s2.p1), -vx, -vy, s1, false),
+      getMovingPointOrthoSegmentIntersection(*(s2.p2), -vx, -vy, s1, false),
+  };
+
+  for (uint8_t i = 0; i < 4; i++)
+    if (lessThan(intermediate[i], result))
+      result = intermediate[i];
+
+  return result;
+}
+
+
 // ============================================================================
+
+// NOTE: Only works for separated rects, otherwise returns BLR_RMT_CONVERGE
+RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
+                                                       OrthoRect *r2,
+                                                       double vx1, double vy1,
+                                                       double vx2, double vy2) {
+  double vx = vx1 - vx2;
+  double vy = vy1 - vy2;
+
+  if (compare(vx, 0) && compare(vy, 0))
+    return RMT_NONE;
+
+  if ((moreEqThan(r1->y, r2->y + r2->h) && moreThan(vy, 0)) ||
+      (lessEqThan(r1->x + r1->w, r2->x) && lessThan(vx, 0)) ||
+      (lessEqThan(r1->y + r1->h, r2->y) && lessThan(vy, 0)) ||
+      (moreEqThan(r1->x, r2->x + r2->w) && moreThan(vx, 0)))
+    return RMT_DIVERGE;
+
+  /* Horizontal movement */
+  if (compare(vy, 0)) {
+    if (moreThan(r1->y, r2->y + r2->h) || lessThan(r1->y + r1->h, r2->y))
+      return RMT_DIVERGE;
+
+    if (compare(r1->edges[0]->line->xy, r2->edges[2]->line->xy) ||
+        compare(r1->edges[2]->line->xy, r2->edges[0]->line->xy))
+      return RMT_SLIP;
+  }
+
+  /* Vertical movement */
+  if (compare(vx, 0)) {
+    if (lessThan(r1->x + r1->w, r2->x) || moreThan(r1->x, r2->x + r2->w))
+      return RMT_DIVERGE;
+
+    if (compare(r1->edges[1]->line->xy, r2->edges[3]->line->xy) ||
+        compare(r1->edges[3]->line->xy, r2->edges[1]->line->xy))
+      return RMT_SLIP;
+  }
+
+  return RMT_CONVERGE;
+}
 
 bool checkOrthoRectsSeparated(OrthoRect *r1, OrthoRect *r2) {
   return moreEqThan(r1->y, r2->y + r2->h) || lessEqThan(r1->x + r1->w, r2->x) ||
@@ -145,4 +272,43 @@ uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
     }
   return result;
 }
+
+// Returns time and "couple" mask
+OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
+                                                    OrthoRect *r2, double vx1,
+                                                    double vy1, double vx2,
+                                                    double vy2) {
+  double vx = vx1 - vx2;
+  double vy = vy1 - vy2;
+  OrthoRectCollisionChange result = {.time = INFINITY, .mask = 0};
+  if (compare(vx, 0) && compare(vy, 0))
+    return result;
+  for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t j = 0; j < 2; j++) {
+      uint8_t k = (uint8_t) (i + j * 2) % 4;
+      OrthoSegment *s1 = r1->edges[i];
+      OrthoSegment *s2 = r2->edges[k];
+      if (checkOrthoSegmentsInterlacing(*s1, *s2, false))
+        continue;
+      double time = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
+
+      if (compare(time, 0)) {
+        puts("FUCK!!!");
+        exit(0);
+      }
+
+      // printf("DEBUG: %i, %i: %f\n", i, k, time);
+
+      if (compare(time, result.time)) {
+        result.mask |= (uint8_t) pow(2, i);
+        result.mask |= (uint8_t) ( pow(2, k) * 16 );
+      }
+      else if (lessThan(time, result.time)) {
+        result.time = time;
+        result.mask = (uint8_t) (pow(2, i) + /*(uint8_t)*/ pow(2, k) * 16);
+      }
+    }
+  return result;
+}
+
 
