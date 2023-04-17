@@ -9,7 +9,8 @@
 // TODO: Handle NAN
 
 void checkValues(double a, double b) {
-  if (isnan(a) || isnan(b)) WARN("Unhandled NAN");
+  if (isnan(a) || isnan(b))
+    WARN("Unhandled NAN");
 
   if (a > DMATH_MAX || b > DMATH_MAX)
     WARN("dmath out of bounds");
@@ -22,32 +23,34 @@ bool compare(double a, double b) {
   if (isfinite(a) && isfinite(b)) {
     checkValues(a, b);
     return fabs(a - b) < DMATH_EPSILON;
-  } else return isinf(a) && isinf(b);
+  } else
+    return isinf(a) && isinf(b) && !((a < 0) ^ (b < 0));
+}
+
+bool compareFinite(double a, double b) {
+  checkValues(a, b);
+  return fabs(a - b) < DMATH_EPSILON;
 }
 
 bool moreThan(double a, double b) {
-  checkValues(a, b);
-  if (compare(a, b))
+  if (isfinite(a) && isfinite(b) && compareFinite(a, b))
     return false;
   return a > b;
 }
 
 bool lessThan(double a, double b) {
-  checkValues(a, b);
-  if (compare(a, b))
+  if (isfinite(a) && isfinite(b) && compareFinite(a, b))
     return false;
   return a < b;
 }
 
 bool moreEqThan(double a, double b) {
-  checkValues(a, b);
   if (compare(a, b))
     return true;
   return a > b;
 }
 
 bool lessEqThan(double a, double b) {
-  checkValues(a, b);
   if (compare(a, b))
     return true;
   return a < b;
