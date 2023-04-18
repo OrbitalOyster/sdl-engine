@@ -49,11 +49,10 @@ uint8_t getCleanMask(uint8_t mask) {
 }
 
 void foo2(OrthoRect* r1, OrthoRect* r2, double *vx, double *vy, uint8_t collisionChangeMask) {
-  INFOF("foo2 mask: %u", collisionChangeMask);
+  WARNF("foo2 mask: %u", collisionChangeMask);
   RelativeMovementType rmt = getOrthoRectsRelativeMovementType(r1, r2, *vx, *vy, 0, 0);
-  uint8_t cleanMask = getCleanMask(collisionChangeMask);
-  //uint8_t cleanMask = collisionChangeMask;
-
+  //uint8_t cleanMask = getCleanMask(collisionChangeMask);
+  uint8_t cleanMask = collisionChangeMask;
   if (rmt == RMT_CONVERGE) {
     if (cleanMask & (130 + 40))
       *vx = 0;
@@ -72,6 +71,7 @@ uint64_t stepEntity(Entity* entity, Scene* scene, uint64_t ticksPassed) {
 
   // Step 1: check for immediate changes
   INFO("Getting immediate collision change: ");
+  // TODO: Don't need EntityNextCollisionChange type here
   EntityNextCollisionChange eicc = getEntityImmediateCollisionChange(entity, vx, vy);
   // Call entity if any changes found
   if (eicc.size) {
@@ -87,9 +87,41 @@ uint64_t stepEntity(Entity* entity, Scene* scene, uint64_t ticksPassed) {
     }
   } 
 
-  moveEntity(entity, vx * (double) ticksPassed, vy * (double) ticksPassed);
-  if (scene){};
-  return ticksPassed;
+  // Step 2: check for next collison change
+  EntityNextCollisionChange nextCollision =
+      getEntityNextCollisionChange(entity, scene, vx, vy);
+
+
+
+
+
+ // Collision change
+  if (lessEqThan(nextCollision.time, (double) ticksPassed)) {
+    moveEntity(entity, vx * nextCollision.time, vy * nextCollision.time);
+//    for (uint8_t i = 0; i < nextCollision.size; i++)
+//      entity->onCollisionChange(nextCollision.changes[i]);
+    entity->collisionState = getEntityCollisionState(entity, scene);
+    return (uint64_t) nextCollision.time;
+  }
+  // End of step
+  else {
+    moveEntity(entity, vx * (double) ticksPassed, vy * (double) ticksPassed);
+
+    if (eicc.size)
+      entity->collisionState = getEntityCollisionState(entity, scene);
+
+    return ticksPassed;
+  }
+
+
+
+
+
+
+
+//  moveEntity(entity, vx * (double) ticksPassed, vy * (double) ticksPassed);
+//  if (scene){};
+//  return ticksPassed;
 }
 
 

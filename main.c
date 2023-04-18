@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "binary.h"
 #include "debug.h"
 #include "dmath/dmath.h"
 #include "input.h"
@@ -60,6 +61,12 @@ void onKeyUp(SDL_Scancode key) {
 }
 
 int main() {
+
+  int n = 128;
+  char *bin = int8ToBinary(n);
+  INFOF("Binary test: %i, %s", n, bin);
+  free(bin);
+
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
