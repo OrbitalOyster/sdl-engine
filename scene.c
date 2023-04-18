@@ -94,17 +94,14 @@ uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
     }
   }
 
-  // Step 2: check for next collison change
-  EntityNextCollisionChange nextCollision =
-      getEntityNextCollisionChange(entity, scene, vx, vy);
+  // Step 2: get time until next collision change 
+  double timeUntilNextCollision = getEntityNextCollisionTime(entity, scene, vx, vy);
 
   // Collision change
-  if (lessEqThan(nextCollision.time, (double)ticksPassed)) {
-    moveEntity(entity, vx * nextCollision.time, vy * nextCollision.time);
-    //    for (uint8_t i = 0; i < nextCollision.size; i++)
-    //      entity->onCollisionChange(nextCollision.changes[i]);
+  if (lessEqThan(timeUntilNextCollision, (double)ticksPassed)) {
+    moveEntity(entity, vx * timeUntilNextCollision, vy * timeUntilNextCollision);
     entity->collisionState = getEntityCollisionState(entity, scene);
-    return (uint64_t)nextCollision.time;
+    return (uint64_t)timeUntilNextCollision;
   }
   // End of step
   else {

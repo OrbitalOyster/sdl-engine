@@ -73,6 +73,19 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
   return result;
 }
 
+double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx, double vy) {
+  double result = INFINITY;
+
+  for (uint32_t i = 0; i < scene->numberOfProps; i++) {
+    Prop *prop = scene->props[i];
+    double t = getMovingOrthoRectsNextCollisionTime(entity->rect, prop->rect, vx, vy, 0, 0);
+    if (lessThan(t, result)) result = t;
+  }
+
+  return result;
+}
+
+/*
 EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene *scene,
                                                  double vx, double vy) {
   EntityNextCollisionChange result = {
@@ -102,5 +115,5 @@ EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene *sc
 
   return result;
 }
-
+*/
 

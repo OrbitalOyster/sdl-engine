@@ -123,7 +123,7 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
 
 // ============================================================================
 
-// NOTE: Only works for separated rects, otherwise returns BLR_RMT_CONVERGE
+// NOTE: Only works for separated rects, otherwise returns RMT_CONVERGE
 RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
                                                        OrthoRect *r2,
                                                        double vx1, double vy1,
@@ -271,6 +271,37 @@ uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
   return result;
 }
 
+// Returns time until next collision change
+double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
+                                            OrthoRect *r2, double vx1,
+                                            double vy1, double vx2,
+                                            double vy2) {
+  double vx = vx1 - vx2;
+  double vy = vy1 - vy2;
+  double result = INFINITY;
+  if (compare(vx, 0) && compare(vy, 0))
+    return result;
+  for (uint8_t i = 0; i < 4; i++)
+    for (uint8_t j = 0; j < 2; j++) {
+      uint8_t k = (uint8_t) (i + j * 2) % 4;
+      OrthoSegment *s1 = r1->edges[i];
+      OrthoSegment *s2 = r2->edges[k];
+      // Skip already colliding segments
+      if (checkOrthoSegmentsInterlacing(*s1, *s2, false))
+        continue;
+      double t = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
+
+      #ifdef GEOMETRY_DEBUG
+      if (compare(t, 0))
+        WARN("Assert failed");
+      #endif
+
+      if (lessThan(t, result))
+        result = t;
+    }
+  return result;
+}
+
 // Returns time and "couple" mask
 OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
                                                     OrthoRect *r2, double vx1,
@@ -290,12 +321,10 @@ OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
         continue;
       double time = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
 
-      if (compare(time, 0)) {
-        puts("FUCK!!!");
-        exit(0);
-      }
-
-      // printf("DEBUG: %i, %i: %f\n", i, k, time);
+      #ifdef GEOMETRY_DEBUG
+      if (compare(time, 0))
+        WARN("Assert failed");
+      #endif
 
       if (compare(time, result.time)) {
         result.mask |= (uint8_t) pow(2, i);
