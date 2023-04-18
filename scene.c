@@ -77,8 +77,7 @@ uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
 
   // Step 1: check for immediate changes
   INFO("Getting immediate collision change: ");
-  // TODO: Don't need EntityNextCollisionChange type here
-  EntityNextCollisionChange eicc =
+  EntityImmediateCollisionChange eicc =
       getEntityImmediateCollisionChange(entity, vx, vy);
   // Call entity if any changes found
   if (eicc.size) {

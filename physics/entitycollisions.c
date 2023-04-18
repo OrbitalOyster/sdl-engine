@@ -52,9 +52,9 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
   return result;
 }
 
-EntityNextCollisionChange
+EntityImmediateCollisionChange
 getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
-  EntityNextCollisionChange result = {.time = 0, .size = 0, .changes = NULL};
+  EntityImmediateCollisionChange result = {.size = 0, .changes = NULL};
 
   // TODO: Proper memory allocation
   result.changes = calloc(10, sizeof(EntityNextCollisionChange));

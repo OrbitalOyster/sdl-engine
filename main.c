@@ -16,6 +16,7 @@
 Entity *player = NULL;
 Prop *ground = NULL;
 Prop *prop1 = NULL;
+Prop *prop2 = NULL;
 
 void onKeyDown(SDL_Scancode key) {
   INFOF("Key pressed: %i/%c", key, SDL_GetKeyFromScancode(key));
@@ -84,8 +85,13 @@ int main() {
   prop1->tag = 2;
   prop1->collisionId = 2;
 
+  prop2 = createProp(350 - 48 - 10, 232 + 48 + 10, 48, 48);
+  prop2->tag = 3;
+  prop2->collisionId = 2;
+
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
+  addPropToScene(getMainScene(), prop2);
   addEntityToScene(getMainScene(), player);
 
   startGame();
