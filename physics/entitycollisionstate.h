@@ -21,7 +21,6 @@ typedef struct {
 typedef struct {
   Prop* prop;
   uint8_t mask;
-  EntityCollision* previous;
 } EntityCollisionChange;
 
 typedef struct {

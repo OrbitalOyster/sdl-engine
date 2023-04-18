@@ -64,9 +64,7 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
     uint8_t mask = getMovingOrthoRectsImmediateCollisionChange(
         entity->rect, prop->rect, vx, vy, 0, 0);
     if (mask) {
-      EntityCollisionChange ncc = {.previous =
-                                       entity->collisionState->collisions[i],
-                                   .mask = mask,
+      EntityCollisionChange ncc = {.mask = mask,
                                    .prop = prop};
       result.changes[result.size++] = ncc;
     }
@@ -88,28 +86,18 @@ EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene *sc
     OrthoRectCollisionChange cc = getMovingOrthoRectsNextCollisionChange(
         entity->rect, prop->rect, vx, vy, 0, 0);
     // Skip
-    // printf("EPSILON: %.20f, %.20f\n", cc.time, result.time);
     if (compare(cc.time, INFINITY) || moreThan(cc.time,result.time)) {
-      // puts("> || INFINITY");
       continue;
     }
     EntityCollisionChange ncc = {.mask = cc.mask, .prop = prop};
     // New candidate
     if (cc.time < result.time) {
-      // puts("<");
       free(result.changes);
       result.time = cc.time;
       result.size = 1;
       result.changes = calloc(10, sizeof(EntityCollisionChange));
-
-
-      ncc.previous = checkCollisionStateIncludesProp(entity->collisionState, prop);
-
       result.changes[0] = ncc;
-    } else { // cc.time == result.time
-      // puts("==");
-      result.changes[result.size++] = ncc;
-    }
+    } else result.changes[result.size++] = ncc;
   }
 
   return result;
