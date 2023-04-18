@@ -229,8 +229,6 @@ OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
   result.edgeCollisionMask = getEdgeCollisionMask(r1, r2);
 
   // Outer border collision
-  //  if (result.edgeCollisionMask && (checkOrthoRectsSeparated(r1, r2) ||
-  //  checkOrthoRectsSeparated(r2, r1)))
   if (result.edgeCollisionMask && checkOrthoRectsSeparated(r1, r2))
     result.type = OUTER_TOUCH;
   else // One rect inside another

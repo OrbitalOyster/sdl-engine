@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+#include "binary.h"
 #include "debug.h"
 #include "dmath/dmath.h"
 #include "physics/entitycollisions.h"
@@ -49,20 +50,22 @@ uint8_t getCleanMask(uint8_t mask) {
   return mask & ignoreMask;
 }
 
-void foo2(OrthoRect *r1, OrthoRect *r2, double *vx, double *vy,
+void slideCallback(OrthoRect *r1, OrthoRect *r2, double *vx, double *vy,
           uint8_t collisionChangeMask) {
-  WARNF("foo2 mask: %u", collisionChangeMask);
+
   RelativeMovementType rmt =
       getOrthoRectsRelativeMovementType(r1, r2, *vx, *vy, 0, 0);
-  // uint8_t cleanMask = getCleanMask(collisionChangeMask);
-  uint8_t cleanMask = collisionChangeMask;
-  if (rmt == RMT_CONVERGE) {
-    if (cleanMask & (130 + 40))
-      *vx = 0;
 
-    if (cleanMask & (65 + 20))
-      *vy = 0;
-  }
+  if (rmt != RMT_CONVERGE)
+    return;
+
+  uint8_t cleanMask = getCleanMask(collisionChangeMask);
+
+  if (cleanMask & (32 + 128))
+    *vx = 0;
+
+  if (cleanMask & (16 + 64))
+    *vy = 0;
 }
 
 uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
@@ -87,7 +90,7 @@ uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
 
       INFOF("Adjusted sliding velocity: %f %f => ", vx, vy);
       if (mask == 2)
-        foo2(entity->rect, prop->rect, &vx, &vy, eicc.changes[i].mask);
+        slideCallback(entity->rect, prop->rect, &vx, &vy, eicc.changes[i].mask);
       INFOF("%f %f", vx, vy);
     }
   }

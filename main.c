@@ -63,7 +63,7 @@ void onKeyUp(SDL_Scancode key) {
 int main() {
 
   int n = 128;
-  char *bin = int8ToBinary(n);
+  char *bin = intToBinary(n, 8);
   INFOF("Binary test: %i, %s", n, bin);
   free(bin);
 

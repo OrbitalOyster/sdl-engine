@@ -2,11 +2,11 @@
 
 #include <stdlib.h>
 
-char* int8ToBinary(int n) {
-  char *result = calloc(9, sizeof(char));
-  for (int i = 0; i < 8; i++, n >>= 1)
-    result[7 - i] = n & 1 ? '1' : '0';
-  result[8] = '\0';
+char* intToBinary(int n, unsigned int size) {
+  char *result = calloc(size + 1, sizeof(char));
+  for (unsigned int i = 0; i < size; i++, n >>= 1)
+    result[size - 1 - i] = n & 1 ? '1' : '0';
+  result[size] = '\0';
   return result;
 }
 
