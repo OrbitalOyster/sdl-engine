@@ -10,6 +10,7 @@ Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title) {
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     WARNF("Unable to initilize SDL: %s", SDL_GetError());
+    free(core);
     return NULL;
   }
   // Init window
@@ -17,6 +18,7 @@ Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title) {
                                     windowWidth, windowHeight, WINDOW_FLAGS);
   if (!core->window) {
     WARNF("Unable to create window: %s", SDL_GetError());
+    free(core);
     return NULL;
   }
   // Init renderer

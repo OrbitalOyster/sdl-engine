@@ -35,5 +35,8 @@ clean:
 	-rm **/*.o
 	-rm $(OUTPUT)
 
-.PHONY: all clean
+valgrind:
+	valgrind --leak-check=full --leak-resolution=med --show-leak-kinds=all --track-origins=yes  --gen-suppressions=all --suppressions=sdl.supp ./$(OUTPUT)
+
+.PHONY: all clean valgrind
 

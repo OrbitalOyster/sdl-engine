@@ -18,20 +18,4 @@ typedef struct {
   EntityCollision** collisions;
 } EntityCollisionState;
 
-typedef struct {
-  Prop* prop;
-  uint8_t mask;
-} EntityCollisionChange;
-
-typedef struct {
-  uint8_t size;
-  EntityCollisionChange* changes;
-} EntityImmediateCollisionChange;
-
-typedef struct {
-  double time;
-  uint8_t size;
-  EntityCollisionChange* changes;
-} EntityNextCollisionChange;
-
 #endif
