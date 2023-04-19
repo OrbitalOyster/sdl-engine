@@ -32,13 +32,9 @@ if (comparePoints(p1, p2)) return 0;
 }
 
 double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
-                                              OrthoSegment s,
-                                              bool excludeEndPoints) {
-
-  // printf("DEBUG: p: %f %f, s: %f %f %f %f\n", p.x, p.y, s.p1->x, s.p1->y, s.p2->x, s.p2->y);
-
+                                              OrthoSegment s) {
   // Special case
-  if (pointBelongsToOrthoSegment(p, s, excludeEndPoints))
+  if (pointBelongsToOrthoSegment(p, s))
     return 0;
 
   // Point's velocity "vector"
@@ -59,7 +55,7 @@ double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
 
   Point ip = getOrthoLineLineIntersection(*s.line, vl);
 
-  if (pointBelongsToOrthoSegment(ip, s, excludeEndPoints))
+  if (pointBelongsToOrthoSegment(ip, s))
     result = getMovingPointPointCollisionTime(p, ip, vx, vy);
 
   // Point moving away from segment
@@ -78,7 +74,7 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
 #ifdef GEOMETRY_DEBUG
   if (s1.line->isVertical != s2.line->isVertical)
     WARN("Segments are not parallel");
-  if (!checkOrthoSegmentsInterlacing(s1, s2, false))
+  if (!checkOrthoSegmentsInterlacing(s1, s2))
     WARN("Segments are not interlacing");
   if (compare(vx, 0) && compare(vy, 0))
     printf("vx == 0 && vy == 0");
@@ -100,17 +96,17 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
 #ifdef GEOMETRY_DEBUG
   if (s1.line->isVertical != s2.line->isVertical)
     WARN("Segments are not parallel");
-  if (checkOrthoSegmentsInterlacing(s1, s2, false))
+  if (checkOrthoSegmentsInterlacing(s1, s2))
     WARN("Segments are interlacing");
 #endif
 
   double result = INFINITY;
 
   double intermediate[4] = {
-      getMovingPointOrthoSegmentIntersection(*(s1.p1), vx, vy, s2, false),
-      getMovingPointOrthoSegmentIntersection(*(s1.p2), vx, vy, s2, false),
-      getMovingPointOrthoSegmentIntersection(*(s2.p1), -vx, -vy, s1, false),
-      getMovingPointOrthoSegmentIntersection(*(s2.p2), -vx, -vy, s1, false),
+      getMovingPointOrthoSegmentIntersection(*(s1.p1), vx, vy, s2),
+      getMovingPointOrthoSegmentIntersection(*(s1.p2), vx, vy, s2),
+      getMovingPointOrthoSegmentIntersection(*(s2.p1), -vx, -vy, s1),
+      getMovingPointOrthoSegmentIntersection(*(s2.p2), -vx, -vy, s1),
   };
 
   for (uint8_t i = 0; i < 4; i++)
@@ -190,7 +186,7 @@ uint8_t getEdgeCollisionMask(OrthoRect *r1, OrthoRect *r2) {
     for (uint8_t j = 0; j < 2; j++) {
       uint8_t k = (uint8_t)(i + j * 2) % 4;
       OrthoSegment edge2 = *r2->edges[k];
-      if (checkOrthoSegmentsInterlacing(edge1, edge2, false)) {
+      if (checkOrthoSegmentsInterlacing(edge1, edge2)) {
         result |= (uint8_t)pow(2, i);
         result |= (uint8_t)(pow(2, k) * 16);
       }
@@ -261,7 +257,7 @@ uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
       uint8_t k = (uint8_t)(i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
-      if (!checkOrthoSegmentsInterlacing(*s1, *s2, false))
+      if (!checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       if (checkOrthoSegmentsAboutToDecouple(*s1, *s2, vx, vy)) {
         result |= (uint8_t)pow(2, i);
@@ -287,7 +283,7 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       // Skip already colliding segments
-      if (checkOrthoSegmentsInterlacing(*s1, *s2, false))
+      if (checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       double t = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
 
@@ -317,7 +313,7 @@ OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
       uint8_t k = (uint8_t) (i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
-      if (checkOrthoSegmentsInterlacing(*s1, *s2, false))
+      if (checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       double time = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
 

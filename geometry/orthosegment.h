@@ -1,6 +1,8 @@
 #ifndef ORTHOSEGMENT_H
 #define ORTHOSEGMENT_H
 
+#include <stdbool.h>
+
 #include "ortholine.h"
 #include "point.h"
 
@@ -11,8 +13,8 @@ typedef struct {
 } OrthoSegment;
 
 OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2);
-bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2, bool excludeEndPoints);
-bool checkOrthoSegmentsIntersecting(OrthoSegment s1, OrthoSegment s2, bool excludeEndPoints);
-bool pointBelongsToOrthoSegment(Point p, OrthoSegment s, bool excludeEndPoints);
+bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2);
+bool checkOrthoSegmentsIntersecting(OrthoSegment s1, OrthoSegment s2);
+bool pointBelongsToOrthoSegment(Point p, OrthoSegment s);
 
 #endif

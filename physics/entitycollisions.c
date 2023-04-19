@@ -78,6 +78,14 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx, doubl
 
   for (uint32_t i = 0; i < scene->numberOfProps; i++) {
     Prop *prop = scene->props[i];
+
+    // NOTE: Skipping props from collisionState leads to bugs
+/*
+    int skip = 0;
+    for (uint32_t j = 0; j < entity->collisionState->size; j++)
+      if (entity->collisionState->collisions[j]->prop == prop) skip = 1;
+    if (skip) continue;
+*/
     double t = getMovingOrthoRectsNextCollisionTime(entity->rect, prop->rect, vx, vy, 0, 0);
     if (lessThan(t, result)) result = t;
   }

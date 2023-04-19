@@ -81,7 +81,7 @@ int main() {
   ground->tag = 1;
   ground->collisionId = 2;
 
-  prop1 = createProp(320, 200 - 48, 48, 48);
+  prop1 = createProp(320, 200 - 48 - 10, 48, 48);
   prop1->tag = 2;
   prop1->collisionId = 2;
 
