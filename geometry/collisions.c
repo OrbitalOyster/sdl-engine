@@ -4,17 +4,19 @@
 
 #include "../debug.h"
 #include "../dmath/dmath.h"
+#include "line.h"
 #include "orthosegment.h"
 #include "point.h"
-#include "line.h"
 
 // ============================================================================
 
 // Returns time before moving p1 will collide with static p2
-double getMovingPointPointCollisionTime(Point p1, Point p2, double vx, double vy) {
+double getMovingPointPointCollisionTime(Point p1, Point p2, double vx,
+                                        double vy) {
 
-// Special case
-if (comparePoints(p1, p2)) return 0;
+  // Special case
+  if (comparePoints(p1, p2))
+    return 0;
 
 #ifdef GEOMETRY_DEBUG
   double k1 = (p2.y - p1.y) / (p2.x - p1.x);
@@ -92,7 +94,8 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
            (s1.p2->x - s2.p1->x) * vx >= 0 && (s1.p2->x - s2.p2->x) * vx >= 0;
 }
 
-double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2, double vx, double vy) {
+double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
+                                               double vx, double vy) {
 #ifdef GEOMETRY_DEBUG
   if (s1.line->isVertical != s2.line->isVertical)
     WARN("Segments are not parallel");
@@ -115,7 +118,6 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
 
   return result;
 }
-
 
 // ============================================================================
 
@@ -268,9 +270,8 @@ uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
 }
 
 // Returns time until next collision change
-double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
-                                            OrthoRect *r2, double vx1,
-                                            double vy1, double vx2,
+double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1, OrthoRect *r2,
+                                            double vx1, double vy1, double vx2,
                                             double vy2) {
   double vx = vx1 - vx2;
   double vy = vy1 - vy2;
@@ -279,7 +280,7 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
     return result;
   for (uint8_t i = 0; i < 4; i++)
     for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t) (i + j * 2) % 4;
+      uint8_t k = (uint8_t)(i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       // Skip already colliding segments
@@ -287,10 +288,10 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
         continue;
       double t = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
 
-      #ifdef GEOMETRY_DEBUG
+#ifdef GEOMETRY_DEBUG
       if (compare(t, 0))
         WARN("Assert failed");
-      #endif
+#endif
 
       if (lessThan(t, result))
         result = t;
@@ -299,10 +300,9 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1,
 }
 
 // Returns time and "couple" mask
-OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
-                                                    OrthoRect *r2, double vx1,
-                                                    double vy1, double vx2,
-                                                    double vy2) {
+OrthoRectCollisionChange
+getMovingOrthoRectsNextCollisionChange(OrthoRect *r1, OrthoRect *r2, double vx1,
+                                       double vy1, double vx2, double vy2) {
   double vx = vx1 - vx2;
   double vy = vy1 - vy2;
   OrthoRectCollisionChange result = {.time = INFINITY, .mask = 0};
@@ -310,28 +310,26 @@ OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
     return result;
   for (uint8_t i = 0; i < 4; i++)
     for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t) (i + j * 2) % 4;
+      uint8_t k = (uint8_t)(i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       if (checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       double time = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
 
-      #ifdef GEOMETRY_DEBUG
+#ifdef GEOMETRY_DEBUG
       if (compare(time, 0))
         WARN("Assert failed");
-      #endif
+#endif
 
       if (compare(time, result.time)) {
-        result.mask |= (uint8_t) pow(2, i);
-        result.mask |= (uint8_t) ( pow(2, k) * 16 );
-      }
-      else if (lessThan(time, result.time)) {
+        result.mask |= (uint8_t)pow(2, i);
+        result.mask |= (uint8_t)(pow(2, k) * 16);
+      } else if (lessThan(time, result.time)) {
         result.time = time;
-        result.mask = (uint8_t) (pow(2, i) + /*(uint8_t)*/ pow(2, k) * 16);
+        result.mask = (uint8_t)(pow(2, i) + /*(uint8_t)*/ pow(2, k) * 16);
       }
     }
   return result;
 }
-
 
