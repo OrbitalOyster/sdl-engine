@@ -3,8 +3,20 @@
 
 #include <stdint.h>
 
+#include "../geometry/collisions.h"
 #include "../geometry/orthorect.h"
-#include "../physics/entitycollisionstate.h"
+#include "prop.h"
+
+
+typedef struct {
+  Prop *prop;
+  OrthoRectCollision orthoRectCollision;
+} EntityCollision;
+
+typedef struct {
+  uint8_t size;
+  EntityCollision **collisions;
+} EntityCollisionState;
 
 typedef struct {
   // Dimensions
@@ -19,8 +31,8 @@ typedef struct {
   // Collision parameters
   uint8_t collisionId;
   uint8_t collisionMask;
-  
-  EntityCollisionState* collisionState;
+
+  EntityCollisionState *collisionState;
 } Entity;
 
 Entity *createEntity(double x, double y, double w, double h);

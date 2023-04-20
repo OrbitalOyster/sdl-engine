@@ -68,7 +68,7 @@ void slideCallback(OrthoRect *r1, OrthoRect *r2, double *vx, double *vy,
     *vy = 0;
 }
 
-uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
+double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
   double vx = entity->_vx;
   double vy = entity->_vy;
 
@@ -98,17 +98,19 @@ uint64_t stepEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
   double timeUntilNextCollision = getEntityNextCollisionTime(entity, scene, vx, vy);
 
   // Collision change
-  if (lessEqThan(timeUntilNextCollision, (double)ticksPassed)) {
+  if (lessEqThan(timeUntilNextCollision, timeToProcess)) {
     moveEntity(entity, vx * timeUntilNextCollision, vy * timeUntilNextCollision);
     entity->collisionState = getEntityCollisionState(entity, scene);
-    return (uint64_t)timeUntilNextCollision;
+    freeEntityImmediateCollisionChange(eicc);
+    return timeUntilNextCollision;
   }
   // End of step
   else {
-    moveEntity(entity, vx * (double)ticksPassed, vy * (double)ticksPassed);
+    moveEntity(entity, vx * timeToProcess, vy * timeToProcess);
     if (eicc.size)
       entity->collisionState = getEntityCollisionState(entity, scene);
-    return ticksPassed;
+    freeEntityImmediateCollisionChange(eicc);
+    return timeToProcess;
   }
 }
 
@@ -117,11 +119,13 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
   if (compare(entity->_vx, 0) && compare(entity->_vy, 0))
     return;
 
+  double timeProcessed = (double) ticksPassed;
+
   uint8_t steps = 5;
-  while (ticksPassed) {
+  while (moreThan(timeProcessed, 0)) {
     if (!--steps)
       ERR(1, "TOO MANY STEPS");
-    ticksPassed -= stepEntity(entity, scene, ticksPassed);
+    timeProcessed -= stepEntity(entity, scene, timeProcessed);
   }
 }
 

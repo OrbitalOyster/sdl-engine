@@ -1,30 +1,38 @@
 #ifndef ENTITY_COLLISIONS_H
 #define ENTITY_COLLISIONS_H
 
-#include "entitycollisionstate.h"
-#include "entity.h"
+#include <stdint.h>
+
 #include "../scene.h"
+#include "entity.h"
+#include "prop.h"
+
+#define MAX_ENTITY_COLLISION_SIZE 100
+#define MAX_ENTITY_COLLISION_CHANGE_SIZE 25
 
 typedef struct {
-  Prop* prop;
+  Prop *prop;
   uint8_t mask;
 } EntityCollisionChange;
 
 typedef struct {
   uint8_t size;
-  EntityCollisionChange* changes;
+  EntityCollisionChange *changes;
 } EntityImmediateCollisionChange;
 
 typedef struct {
   double time;
   uint8_t size;
-  EntityCollisionChange* changes;
+  EntityCollisionChange *changes;
 } EntityNextCollisionChange;
 
-
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
-EntityImmediateCollisionChange getEntityImmediateCollisionChange(Entity *entity, double vx, double vy);
-double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx, double vy);
-/* EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene *scene, double vx, double vy); */
- 
+EntityImmediateCollisionChange
+getEntityImmediateCollisionChange(Entity *entity, double vx, double vy);
+void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc);
+double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
+                                  double vy);
+/* EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene
+ * *scene, double vx, double vy); */
+
 #endif

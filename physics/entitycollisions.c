@@ -54,10 +54,7 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
 EntityImmediateCollisionChange
 getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
-  EntityImmediateCollisionChange result = {.size = 0, .changes = NULL};
-
-  // TODO: Proper memory allocation
-  result.changes = calloc(10, sizeof(EntityNextCollisionChange));
+  EntityImmediateCollisionChange result = {.size = 0, .changes = calloc(MAX_ENTITY_COLLISION_CHANGE_SIZE, sizeof(EntityNextCollisionChange))};
 
   for (uint8_t i = 0; i < entity->collisionState->size; i++) {
     Prop *prop = entity->collisionState->collisions[i]->prop;
@@ -67,10 +64,16 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
       EntityCollisionChange ncc = {.mask = mask,
                                    .prop = prop};
       result.changes[result.size++] = ncc;
+      if (result.size == MAX_ENTITY_COLLISION_CHANGE_SIZE)
+        ERR(1, "Too many collisions");
     }
   }
 
   return result;
+}
+
+void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc) {
+  free(cc.changes);
 }
 
 double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx, double vy) {
