@@ -51,7 +51,7 @@ void jumpOrthoRect(OrthoRect *rect, double x, double y) {
 }
 
 void moveOrthoRect(OrthoRect *rect, double dx, double dy) {
-  for (uint8_t i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     rect->vertices[i]->x += dx;
     rect->vertices[i]->y += dy;
     moveOrthoLine(rect->edges[i]->line, dx, dy);
@@ -61,10 +61,9 @@ void moveOrthoRect(OrthoRect *rect, double dx, double dy) {
 }
 
 void freeOrthoRect(OrthoRect *rect) {
-  for (uint8_t i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     free(rect->vertices[i]);
-    free(rect->edges[i]->line);
-    free(rect->edges[i]);
+    freeOrthoSegment(rect -> edges[i]);
   }
   free(rect);
 }

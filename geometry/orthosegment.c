@@ -24,10 +24,6 @@ OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2) {
 }
 
 bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2) {
-  /* Special case TODO: Isn't this an error? */
-//  if (compareOrthoSegments(s1, s2))
-//    return true;
-
   return compareOrthoLines(*(s1.line), *(s2.line)) &&
          (pointBelongsToOrthoSegment(*(s1.p1), s2) ||
           pointBelongsToOrthoSegment(*(s1.p2), s2) ||
@@ -49,5 +45,10 @@ bool pointBelongsToOrthoSegment(Point p, OrthoSegment s) {
   // Complicated math
   return lessEqThan((s.p1->x - p.x) * (s.p2->x - p.x), 0) &&
          lessEqThan((s.p1->y - p.y) * (s.p2->y - p.y), 0);
+}
+
+void freeOrthoSegment(OrthoSegment* s) {
+  free(s -> line);
+  free(s);
 }
 

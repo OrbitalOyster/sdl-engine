@@ -16,5 +16,6 @@ OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2);
 bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2);
 bool checkOrthoSegmentsIntersecting(OrthoSegment s1, OrthoSegment s2);
 bool pointBelongsToOrthoSegment(Point p, OrthoSegment s);
+void freeOrthoSegment(OrthoSegment* s);
 
 #endif

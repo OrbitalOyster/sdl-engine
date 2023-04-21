@@ -32,10 +32,7 @@ bool compareOrthoLines(OrthoLine l1, OrthoLine l2) {
 }
 
 bool compareLineOrthoLine(Line l1, OrthoLine l2) {
-  if (l2.isVertical)
-    return compare(l2.xy, l1.x0);
-  else
-    return compare(l2.xy, l1.y0);
+  return l2.isVertical ? compare(l2.xy, l1.x0) : compare(l2.xy, l1.y0);
 }
 
 void jumpOrthoLine(OrthoLine *line, double x, double y) {
@@ -47,7 +44,6 @@ void moveOrthoLine(OrthoLine *line, double dx, double dy) {
 }
 
 bool pointBelongsToOrthoLine(Point p, OrthoLine l) {
-  // printf("DEBUG1: %.20f %.20f %.20f\n", p.x, p.y, l.xy);
   return l.isVertical ? compare(p.x, l.xy) : compare(p.y, l.xy);
 }
 
@@ -57,9 +53,9 @@ Point getOrthoLinesIntersection(OrthoLine l1, OrthoLine l2) {
     WARN("No intersection of parallel lines");
 #endif
   if (l1.isVertical)
-    return (Point) {.x = l1.xy, .y = l2.xy};
+    return (Point){.x = l1.xy, .y = l2.xy};
   else
-    return (Point) {.x = l2.xy, .y = l1.xy};
+    return (Point){.x = l2.xy, .y = l1.xy};
 }
 
 Point getOrthoLineLineIntersection(OrthoLine l1, Line l2) {
@@ -72,5 +68,4 @@ Point getOrthoLineLineIntersection(OrthoLine l1, Line l2) {
   else
     return (Point){.x = getLineX(l2, l1.xy), .y = l1.xy};
 }
-
 
