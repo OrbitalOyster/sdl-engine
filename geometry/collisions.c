@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "../binary.h"
+
 #include "../debug.h"
 #include "../dmath/dmath.h"
 #include "line.h"
@@ -30,7 +32,7 @@ double getMovingPointPointCollisionTime(Point p1, Point p2, double vx,
 #endif
   double k = vy / vx;
   double result = (fabs(k) > 1) ? (p2.y - p1.y) / vy : (p2.x - p1.x) / vx;
-  return result < 0 ? INFINITY : result;
+  return lessThan(result, 0) ? INFINITY : result;
 }
 
 double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
@@ -50,19 +52,14 @@ double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
       return INFINITY;
     double t1 = getMovingPointPointCollisionTime(p, *s.p1, vx, vy);
     double t2 = getMovingPointPointCollisionTime(p, *s.p2, vx, vy);
-    return t1 < t2 ? t1 : t2;
+    return lessThan(t1, t2) ? t1 : t2;
   }
 
+  // Point is crossing segment
   double result = INFINITY;
-
   Point ip = getOrthoLineLineIntersection(*s.line, vl);
-
   if (pointBelongsToOrthoSegment(ip, s))
     result = getMovingPointPointCollisionTime(p, ip, vx, vy);
-
-  // Point moving away from segment
-  if (lessThan(result, 0))
-    result = INFINITY;
 
   return result;
 }
@@ -87,11 +84,15 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
     return true;
 
   if (s1.line->isVertical)
-    return (s1.p1->y - s2.p1->y) * vy >= 0 && (s1.p1->y - s2.p2->y) * vy >= 0 &&
-           (s1.p2->y - s2.p1->y) * vy >= 0 && (s1.p2->y - s2.p2->y) * vy >= 0;
+    return moreEqThan((s1.p1->y - s2.p1->y) * vy, 0) &&
+           moreEqThan((s1.p1->y - s2.p2->y) * vy, 0) &&
+           moreEqThan((s1.p2->y - s2.p1->y) * vy, 0) &&
+           moreEqThan((s1.p2->y - s2.p2->y) * vy, 0);
   else
-    return (s1.p1->x - s2.p1->x) * vx >= 0 && (s1.p1->x - s2.p2->x) * vx >= 0 &&
-           (s1.p2->x - s2.p1->x) * vx >= 0 && (s1.p2->x - s2.p2->x) * vx >= 0;
+    return moreEqThan((s1.p1->x - s2.p1->x) * vx, 0) &&
+           moreEqThan((s1.p1->x - s2.p2->x) * vx, 0) &&
+           moreEqThan((s1.p2->x - s2.p1->x) * vx, 0) &&
+           moreEqThan((s1.p2->x - s2.p2->x) * vx, 0);
 }
 
 double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
@@ -112,7 +113,7 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
       getMovingPointOrthoSegmentIntersection(*(s2.p2), -vx, -vy, s1),
   };
 
-  for (uint8_t i = 0; i < 4; i++)
+  for (int i = 0; i < 4; i++)
     if (lessThan(intermediate[i], result))
       result = intermediate[i];
 
@@ -183,10 +184,10 @@ bool checkR1HardInsideR2(OrthoRect *r1, OrthoRect *r2) {
 
 uint8_t getEdgeCollisionMask(OrthoRect *r1, OrthoRect *r2) {
   uint8_t result = 0;
-  for (uint8_t i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     OrthoSegment edge1 = *r1->edges[i];
-    for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t)(i + j * 2) % 4;
+    for (int j = 0; j < 2; j++) {
+      int k = (i + j * 2) % 4;
       OrthoSegment edge2 = *r2->edges[k];
       if (checkOrthoSegmentsInterlacing(edge1, edge2)) {
         result |= (uint8_t)pow(2, i);
@@ -254,9 +255,9 @@ uint8_t getMovingOrthoRectsImmediateCollisionChange(OrthoRect *r1,
   uint8_t result = 0;
   if (compare(vx, 0) && compare(vy, 0))
     return result;
-  for (uint8_t i = 0; i < 4; i++)
-    for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t)(i + j * 2) % 4;
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 2; j++) {
+      int k = (i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       if (!checkOrthoSegmentsInterlacing(*s1, *s2))
@@ -278,9 +279,9 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1, OrthoRect *r2,
   double result = INFINITY;
   if (compare(vx, 0) && compare(vy, 0))
     return result;
-  for (uint8_t i = 0; i < 4; i++)
-    for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t)(i + j * 2) % 4;
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 2; j++) {
+      int k = (i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       // Skip already colliding segments
@@ -308,9 +309,9 @@ getMovingOrthoRectsNextCollisionChange(OrthoRect *r1, OrthoRect *r2, double vx1,
   OrthoRectCollisionChange result = {.time = INFINITY, .mask = 0};
   if (compare(vx, 0) && compare(vy, 0))
     return result;
-  for (uint8_t i = 0; i < 4; i++)
-    for (uint8_t j = 0; j < 2; j++) {
-      uint8_t k = (uint8_t)(i + j * 2) % 4;
+  for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 2; j++) {
+      int k = (i + j * 2) % 4;
       OrthoSegment *s1 = r1->edges[i];
       OrthoSegment *s2 = r2->edges[k];
       if (checkOrthoSegmentsInterlacing(*s1, *s2))
@@ -327,7 +328,7 @@ getMovingOrthoRectsNextCollisionChange(OrthoRect *r1, OrthoRect *r2, double vx1,
         result.mask |= (uint8_t)(pow(2, k) * 16);
       } else if (lessThan(time, result.time)) {
         result.time = time;
-        result.mask = (uint8_t)(pow(2, i) + /*(uint8_t)*/ pow(2, k) * 16);
+        result.mask = (uint8_t)(pow(2, i) + pow(2, k) * 16);
       }
     }
   return result;
