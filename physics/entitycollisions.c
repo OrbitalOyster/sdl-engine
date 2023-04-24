@@ -35,7 +35,7 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
   INFO("Getting entity collision state");
   EntityCollisionState *result = createEmptyHeapEntityCollisionState();
 
-  for (uint32_t i = 0; i < scene->numberOfProps; i++) {
+  for (unsigned int i = 0; i < scene->numberOfProps; i++) {
     Prop *prop = scene->props[i];
 
     // Ignore collisions
@@ -79,7 +79,7 @@ void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc) {
 double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx, double vy) {
   double result = INFINITY;
 
-  for (uint32_t i = 0; i < scene->numberOfProps; i++) {
+  for (unsigned int i = 0; i < scene->numberOfProps; i++) {
     Prop *prop = scene->props[i];
 
     // NOTE: Skipping props from collisionState leads to bugs

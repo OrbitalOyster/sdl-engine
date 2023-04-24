@@ -15,7 +15,7 @@ Scene *initScene() {
 }
 
 void addPropToScene(Scene *scene, Prop *prop) {
-  for (uint32_t i = 0; i < scene->numberOfProps; i++)
+  for (unsigned int i = 0; i < scene->numberOfProps; i++)
     if (scene->props[i] == prop)
       WARN("Prop already added");
 
@@ -24,7 +24,7 @@ void addPropToScene(Scene *scene, Prop *prop) {
 }
 
 void addEntityToScene(Scene *scene, Entity *entity) {
-  for (uint32_t i = 0; i < scene->numberOfEntities; i++)
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     if (scene->entities[i] == entity)
       WARN("Entity already added");
 
@@ -33,7 +33,7 @@ void addEntityToScene(Scene *scene, Entity *entity) {
 }
 
 void initSceneCollisions(Scene *scene) {
-  for (uint32_t i = 0; i < scene->numberOfEntities; i++)
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
         getEntityCollisionState(scene->entities[i], scene);
 }
@@ -44,8 +44,8 @@ void initSceneCollisions(Scene *scene) {
   1100 1001 => 0100 0001
 */
 uint8_t getCleanMask(uint8_t mask) {
-  uint8_t a = (uint8_t)(mask << 4);
-  uint8_t b = (uint8_t)(mask >> 4);
+  int a = mask << 4;
+  int b = mask >> 4;
   uint8_t ignoreMask = (uint8_t)(mask ^ (a + b));
   return mask & ignoreMask;
 }
@@ -130,7 +130,7 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
 }
 
 void processScene(Scene *scene, uint64_t ticksPassed) {
-  for (uint32_t i = 0; i < scene->numberOfEntities; i++)
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     processEntity(scene->entities[i], scene, ticksPassed);
 }
 

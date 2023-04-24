@@ -288,12 +288,6 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1, OrthoRect *r2,
       if (checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       double t = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
-
-#ifdef GEOMETRY_DEBUG
-      if (compare(t, 0))
-        WARN("Assert failed");
-#endif
-
       if (lessThan(t, result))
         result = t;
     }
@@ -317,12 +311,6 @@ getMovingOrthoRectsNextCollisionChange(OrthoRect *r1, OrthoRect *r2, double vx1,
       if (checkOrthoSegmentsInterlacing(*s1, *s2))
         continue;
       double time = getMovingParallelOrthoSegmentsCollision(*s1, *s2, vx, vy);
-
-#ifdef GEOMETRY_DEBUG
-      if (compare(time, 0))
-        WARN("Assert failed");
-#endif
-
       if (compare(time, result.time)) {
         result.mask |= (uint8_t)pow(2, i);
         result.mask |= (uint8_t)(pow(2, k) * 16);

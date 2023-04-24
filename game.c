@@ -30,10 +30,10 @@ Scene *getMainScene() {
 }
 
 void renderScene(Scene *scene, SDL_Renderer *renderer) {
-  for (uint32_t i = 0; i < scene->numberOfProps; i++) {
+  for (unsigned int i = 0; i < scene->numberOfProps; i++) {
     drawRect(renderer, scene->props[i]->x, scene->props[i]->y, scene->props[i]->w, scene->props[i]->h);
   }
-  for (uint32_t i = 0; i < scene->numberOfEntities; i++) {
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     drawRect(renderer, scene->entities[i]->x, scene->entities[i]->y, scene->entities[i]->w, scene->entities[i]->h);
   }
 }
