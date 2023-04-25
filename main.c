@@ -9,6 +9,7 @@
 #include "input.h"
 #include "physics/entity.h"
 #include "physics/prop.h"
+#include "physics/callback.h"
 #include "game.h"
 
 #include "geometry/collisions.h"
@@ -61,6 +62,35 @@ void onKeyUp(SDL_Scancode key) {
   }
 }
 
+/*
+  Returns change mask that ignores same-side collisions
+  for example:
+  1100 1001 => 0100 0001
+*/
+uint8_t getCleanMask(uint8_t mask) {
+  int a = mask << 4;
+  int b = mask >> 4;
+  uint8_t ignoreMask = (uint8_t)(mask ^ (a + b));
+  return mask & ignoreMask;
+}
+
+void slideCallback(physicsCallbackStats s) {
+
+  RelativeMovementType rmt =
+      getOrthoRectsRelativeMovementType(s.r1, s.r2, *s.vx, *s.vy, 0, 0);
+
+  if (rmt != RMT_CONVERGE)
+    return;
+
+  uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
+
+  if (cleanMask & (32 + 128))
+    *s.vx = 0;
+
+  if (cleanMask & (16 + 64))
+    *s.vy = 0;
+}
+
 int main() {
 
   int n = 128;
@@ -93,6 +123,8 @@ int main() {
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addEntityToScene(getMainScene(), player);
+
+  foo(2, slideCallback);
 
   startGame();
   return 0;

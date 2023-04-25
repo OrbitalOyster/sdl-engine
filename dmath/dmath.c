@@ -13,10 +13,10 @@ void checkValues(double a, double b) {
     WARN("Unhandled NAN");
 
   if (a > DMATH_MAX || b > DMATH_MAX)
-    WARN("dmath out of bounds");
+    WARNF("dmath out of bounds: %lf, %lf", a, b);
 
   if (a < DMATH_MIN || b < DMATH_MIN)
-    WARN("dmath out of bounds");
+    WARNF("dmath out of bounds: %lf, %lf", a, b);
 }
 
 bool compare(double a, double b) {

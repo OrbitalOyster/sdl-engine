@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "physics/prop.h"
+#include "physics/callback.h"
 #include "scene.h"
 
 typedef struct {
@@ -15,6 +16,7 @@ typedef struct {
 
 bool initGame(GameParameters *gameParameters);
 Scene *getMainScene();
+void foo(uint16_t mask, void (*func)(physicsCallbackStats s));
 void startGame();
 void stopGame();
 void destroyGame();

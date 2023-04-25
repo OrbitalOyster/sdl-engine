@@ -11,6 +11,7 @@ Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));
   scene->props = calloc(MAX_NUMBER_OF_PROPS, sizeof(Prop *));
   scene->entities = calloc(MAX_NUMBER_OF_ENTITIES, sizeof(Entity *));
+  scene->callbacks = calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(void *));
   return scene;
 }
 
@@ -32,40 +33,17 @@ void addEntityToScene(Scene *scene, Entity *entity) {
   scene->numberOfEntities++;
 }
 
+void registerCollisionCallback(Scene *scene, uint16_t mask,
+                               void (*func)(physicsCallbackStats)) {
+  if (scene->callbacks[mask] != NULL)
+    WARN("Callback already taken");
+  scene->callbacks[mask] = func;
+}
+
 void initSceneCollisions(Scene *scene) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
         getEntityCollisionState(scene->entities[i], scene);
-}
-
-/*
-  Returns change mask that ignores same-side collisions
-  for example:
-  1100 1001 => 0100 0001
-*/
-uint8_t getCleanMask(uint8_t mask) {
-  int a = mask << 4;
-  int b = mask >> 4;
-  uint8_t ignoreMask = (uint8_t)(mask ^ (a + b));
-  return mask & ignoreMask;
-}
-
-void slideCallback(OrthoRect *r1, OrthoRect *r2, double *vx, double *vy,
-          uint8_t collisionChangeMask) {
-
-  RelativeMovementType rmt =
-      getOrthoRectsRelativeMovementType(r1, r2, *vx, *vy, 0, 0);
-
-  if (rmt != RMT_CONVERGE)
-    return;
-
-  uint8_t cleanMask = getCleanMask(collisionChangeMask);
-
-  if (cleanMask & (32 + 128))
-    *vx = 0;
-
-  if (cleanMask & (16 + 64))
-    *vy = 0;
 }
 
 double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
@@ -86,20 +64,27 @@ double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
       Prop *prop = eicc.changes[i].prop;
       uint8_t mask = entity->collisionMask & prop->collisionId;
       INFOF("Collision mask: %u", mask);
-
       INFOF("Adjusted sliding velocity: %f %f => ", vx, vy);
-      if (mask == 2)
-        slideCallback(entity->rect, prop->rect, &vx, &vy, eicc.changes[i].mask);
+      if (scene->callbacks[mask]) {
+        physicsCallbackStats s = {.r1 = entity->rect,
+                                  .r2 = prop->rect,
+                                  .vx = &vx,
+                                  .vy = &vy,
+                                  .collisionChangeMask = eicc.changes[i].mask};
+        scene->callbacks[mask](s);
+      }
       INFOF("%f %f", vx, vy);
     }
   }
 
-  // Step 2: get time until next collision change 
-  double timeUntilNextCollision = getEntityNextCollisionTime(entity, scene, vx, vy);
+  // Step 2: get time until next collision change
+  double timeUntilNextCollision =
+      getEntityNextCollisionTime(entity, scene, vx, vy);
 
   // Collision change
   if (lessEqThan(timeUntilNextCollision, timeToProcess)) {
-    moveEntity(entity, vx * timeUntilNextCollision, vy * timeUntilNextCollision);
+    moveEntity(entity, vx * timeUntilNextCollision,
+               vy * timeUntilNextCollision);
     entity->collisionState = getEntityCollisionState(entity, scene);
     freeEntityImmediateCollisionChange(eicc);
     return timeUntilNextCollision;
@@ -119,7 +104,7 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
   if (compare(entity->_vx, 0) && compare(entity->_vy, 0))
     return;
 
-  double timeProcessed = (double) ticksPassed;
+  double timeProcessed = (double)ticksPassed;
 
   uint8_t steps = 5;
   while (moreThan(timeProcessed, 0)) {
@@ -130,6 +115,7 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
 }
 
 void processScene(Scene *scene, uint64_t ticksPassed) {
+  INFOF("Processing scene; ticksPassed: %li", ticksPassed);
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     processEntity(scene->entities[i], scene, ticksPassed);
 }

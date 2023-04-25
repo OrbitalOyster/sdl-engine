@@ -29,6 +29,10 @@ Scene *getMainScene() {
   return mainScene;
 }
 
+void foo(uint16_t mask, void (*func)(physicsCallbackStats)) {
+  registerCollisionCallback(mainScene, mask, func);
+}
+
 void renderScene(Scene *scene, SDL_Renderer *renderer) {
   for (unsigned int i = 0; i < scene->numberOfProps; i++) {
     drawRect(renderer, scene->props[i]->x, scene->props[i]->y, scene->props[i]->w, scene->props[i]->h);
