@@ -23,7 +23,6 @@ typedef struct {
 Scene *initScene();
 void addPropToScene(Scene *scene, Prop *prop);
 void addEntityToScene(Scene *scene, Entity *entity);
-void registerCollisionCallback(Scene *scene, uint16_t mask, void (*func)(physicsCallbackStats));
 void initSceneCollisions(Scene *scene);
 void processScene(Scene* scene, uint64_t ticksPassed);
 void freeScene(Scene *scene);

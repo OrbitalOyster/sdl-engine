@@ -29,8 +29,10 @@ Scene *getMainScene() {
   return mainScene;
 }
 
-void foo(uint16_t mask, void (*func)(physicsCallbackStats)) {
-  registerCollisionCallback(mainScene, mask, func);
+void registerCollisionCallback(uint16_t mask, void (*func)(physicsCallbackStats)) {
+  if (mainScene->callbacks[mask] != NULL)
+    WARN("Callback already taken");
+  mainScene->callbacks[mask] = func;
 }
 
 void renderScene(Scene *scene, SDL_Renderer *renderer) {

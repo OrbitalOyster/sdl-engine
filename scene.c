@@ -33,13 +33,6 @@ void addEntityToScene(Scene *scene, Entity *entity) {
   scene->numberOfEntities++;
 }
 
-void registerCollisionCallback(Scene *scene, uint16_t mask,
-                               void (*func)(physicsCallbackStats)) {
-  if (scene->callbacks[mask] != NULL)
-    WARN("Callback already taken");
-  scene->callbacks[mask] = func;
-}
-
 void initSceneCollisions(Scene *scene) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
@@ -63,8 +56,6 @@ double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
     for (uint8_t i = 0; i < eicc.size; i++) {
       Prop *prop = eicc.changes[i].prop;
       uint8_t mask = entity->collisionMask & prop->collisionId;
-      INFOF("Collision mask: %u", mask);
-      INFOF("Adjusted sliding velocity: %f %f => ", vx, vy);
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
                                   .r2 = prop->rect,
@@ -73,7 +64,6 @@ double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
                                   .collisionChangeMask = eicc.changes[i].mask};
         scene->callbacks[mask](s);
       }
-      INFOF("%f %f", vx, vy);
     }
   }
 

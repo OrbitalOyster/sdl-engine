@@ -18,6 +18,7 @@ Entity *player = NULL;
 Prop *ground = NULL;
 Prop *prop1 = NULL;
 Prop *prop2 = NULL;
+Entity *box = NULL;
 
 void onKeyDown(SDL_Scancode key) {
   INFOF("Key pressed: %i/%c", key, SDL_GetKeyFromScancode(key));
@@ -75,7 +76,6 @@ uint8_t getCleanMask(uint8_t mask) {
 }
 
 void slideCallback(physicsCallbackStats s) {
-
   RelativeMovementType rmt =
       getOrthoRectsRelativeMovementType(s.r1, s.r2, *s.vx, *s.vy, 0, 0);
 
@@ -92,12 +92,6 @@ void slideCallback(physicsCallbackStats s) {
 }
 
 int main() {
-
-  int n = 128;
-  char *bin = intToBinary(n, 8);
-  INFOF("Binary test: %i, %s", n, bin);
-  free(bin);
-
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
@@ -124,7 +118,7 @@ int main() {
   addPropToScene(getMainScene(), prop2);
   addEntityToScene(getMainScene(), player);
 
-  foo(2, slideCallback);
+  registerCollisionCallback(2, slideCallback);
 
   startGame();
   return 0;
