@@ -5,6 +5,7 @@
 #include "core.h"
 #include "debug.h"
 #include "input.h"
+#include "render.h"
 #include "scene.h"
 
 Core *core = NULL;
@@ -36,12 +37,11 @@ void registerCollisionCallback(uint16_t mask, void (*func)(physicsCallbackStats)
 }
 
 void renderScene(Scene *scene, SDL_Renderer *renderer) {
-  for (unsigned int i = 0; i < scene->numberOfProps; i++) {
-    drawRect(renderer, scene->props[i]->x, scene->props[i]->y, scene->props[i]->w, scene->props[i]->h);
-  }
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
-    drawRect(renderer, scene->entities[i]->x, scene->entities[i]->y, scene->entities[i]->w, scene->entities[i]->h);
-  }
+  for (unsigned int i = 0; i < scene->numberOfProps; i++)
+    renderProp(renderer, scene->props[i]);
+
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
+    renderEntity(renderer, scene->entities[i]);
 }
 
 void startGame() {

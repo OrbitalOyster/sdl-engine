@@ -17,7 +17,6 @@ typedef struct {
 } Core;
 
 Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title);
-void drawRect(SDL_Renderer* renderer, double x, double y, double w, double h);
 void destroyCore(Core *core);
 
 #endif
