@@ -7,9 +7,14 @@
 #include "../geometry/orthorect.h"
 #include "prop.h"
 
+typedef enum {CAT_PROP, CAT_ENTITY}
+CollisionAgentType;
 
 typedef struct {
+  CollisionAgentType agentType;
+  // void *agent;
   Prop *prop;
+  // Entity *entity;
   OrthoRectCollision orthoRectCollision;
 } EntityCollision;
 

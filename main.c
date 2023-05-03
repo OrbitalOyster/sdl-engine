@@ -113,7 +113,7 @@ int main() {
   prop2->tag = 3;
   prop2->collisionId = 2;
 
-  box = createEntity(120, 50, 32, 32);
+  box = createEntity(120, 30, 32, 32);
   box->collisionId = 4;
   box->collisionMask = 3;
   box->_vy = 0.1;
