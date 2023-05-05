@@ -125,6 +125,7 @@ int main() {
   addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
+  registerCollisionCallback(1, slideCallback);
 
   startGame();
   return 0;

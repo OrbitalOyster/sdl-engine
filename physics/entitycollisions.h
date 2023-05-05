@@ -11,7 +11,9 @@
 #define MAX_ENTITY_COLLISION_CHANGE_SIZE 25
 
 typedef struct {
-  Prop *prop;
+  CollisionAgentType agentType;
+  void *agent;
+  //Prop *prop;
   uint8_t mask;
 } EntityCollisionChange;
 

@@ -54,11 +54,30 @@ double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
   if (eicc.size) {
     INFOF("Found %u", eicc.size);
     for (uint8_t i = 0; i < eicc.size; i++) {
-      Prop *prop = eicc.changes[i].prop;
-      uint8_t mask = entity->collisionMask & prop->collisionId;
+      //if (eicc.changes[i].agentType != CAT_PROP) continue;
+      void *agent = eicc.changes[i].agent;
+      uint8_t collisionId = 0;
+      OrthoRect *rect = NULL;
+
+      INFOF("Agent type: %i", eicc.changes[i].agentType);
+      switch (eicc.changes[i].agentType) {
+        case CAT_PROP:
+          rect = ((Prop*) agent) -> rect;
+          collisionId = ((Prop*) agent) -> collisionId;
+          break;
+        case CAT_ENTITY:
+          rect = ((Entity*) agent) -> rect;
+          collisionId = ((Entity*) agent) -> collisionId;
+          break;
+      }
+
+      //Prop *prop = eicc.changes[i].agent;
+      INFOF("Collision id: %u", collisionId);
+      uint8_t mask = entity->collisionMask & collisionId;
+      INFOF("Collision mask: %u", mask);
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
-                                  .r2 = prop->rect,
+                                  .r2 = rect,
                                   .vx = &vx,
                                   .vy = &vy,
                                   .collisionChangeMask = eicc.changes[i].mask};
