@@ -32,9 +32,12 @@ typedef struct {
   double w;
   double h;
   OrthoRect *rect;
-  // Velocity
+  // "Vacuum" velocity
   double _vx;
   double _vy;
+  // Actual velocity, adjusted after all collisions
+  double _avx;
+  double _avy;
   // Collision parameters
   uint8_t collisionId;
   uint8_t collisionMask;

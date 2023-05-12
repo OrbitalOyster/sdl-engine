@@ -76,6 +76,9 @@ uint8_t getCleanMask(uint8_t mask) {
 }
 
 void slideCallback(physicsCallbackStats s) {
+
+  INFOF("Physics callback mask: %u", s.collisionChangeMask);
+
   RelativeMovementType rmt =
       getOrthoRectsRelativeMovementType(s.r1, s.r2, *s.vx, *s.vy, 0, 0);
 

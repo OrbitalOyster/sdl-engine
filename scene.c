@@ -39,26 +39,18 @@ void initSceneCollisions(Scene *scene) {
         getEntityCollisionState(scene->entities[i], scene);
 }
 
-double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
-  double vx = entity->_vx;
-  double vy = entity->_vy;
-
-  INFOF("Stepping entity (%.8lf, %.8lf)", vx, vy);
-  INFOF("Entity collision state size: %u", entity->collisionState->size);
-
-  // Step 1: check for immediate changes
-  INFO("Getting immediate collision change: ");
+// Returns true if any immediate collision changes was found
+bool adjustEntityVelocity(Entity *entity, Scene *scene) {
+  entity->_avx = entity->_vx;
+  entity->_avy = entity->_vy;
   EntityImmediateCollisionChange eicc =
-      getEntityImmediateCollisionChange(entity, vx, vy);
-  // Call entity if any changes found
+      getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
   if (eicc.size) {
     INFOF("Found %u", eicc.size);
     for (uint8_t i = 0; i < eicc.size; i++) {
-      //if (eicc.changes[i].agentType != CAT_PROP) continue;
       void *agent = eicc.changes[i].agent;
       uint8_t collisionId = 0;
       OrthoRect *rect = NULL;
-
       INFOF("Agent type: %i", eicc.changes[i].agentType);
       switch (eicc.changes[i].agentType) {
         case CAT_PROP:
@@ -70,40 +62,46 @@ double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
           collisionId = ((Entity*) agent) -> collisionId;
           break;
       }
-
-      //Prop *prop = eicc.changes[i].agent;
       INFOF("Collision id: %u", collisionId);
       uint8_t mask = entity->collisionMask & collisionId;
       INFOF("Collision mask: %u", mask);
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
                                   .r2 = rect,
-                                  .vx = &vx,
-                                  .vy = &vy,
+                                  .vx = &(entity->_avx),
+                                  .vy = &(entity->_avy),
                                   .collisionChangeMask = eicc.changes[i].mask};
         scene->callbacks[mask](s);
       }
     }
   }
+  freeEntityImmediateCollisionChange(eicc);
+  return eicc.size > 0;
+}
+
+double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
+  INFOF("Stepping entity (%.8lf, %.8lf)", entity->_vx, entity->_vy);
+  INFOF("Entity collision state size: %u", entity->collisionState->size);
+
+  // Step 1: check for immediate changes
+  bool adjustedVelocity = adjustEntityVelocity(entity, scene);
 
   // Step 2: get time until next collision change
   double timeUntilNextCollision =
-      getEntityNextCollisionTime(entity, scene, vx, vy);
+      getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
 
   // Collision change
   if (lessEqThan(timeUntilNextCollision, timeToProcess)) {
-    moveEntity(entity, vx * timeUntilNextCollision,
-               vy * timeUntilNextCollision);
+    moveEntity(entity, entity->_avx * timeUntilNextCollision,
+               entity->_avy * timeUntilNextCollision);
     entity->collisionState = getEntityCollisionState(entity, scene);
-    freeEntityImmediateCollisionChange(eicc);
     return timeUntilNextCollision;
   }
   // End of step
   else {
-    moveEntity(entity, vx * timeToProcess, vy * timeToProcess);
-    if (eicc.size)
+    moveEntity(entity, entity->_avx * timeToProcess, entity->_avy * timeToProcess);
+    if (adjustedVelocity)
       entity->collisionState = getEntityCollisionState(entity, scene);
-    freeEntityImmediateCollisionChange(eicc);
     return timeToProcess;
   }
 }
@@ -124,7 +122,11 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
 }
 
 void processScene(Scene *scene, uint64_t ticksPassed) {
-  INFOF("Processing scene; ticksPassed: %li", ticksPassed);
+  // Adjust velocities
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+  }
+
+  // INFOF("Processing scene; ticksPassed: %li", ticksPassed);
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     processEntity(scene->entities[i], scene, ticksPassed);
 }

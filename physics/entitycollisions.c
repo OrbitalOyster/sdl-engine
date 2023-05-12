@@ -86,9 +86,6 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
                         sizeof(EntityNextCollisionChange))};
 
   for (uint8_t i = 0; i < entity->collisionState->size; i++) {
-
-    //if (entity->collisionState->collisions[i]->agentType != CAT_PROP) continue;
-
     CollisionAgentType agentType = entity->collisionState->collisions[i]->agentType;
     void* agent = entity->collisionState->collisions[i]->agent;
     double avx = 0;
