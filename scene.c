@@ -46,12 +46,12 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
   EntityImmediateCollisionChange eicc =
       getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
   if (eicc.size) {
-    INFOF("Found %u", eicc.size);
+//    INFOF("Found %u", eicc.size);
     for (uint8_t i = 0; i < eicc.size; i++) {
       void *agent = eicc.changes[i].agent;
       uint8_t collisionId = 0;
       OrthoRect *rect = NULL;
-      INFOF("Agent type: %i", eicc.changes[i].agentType);
+//      INFOF("Agent type: %i", eicc.changes[i].agentType);
       switch (eicc.changes[i].agentType) {
         case CAT_PROP:
           rect = ((Prop*) agent) -> rect;
@@ -62,9 +62,9 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
           collisionId = ((Entity*) agent) -> collisionId;
           break;
       }
-      INFOF("Collision id: %u", collisionId);
+//      INFOF("Collision id: %u", collisionId);
       uint8_t mask = entity->collisionMask & collisionId;
-      INFOF("Collision mask: %u", mask);
+//      INFOF("Collision mask: %u", mask);
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
                                   .r2 = rect,
@@ -155,14 +155,18 @@ void processScene(Scene *scene, uint64_t ticksPassed) {
   //for (unsigned int i = 0; i < scene->numberOfEntities; i++)
   //  processEntity(scene->entities[i], scene, ticksPassed);
 
+  INFOF("Processing scene, ticksPassed: %u", ticksPassed);
   double timeProcessed = (double)ticksPassed;
 
-  uint8_t steps = 5;
+  uint16_t steps = 1000;
   while (moreThan(timeProcessed, 0)) {
     if (!--steps)
       ERR(1, "TOO MANY STEPS");
     timeProcessed -= stepScene(scene, timeProcessed);
+    INFOF("Time left to process: %5.10lf", timeProcessed);
   }
+
+  INFOF("Scene processed, steps: %u", 1000 - steps);
 }
 
 void destroyScene(Scene *scene) { free(scene); }

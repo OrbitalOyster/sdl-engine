@@ -22,3 +22,4 @@ void renderProp(SDL_Renderer *renderer, Prop *prop) {
 void renderEntity(SDL_Renderer *renderer, Entity *entity) {
   drawRect(renderer, entity->x, entity->y, entity->w, entity->h);
 }
+

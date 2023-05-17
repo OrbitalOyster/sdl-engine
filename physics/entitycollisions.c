@@ -15,17 +15,8 @@ EntityCollisionState *createEmptyHeapEntityCollisionState() {
 
 void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType, void *agent, OrthoRectCollision rc) {
   EntityCollision *ec = calloc(1, sizeof(EntityCollision));
-  /* switch (agentType) {
-    case CAT_PROP:
-      ec->agent = (Prop*) agent;
-      break;
-    case CAT_ENTITY:
-      ec->agent = (Entity*) agent;
-      break;
-  }*/
   ec->agentType = agentType;
   ec->agent = agent;
-  // ec->prop = prop;
   ec->orthoRectCollision = rc;
   cs->collisions[cs->size] = ec;
   cs->size++;
@@ -69,7 +60,7 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
     OrthoRectCollision rc = getOrthoRectCollision(entity->rect, entity2->rect);
     if (rc.type) {
-      INFOF("Found %u collision with entity", rc.type);
+      INFOF("Found [%u] collision with entity #%u", rc.type, entity2->tag);
       updateCollisionState(result, CAT_ENTITY, entity2, rc);
     }
   }

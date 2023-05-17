@@ -127,7 +127,7 @@ int main() {
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addEntityToScene(getMainScene(), player);
-//  addEntityToScene(getMainScene(), box);
+  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);

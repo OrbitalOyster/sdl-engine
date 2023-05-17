@@ -50,5 +50,4 @@ OrthoRectCollisionChange getMovingOrthoRectsNextCollisionChange(OrthoRect *r1,
                                                     OrthoRect *r2, double vx1,
                                                     double vy1, double vx2,
                                                     double vy2);
- 
 #endif
