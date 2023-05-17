@@ -41,7 +41,8 @@ typedef struct {
   // Collision parameters
   uint8_t collisionId;
   uint8_t collisionMask;
-
+  // Tag
+  uint16_t tag;
   EntityCollisionState *collisionState;
 } Entity;
 

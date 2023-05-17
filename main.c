@@ -103,6 +103,7 @@ int main() {
   player = createEntity(120, 200 - 48, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
+  player->tag = 0;
 
   ground = createProp(100, 200, 250, 32);
   ground->tag = 1;
@@ -119,13 +120,14 @@ int main() {
   box = createEntity(120, 30, 32, 32);
   box->collisionId = 4;
   box->collisionMask = 3;
+  box->tag = 1;
   box->_vy = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addEntityToScene(getMainScene(), player);
-  addEntityToScene(getMainScene(), box);
+//  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);

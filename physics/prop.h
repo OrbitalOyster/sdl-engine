@@ -14,7 +14,7 @@ typedef struct {
   OrthoRect* rect;
   // Collision parameters
   uint8_t collisionId;
-  // Tag  
+  // Tag
   uint16_t tag;
 } Prop;
 

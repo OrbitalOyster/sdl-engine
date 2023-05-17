@@ -13,8 +13,7 @@ EntityCollisionState *createEmptyHeapEntityCollisionState() {
   return result;
 }
 
-void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType, void *agent,
-                          OrthoRectCollision rc) {
+void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType, void *agent, OrthoRectCollision rc) {
   EntityCollision *ec = calloc(1, sizeof(EntityCollision));
   /* switch (agentType) {
     case CAT_PROP:
@@ -42,7 +41,7 @@ EntityCollision *checkCollisionStateIncludesProp(EntityCollisionState *cs,
 }
 
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
-  INFO("Getting entity collision state");
+  INFOF("Getting entity #%u collision state", entity->tag);
   EntityCollisionState *result = createEmptyHeapEntityCollisionState();
 
   // Props
@@ -55,7 +54,7 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
     OrthoRectCollision rc = getOrthoRectCollision(entity->rect, prop->rect);
     if (rc.type) {
-      INFOF("Found %u collision with prop %u", rc.type, prop->tag);
+      INFOF("Found [%u] collision with prop #%u", rc.type, prop->tag);
       updateCollisionState(result, CAT_PROP, prop, rc);
     }
   }

@@ -5,7 +5,7 @@ WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion -W
 STANDART := -std=c11
 OPTIMIZATION := -O2
 DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
-DEBUG := -ggdb3 
+DEBUG := -ggdb3
 
 # Implicit variables
 CC := gcc

@@ -79,7 +79,6 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
   return eicc.size > 0;
 }
 
-/*
 double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
   INFOF("Stepping entity (%.8lf, %.8lf)", entity->_vx, entity->_vy);
   INFOF("Entity collision state size: %u", entity->collisionState->size);
@@ -121,7 +120,6 @@ void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
     timeProcessed -= stepEntity(entity, scene, timeProcessed);
   }
 }
-*/
 
 double stepScene(Scene *scene, double timeToProcess) {
   double timeProcessed = (double) timeToProcess;
@@ -135,14 +133,12 @@ double stepScene(Scene *scene, double timeToProcess) {
     if (t < timeProcessed) timeProcessed = t;
   }
 
-  // Move entities
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
     if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) continue;
     moveEntity(entity,
         entity->_avx * timeProcessed,
         entity->_avy * timeProcessed);
-    //TODO Don't need to get collision state every time
     entity->collisionState = getEntityCollisionState(entity, scene);
   }
 
@@ -163,6 +159,8 @@ void processScene(Scene *scene, uint64_t ticksPassed) {
       ERR(1, "TOO MANY STEPS");
     timeProcessed -= stepScene(scene, timeProcessed);
   }
+}
+  
 }
 
 void destroyScene(Scene *scene) { free(scene); }

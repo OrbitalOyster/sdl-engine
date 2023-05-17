@@ -22,7 +22,7 @@ void moveEntity(Entity *entity, double dx, double dy) {
   entity->x += dx;
   entity->y += dy;
   moveOrthoRect(entity->rect, dx, dy);
-  INFOF("Moved entity by (%.8f %.8f) to (%.8f %.8f)", dx, dy, entity->x, entity->y);
+  INFOF("Moved entity #%u by (%.8f %.8f) to (%.8f %.8f)", entity->tag, dx, dy, entity->x, entity->y);
 }
 
 void freeEntity(Entity *entity) {

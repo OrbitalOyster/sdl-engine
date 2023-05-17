@@ -13,7 +13,6 @@
 typedef struct {
   CollisionAgentType agentType;
   void *agent;
-  //Prop *prop;
   uint8_t mask;
 } EntityCollisionChange;
 
