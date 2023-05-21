@@ -5,11 +5,15 @@
 #include "core.h"
 #include "debug.h"
 #include "input.h"
+#include "gui/gui.h"
 #include "render.h"
 #include "scene.h"
 
 Core *core = NULL;
 Scene *mainScene = NULL;
+GUI *gui = NULL;
+
+Caption* debugCaption = NULL;
 
 bool quit = false;
 uint64_t lastTick = 0;
@@ -21,6 +25,21 @@ bool initGame(GameParameters *gameParameters) {
     WARN("Unable to start engine");
     return false;
   }
+  // GUI
+  gui = createGUI(core->renderer);
+  if (!gui) {
+    WARN("Unable to initialize GUI");
+    return false;
+  }
+
+  SDL_Color whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
+  SDL_Color greyColor = {0x22, 0x22, 0x22, 0xFF};
+  char* text = "Hello, World!";
+  debugCaption = createCaption(core->renderer, gui->defaultFont, 10, 10, text, &whiteColor, &greyColor);
+  gui->captions[gui->numberOfCaptions] = debugCaption;
+  gui->numberOfCaptions++;
+
+  // Input
   resetKeyInput();
   mainScene = initScene();
   return true;
@@ -58,6 +77,8 @@ void startGame() {
     SDL_SetRenderDrawColor(core->renderer, 0x77, 0x77, 0xCC, 0xFF);
     SDL_RenderClear(core->renderer);
     renderScene(mainScene, core->renderer);
+    // GUI
+    renderGUI(gui);
     SDL_RenderPresent(core->renderer);
     // Delay
     SDL_Delay(50);
