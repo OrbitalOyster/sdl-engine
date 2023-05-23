@@ -9,22 +9,22 @@
 #include "font.h"
 
 typedef struct {
-  // Position
   uint32_t x;
   uint32_t y;
-  // Size
-  uint32_t width;
-  uint32_t height;
-  // Text
   char *text;
-  // Texture
+  Font *font;
+  SDL_Color *color;
+  SDL_Color *outlineColor;
+  // Size is determined dynamically
+  uint32_t w;
+  uint32_t h;
   SDL_Texture *texture;
 } Caption;
 
-Caption *createCaption(SDL_Renderer *renderer, Font *font, uint32_t x,
-                       uint32_t y, char *text, SDL_Color *color,
+Caption *createCaption(SDL_Renderer *renderer, uint32_t x, uint32_t y,
+                       char *text, Font *font, SDL_Color *color,
                        SDL_Color *outlineColor);
-
+void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption);
 void destroyCaption(Caption *caption);
 
 #endif

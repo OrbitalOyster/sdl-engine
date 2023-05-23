@@ -25,7 +25,7 @@ void renderGUI(GUI *gui) {
   // Captions
   for (unsigned int i = 0; i < gui->numberOfCaptions; i++) {
     SDL_Rect dstRect = {(int)gui->captions[i]->x, (int)gui->captions[i]->y,
-                        (int)gui->captions[i]->width, (int)gui->captions[i]->height};
+                        (int)gui->captions[i]->w, (int)gui->captions[i]->h};
     SDL_RenderCopy(gui->renderer, gui->captions[i]->texture, NULL, &dstRect);
   }
 }

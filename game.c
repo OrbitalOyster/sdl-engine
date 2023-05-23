@@ -13,10 +13,14 @@ Core *core = NULL;
 Scene *mainScene = NULL;
 GUI *gui = NULL;
 
-Caption* debugCaption = NULL;
+Caption *debugCaption = NULL;
+char debugText[100];
 
 bool quit = false;
 uint64_t lastTick = 0;
+
+SDL_Color whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
+SDL_Color greyColor = {0x22, 0x22, 0x22, 0xFF};
 
 bool initGame(GameParameters *gameParameters) {
   core = initCore(gameParameters->screenWidth, gameParameters->screenHeight, gameParameters->title);
@@ -32,10 +36,9 @@ bool initGame(GameParameters *gameParameters) {
     return false;
   }
 
-  SDL_Color whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
-  SDL_Color greyColor = {0x22, 0x22, 0x22, 0xFF};
-  char* text = "Hello, World!";
-  debugCaption = createCaption(core->renderer, gui->defaultFont, 10, 10, text, &whiteColor, &greyColor);
+  snprintf(debugText, 100, "Tick: %lu", lastTick);
+  debugCaption = createCaption(core->renderer, 10, 10, debugText, gui->defaultFont, &whiteColor, &greyColor);
+  //updateCaptionTexture(core->renderer, debugCaption);
   gui->captions[gui->numberOfCaptions] = debugCaption;
   gui->numberOfCaptions++;
 
@@ -79,6 +82,10 @@ void startGame() {
     renderScene(mainScene, core->renderer);
     // GUI
     renderGUI(gui);
+
+    updateCaptionTexture(gui->renderer, debugCaption);
+    snprintf(debugText, 100, "Tick: %lu", currentTick);
+
     SDL_RenderPresent(core->renderer);
     // Delay
     SDL_Delay(50);

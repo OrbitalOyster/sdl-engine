@@ -9,12 +9,12 @@
 #define COLOR_CYAN   "[0;36m"
 
 #ifdef COLOR_OUTPUT
-#define MSG_RED(s) "\033" COLOR_RED s "\033[0m"  
-#define MSG_GREEN(s) "\033" COLOR_GREEN s "\033[0m"  
-#define MSG_YELLOW(s) "\033" COLOR_YELLOW s "\033[0m"  
-#define MSG_BLUE(s) "\033" COLOR_BLUE s "\033[0m"  
-#define MSG_PURPLE(s) "\033" COLOR_PURPLE s "\033[0m"  
-#define MSG_CYAN(s) "\033" COLOR_CYAN s "\033[0m"  
+#define MSG_RED(s) "\033" COLOR_RED s "\033[0m"
+#define MSG_GREEN(s) "\033" COLOR_GREEN s "\033[0m"
+#define MSG_YELLOW(s) "\033" COLOR_YELLOW s "\033[0m"
+#define MSG_BLUE(s) "\033" COLOR_BLUE s "\033[0m"
+#define MSG_PURPLE(s) "\033" COLOR_PURPLE s "\033[0m"
+#define MSG_CYAN(s) "\033" COLOR_CYAN s "\033[0m"
 #else
 #define MSG_RED(s) s
 #define MSG_GREEN(s) s

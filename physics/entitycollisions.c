@@ -94,7 +94,6 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
         break;
     }
 
-    //Prop *prop = entity->collisionState->collisions[i]->agent;
     uint8_t mask = getMovingOrthoRectsImmediateCollisionChange(
         entity->rect, rect, vx, vy, avx, avy);
     if (mask) {

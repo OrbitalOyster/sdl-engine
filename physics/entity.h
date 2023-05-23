@@ -15,8 +15,6 @@ typedef enum {
 typedef struct {
   CollisionAgentType agentType;
   void *agent;
-  // Prop *prop;
-  // Entity *entity;
   OrthoRectCollision orthoRectCollision;
 } EntityCollision;
 

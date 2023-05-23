@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-#include <stdio.h>
+#include "../debug.h"
 
 Font *createFont(char *filename, uint8_t size, uint8_t outlineSize) {
   Font *font = calloc(1, sizeof(Font));
@@ -10,14 +10,14 @@ Font *createFont(char *filename, uint8_t size, uint8_t outlineSize) {
 
   font->ttf = TTF_OpenFont(filename, font->size);
   if (!font->ttf) {
-    printf("Unable to open font %s: %s\n", filename, TTF_GetError());
+    WARNF("Unable to open font %s: %s\n", filename, TTF_GetError());
     return NULL;
   }
   font->outlineSize = outlineSize;
 
   font->outline = TTF_OpenFont(filename, font->size);
   if (!font->outline) {
-    printf("Unable to open font %s: %s\n", filename, TTF_GetError());
+    WARNF("Unable to open font %s: %s\n", filename, TTF_GetError());
     return NULL;
   }
   TTF_SetFontOutline(font->outline, font->outlineSize);
