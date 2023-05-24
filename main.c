@@ -38,6 +38,13 @@ void onKeyDown(SDL_Scancode key) {
     case 4: // a
       player->_vx -= .13;
       break;
+    // Debug section
+    case 62: // F5
+      debugGame(true, 0);
+      break;
+    case 63: // F6
+      debugGame(false, 50);
+      break;
     default:
       break;
   }

@@ -13,11 +13,15 @@ Core *core = NULL;
 Scene *mainScene = NULL;
 GUI *gui = NULL;
 
+// Debug section
 Caption *debugCaption = NULL;
-char debugText[100];
+char debugText[100] = "DEBUG";
+bool debugPaused = true;
+uint8_t debugStep = 0;
 
 bool quit = false;
 uint64_t lastTick = 0;
+uint64_t physicsTick = 0;
 
 SDL_Color whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
 SDL_Color greyColor = {0x22, 0x22, 0x22, 0xFF};
@@ -36,9 +40,8 @@ bool initGame(GameParameters *gameParameters) {
     return false;
   }
 
-  snprintf(debugText, 100, "Tick: %lu", lastTick);
+  // Debug section
   debugCaption = createCaption(core->renderer, 10, 10, debugText, gui->defaultFont, &whiteColor, &greyColor);
-  //updateCaptionTexture(core->renderer, debugCaption);
   gui->captions[gui->numberOfCaptions] = debugCaption;
   gui->numberOfCaptions++;
 
@@ -73,8 +76,19 @@ void startGame() {
     processInput(&quit);
     const uint64_t currentTick = SDL_GetTicks();
     const uint64_t ticksPassed = currentTick - lastTick;
+
     // Process
-    processScene(mainScene, ticksPassed);
+    if (!debugPaused) {
+      processScene(mainScene, ticksPassed);
+      physicsTick += ticksPassed;
+    }
+    else
+      if (debugStep) {
+        processScene(mainScene, debugStep);
+        physicsTick += debugStep;
+        debugStep = 0;
+      }
+
     lastTick = currentTick;
     // Render
     SDL_SetRenderDrawColor(core->renderer, 0x77, 0x77, 0xCC, 0xFF);
@@ -83,15 +97,22 @@ void startGame() {
     // GUI
     renderGUI(gui);
 
+    // Debug
+    snprintf(debugText, 100, "SDL ticks: %lu / Physics ticks: %lu", currentTick, physicsTick);
     updateCaptionTexture(gui->renderer, debugCaption);
-    snprintf(debugText, 100, "Tick: %lu", currentTick);
 
+    // Done
     SDL_RenderPresent(core->renderer);
     // Delay
     SDL_Delay(50);
   }
 
   destroyGame();
+}
+
+void debugGame(bool togglePause, uint8_t step) {
+  if (togglePause) debugPaused = !debugPaused;
+  if (step) debugStep = step;
 }
 
 void stopGame() {
