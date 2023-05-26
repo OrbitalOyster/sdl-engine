@@ -6,6 +6,7 @@
 
 Font *createFont(char *filename, uint8_t size, uint8_t outlineSize) {
   Font *font = calloc(1, sizeof(Font));
+  font->filename = filename;
   font->size = size;
 
   font->ttf = TTF_OpenFont(filename, font->size);
@@ -22,6 +23,9 @@ Font *createFont(char *filename, uint8_t size, uint8_t outlineSize) {
   }
   TTF_SetFontOutline(font->outline, font->outlineSize);
 
+  font->lineHeight = 0;
+
+  INFOF("Loaded font \"%s\", size %u", filename, size);
   return font;
 }
 

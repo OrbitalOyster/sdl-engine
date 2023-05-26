@@ -42,7 +42,7 @@ void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption) {
   SDL_QueryTexture(fg, NULL, NULL, &fw, &fh);
   // Create caption texture
   SDL_DestroyTexture(caption->texture);
-  // Transparent background
+  // Transparent background TODO: Make it optional bg color?
   SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
   caption->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
                                        SDL_TEXTUREACCESS_TARGET, bw, bh);
