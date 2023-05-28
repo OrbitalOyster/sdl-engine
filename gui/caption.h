@@ -8,10 +8,14 @@
 
 #include "font.h"
 
+#define MAX_CAPTION_LINES 255
+#define MAX_CAPTION_LINE_SIZE 255
+
 typedef struct {
   uint32_t x;
   uint32_t y;
   char *text;
+  uint8_t lines;
   Font *font;
   SDL_Color *color;
   SDL_Color *outlineColor;

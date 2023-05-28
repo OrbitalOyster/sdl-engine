@@ -98,7 +98,7 @@ void startGame() {
     renderGUI(gui);
 
     // Debug
-    snprintf(debugText, 100, "SDL ticks: %lu / Physics ticks: %lu", currentTick, physicsTick);
+    snprintf(debugText, 100, "SDL ticks: %lu\nPhysics ticks: %lu\n%s", currentTick, physicsTick, debugPaused ? "Paused" : "Running");
     updateCaptionTexture(gui->renderer, debugCaption);
 
     // Done

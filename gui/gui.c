@@ -31,7 +31,7 @@ GUI *createGUI(SDL_Renderer *renderer) {
   }
 
   // TODO: Load it from somewhere
-  gui->defaultFont = createFont("fonts/PressStart2P-Regular.ttf", 16, 3);
+  gui->defaultFont = createFont("fonts/PressStart2P-Regular.ttf", 16, 2);
   setFontLineHeight(gui, gui->defaultFont);
 
   gui->numberOfCaptions = 0;
