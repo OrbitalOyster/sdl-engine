@@ -23,6 +23,7 @@ typedef struct {
   uint32_t w;
   uint32_t h;
   SDL_Texture *texture;
+  SDL_Texture **textures;
 } Caption;
 
 Caption *createCaption(SDL_Renderer *renderer, uint32_t x, uint32_t y,
