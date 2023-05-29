@@ -25,7 +25,7 @@ SDL_Texture *createCaptionTexture(SDL_Renderer *renderer, TTF_Font *font,
   return fontTexture;
 }
 
-SDL_Texture *createOutlinedCaptionTexture(SDL_Renderer *renderer, char* text, Font* font, SDL_Color* color, SDL_Color *outlineColor, Caption *caption) {
+SDL_Texture *createOutlinedCaptionTexture(SDL_Renderer *renderer, char* text, Font* font, SDL_Color* color, SDL_Color *outlineColor) {
   SDL_Texture *result;
 
   // Outline text on background
@@ -39,9 +39,6 @@ SDL_Texture *createOutlinedCaptionTexture(SDL_Renderer *renderer, char* text, Fo
   int bh;
   SDL_QueryTexture(bg, NULL, NULL, &bw, &bh);
   //TTF_SizeText(caption->font->ttf, caption->text, &bw, &bh);
-  // ???
-  caption->w = (uint32_t)bw;
-  caption->h = (uint32_t)bh;
   // Get fg dimensions
   int fw;
   int fh;
@@ -69,13 +66,12 @@ SDL_Texture *createOutlinedCaptionTexture(SDL_Renderer *renderer, char* text, Fo
 }
 
 void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption) {
-  if (caption->texture)
-    SDL_DestroyTexture(caption->texture);
-
-  for (unsigned int n = 0; n < caption->lines; n++)
+  for (unsigned int n = 0; n < caption->numberOfLines; n++) {
+    free(caption->lines[n]);
     SDL_DestroyTexture(caption->textures[n]);
+  }
 
-  caption -> lines = 0;
+  caption -> numberOfLines = 0;
   uint32_t n = 0;
   uint8_t ln = 0;
   char line[MAX_CAPTION_LINE_SIZE];
@@ -87,42 +83,43 @@ void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption) {
 
     if (c == '\n' || c == '\0') {
       line[ln] = '\0';
-      caption->textures[caption->lines] = createOutlinedCaptionTexture(renderer, line, caption->font, caption->color, caption->outlineColor, caption);
-      caption->lines++;
+      caption->lines[caption->numberOfLines] = calloc(ln, sizeof(char));
+      //snprintf(caption->lines[caption->numberOfLines], MAX_CAPTION_LINE_SIZE, "%s", line);
+      strcpy(caption->lines[caption->numberOfLines], line);
+      caption->textures[caption->numberOfLines] = createOutlinedCaptionTexture(renderer, line, caption->font, caption->color, caption->outlineColor);
+      caption->numberOfLines++;
       ln = 0;
-      printf("DEBUG '%s'\n", line);
       if (c == '\0') done = true;
     }
     else ln++;
   }
 
-  INFOF("Updating caption texture. Number of lines: %u", caption->lines);
-  caption->texture = createOutlinedCaptionTexture(renderer, caption->text, caption->font, caption->color, caption->outlineColor, caption);
-
-  //caption->texture = caption->textures[0];
+  INFOF("Updating caption texture. Number of lines: %u", caption->numberOfLines);
 }
 
-Caption *createCaption(SDL_Renderer *renderer, uint32_t x, uint32_t y,
+Caption *createCaption(SDL_Renderer *renderer, int32_t x, int32_t y,
                        char *text, Font *font, SDL_Color *color,
                        SDL_Color *outlineColor) {
   Caption *caption = calloc(1, sizeof(Caption));
   *caption = (Caption){.x = x,
                        .y = y,
                        .text = text,
-                       .lines = 0,
+                       .numberOfLines = 0,
+                       .lines = calloc(MAX_CAPTION_LINES, sizeof(char*)),
                        .font = font,
                        .color = color,
                        .outlineColor = outlineColor,
-                       .w = 0,
-                       .h = 0,
-                       .texture = NULL,
+                       .leading = 1,
                        .textures = calloc(MAX_CAPTION_LINES, sizeof(SDL_Texture*))};
   updateCaptionTexture(renderer, caption);
   return caption;
 }
 
 void destroyCaption(Caption *caption) {
-  SDL_DestroyTexture(caption->texture);
+  for (unsigned int n = 0; n < caption->numberOfLines; n++) {
+    free(caption->lines[n]);
+    SDL_DestroyTexture(caption->textures[n]);
+  }
   free(caption);
 }
 
