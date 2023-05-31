@@ -18,6 +18,7 @@ Entity *player = NULL;
 Prop *ground = NULL;
 Prop *prop1 = NULL;
 Prop *prop2 = NULL;
+Prop *prop3 = NULL;
 Entity *box = NULL;
 
 void onKeyDown(SDL_Scancode key) {
@@ -27,16 +28,20 @@ void onKeyDown(SDL_Scancode key) {
       stopGame();
       break;
     case 26: // w
-      player->_vy -= .13;
+      increaseEntityVelocity(player, 0, -.13);
+      //player->_vy -= .13;
       break;
     case 7: // d
-      player->_vx += .13;
+      increaseEntityVelocity(player, .13, 0);
+      //player->_vx += .13;
       break;
     case 22: // s
-      player->_vy += .13;
+      increaseEntityVelocity(player, 0, .13);
+      //player->_vy += .13;
       break;
     case 4: // a
-      player->_vx -= .13;
+      increaseEntityVelocity(player, -.13, 0);
+      //player->_vx -= .13;
       break;
     // Debug section
     case 62: // F5
@@ -54,16 +59,20 @@ void onKeyUp(SDL_Scancode key) {
   INFOF("Key released: %i/%c", key, SDL_GetKeyFromScancode(key));
   switch (key) {
     case 26: // w
-      player->_vy += .13;
+      increaseEntityVelocity(player, 0, .13);
+      // player->_vy += .13;
       break;
     case 7: // d
-      player->_vx -= .13;
+      increaseEntityVelocity(player, -.13, 0);
+      // player->_vx -= .13;
       break;
     case 22: // s
-      player->_vy -= .13;
+      increaseEntityVelocity(player, 0, -.13);
+      //player->_vy -= .13;
       break;
     case 4: // a
-      player->_vx += .13;
+      increaseEntityVelocity(player, .13, 0);
+      //player->_vx += .13;
       break;
     default:
       break;
@@ -83,22 +92,30 @@ uint8_t getCleanMask(uint8_t mask) {
 }
 
 void slideCallback(physicsCallbackStats s) {
+  INFOF("Physics callback mask: %s", intToBinary(s.collisionChangeMask, 8));
 
-  INFOF("Physics callback mask: %u", s.collisionChangeMask);
+  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
 
   RelativeMovementType rmt =
-      getOrthoRectsRelativeMovementType(s.r1, s.r2, *s.vx, *s.vy, 0, 0);
+      getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
 
-  if (rmt != RMT_CONVERGE)
+  if (rmt != RMT_CONVERGE) {
+    INFO("Not convergig, skipping");
     return;
+  }
 
   uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
+  INFOF("Clean callback mask: %s", intToBinary(cleanMask, 8));
 
-  if (cleanMask & (32 + 128))
-    *s.vx = 0;
+  if (cleanMask & (32 + 128)) {
+    *s.avx = 0;
+    INFO("avx = 0");
+  }
 
-  if (cleanMask & (16 + 64))
-    *s.vy = 0;
+  if (cleanMask & (16 + 64)) {
+    *s.avy = 0;
+    INFO("avy = 0");
+  }
 }
 
 int main() {
@@ -107,7 +124,7 @@ int main() {
   registerOnKeyDownFunc(onKeyDown);
   registerOnKeyUpFunc(onKeyUp);
 
-  player = createEntity(120, 200 - 48, 48, 48);
+  player = createEntity(170, 152, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
   player->tag = 0;
@@ -116,25 +133,33 @@ int main() {
   ground->tag = 1;
   ground->collisionId = 2;
 
-  prop1 = createProp(320, 200 - 48 - 10, 48, 48);
+  prop1 = createProp(320, 142, 48, 48);
   prop1->tag = 2;
   prop1->collisionId = 2;
 
-  prop2 = createProp(350 - 48 - 10, 232 + 48 + 10, 48, 48);
+  prop2 = createProp(292, 290, 48, 48);
   prop2->tag = 3;
   prop2->collisionId = 2;
+
+  prop3 = createProp(320, 142 - 48, 48, 48);
+  prop3->tag = 4;
+  prop3->collisionId = 2;
 
   box = createEntity(120, 30, 32, 32);
   box->collisionId = 4;
   box->collisionMask = 3;
-  box->tag = 1;
-  box->_vy = 0.1;
+  box->tag = 5;
+ 
+  // So wrong
+  //box->_vy = 0.1;
+  //box->_avy = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
+  addPropToScene(getMainScene(), prop3);
   addEntityToScene(getMainScene(), player);
-  addEntityToScene(getMainScene(), box);
+//  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);

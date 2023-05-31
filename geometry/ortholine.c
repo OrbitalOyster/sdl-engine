@@ -1,5 +1,6 @@
 #include "ortholine.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 #include "../debug.h"
@@ -60,7 +61,7 @@ Point getOrthoLinesIntersection(OrthoLine l1, OrthoLine l2) {
 
 Point getOrthoLineLineIntersection(OrthoLine l1, Line l2) {
 #ifdef GEOMETRY_DEBUG
-  if ((l1.isVertical && l2.k == INFINITY) || (!l1.isVertical && l2.k == 0))
+  if ((l1.isVertical && isinf(l2.k)) || (!l1.isVertical && compare(l2.k, 0)))
     WARN("Parallel lines");
 #endif
   if (l1.isVertical)

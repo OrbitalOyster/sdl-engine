@@ -22,14 +22,15 @@ double getMovingPointPointCollisionTime(Point p1, Point p2, double vx,
 
 #ifdef GEOMETRY_DEBUG
   double k1 = (p2.y - p1.y) / (p2.x - p1.x);
-  if (k1 == -INFINITY)
+  if (isinf(k1) && k1 < 0)
     k1 = INFINITY;
   double k2 = vy / vx;
-  if (k2 == -INFINITY)
+  if (isinf(k2) && k2 < 0)
     k2 = INFINITY;
-  if (!(k1 == INFINITY && k2 == INFINITY) && !compare(k1, k2))
+  if (!(isinf(k1) && isinf(k2)) && !compare(k1, k2))
     WARNF("Points are not alligned: %f, %f", k1, k2);
 #endif
+
   double k = vy / vx;
   double result = (fabs(k) > 1) ? (p2.y - p1.y) / vy : (p2.x - p1.x) / vx;
   return lessThan(result, 0) ? INFINITY : result;
@@ -79,20 +80,22 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
     printf("vx == 0 && vy == 0");
 #endif
 
+  // Easy case
   if ((s1.line->isVertical && !compare(vx, 0)) ||
       (!s1.line->isVertical && !compare(vy, 0)))
     return true;
 
+  // Hard case
   if (s1.line->isVertical)
-    return moreEqThan((s1.p1->y - s2.p1->y) * vy, 0) &&
-           moreEqThan((s1.p1->y - s2.p2->y) * vy, 0) &&
-           moreEqThan((s1.p2->y - s2.p1->y) * vy, 0) &&
-           moreEqThan((s1.p2->y - s2.p2->y) * vy, 0);
+    return moreThan((s1.p1->y - s2.p1->y) * vy, 0) &&
+           moreThan((s1.p1->y - s2.p2->y) * vy, 0) &&
+           moreThan((s1.p2->y - s2.p1->y) * vy, 0) &&
+           moreThan((s1.p2->y - s2.p2->y) * vy, 0);
   else
-    return moreEqThan((s1.p1->x - s2.p1->x) * vx, 0) &&
-           moreEqThan((s1.p1->x - s2.p2->x) * vx, 0) &&
-           moreEqThan((s1.p2->x - s2.p1->x) * vx, 0) &&
-           moreEqThan((s1.p2->x - s2.p2->x) * vx, 0);
+    return moreThan((s1.p1->x - s2.p1->x) * vx, 0) &&
+           moreThan((s1.p1->x - s2.p2->x) * vx, 0) &&
+           moreThan((s1.p2->x - s2.p1->x) * vx, 0) &&
+           moreThan((s1.p2->x - s2.p2->x) * vx, 0);
 }
 
 double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,

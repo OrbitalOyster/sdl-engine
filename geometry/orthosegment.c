@@ -12,7 +12,7 @@ OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2) {
   if (comparePoints(*p1, *p2))
     WARN("Creating zero-length segment");
 
-  if (!compareEps(p1->x, p2->x) && !compareEps(p1->y, p2->y))
+  if (!compare(p1->x, p2->x) && !compare(p1->y, p2->y))
     WARN("Attempting to create non-ortho segment");
 #endif
   OrthoSegment *result = calloc(1, sizeof(OrthoSegment));
@@ -21,6 +21,11 @@ OrthoSegment *createHeapOrthoSegment(Point *p1, Point *p2) {
   // Make a line out of two points
   result->line = createHeapOrthoLine(*p1, *p2);
   return result;
+}
+
+bool compareOrthoSegments(OrthoSegment s1, OrthoSegment s2) {
+  return (comparePoints(*s1.p1, *s2.p1) && comparePoints(*s1.p2, *s2.p2)) ||
+         (comparePoints(*s1.p1, *s2.p2) && comparePoints(*s1.p2, *s2.p1));
 }
 
 bool checkOrthoSegmentsInterlacing(OrthoSegment s1, OrthoSegment s2) {

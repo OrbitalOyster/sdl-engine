@@ -36,30 +36,35 @@ void addEntityToScene(Scene *scene, Entity *entity) {
 void initSceneCollisions(Scene *scene) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
-        getEntityCollisionState(scene->entities[i], scene);
+      getEntityCollisionState(scene->entities[i], scene);
+//if (scene){};
 }
 
 // Returns true if any immediate collision changes has been found
 bool adjustEntityVelocity(Entity *entity, Scene *scene) {
-  entity->_avx = entity->_vx;
-  entity->_avy = entity->_vy;
   EntityImmediateCollisionChange eicc =
       getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
   if (eicc.size) {
+  entity->_avx = entity->_vx;
+  entity->_avy = entity->_vy;
 //    INFOF("Found %u", eicc.size);
     for (uint8_t i = 0; i < eicc.size; i++) {
       void *agent = eicc.changes[i].agent;
       uint8_t collisionId = 0;
-      OrthoRect *rect = NULL;
+      OrthoRect *agentRect = NULL;
+      double agentVx = 0;
+      double agentVy = 0;
 //      INFOF("Agent type: %i", eicc.changes[i].agentType);
       switch (eicc.changes[i].agentType) {
         case CAT_PROP:
-          rect = ((Prop*) agent) -> rect;
+          agentRect = ((Prop*) agent) -> rect;
           collisionId = ((Prop*) agent) -> collisionId;
           break;
         case CAT_ENTITY:
-          rect = ((Entity*) agent) -> rect;
+          agentRect = ((Entity*) agent) -> rect;
           collisionId = ((Entity*) agent) -> collisionId;
+          agentVx = ((Entity*) agent) -> _avx;
+          agentVy = ((Entity*) agent) -> _avy;
           break;
       }
 //      INFOF("Collision id: %u", collisionId);
@@ -67,11 +72,16 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
 //      INFOF("Collision mask: %u", mask);
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
-                                  .r2 = rect,
-                                  .vx = &(entity->_avx),
-                                  .vy = &(entity->_avy),
+                                  .r2 = agentRect,
+                                  .vx1 = entity->_avx,
+                                  .vy1 = entity->_avy,
+                                  .vx2 = agentVx,
+                                  .vy2 = agentVy,
+                                  .avx = &entity->_avx,
+                                  .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask};
         scene->callbacks[mask](s);
+  //      INFOF("%.8f %.8f", entity->_avx, entity->_avy);
       }
     }
   }
@@ -79,57 +89,15 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
   return eicc.size > 0;
 }
 
-/*
-double stepEntity(Entity *entity, Scene *scene, double timeToProcess) {
-  INFOF("Stepping entity (%.8lf, %.8lf)", entity->_vx, entity->_vy);
-  INFOF("Entity collision state size: %u", entity->collisionState->size);
-
-  // Step 1: check for immediate changes
-  bool adjustedVelocity = adjustEntityVelocity(entity, scene);
-
-  // Step 2: get time until next collision change
-  double timeUntilNextCollision =
-      getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
-
-  // Collision change
-  if (lessEqThan(timeUntilNextCollision, timeToProcess)) {
-    moveEntity(entity, entity->_avx * timeUntilNextCollision,
-               entity->_avy * timeUntilNextCollision);
-   entity->collisionState = getEntityCollisionState(entity, scene);
-    return timeUntilNextCollision;
-  }
-  // End of step
-  else {
-    moveEntity(entity, entity->_avx * timeToProcess, entity->_avy * timeToProcess);
-    if (adjustedVelocity)
-      entity->collisionState = getEntityCollisionState(entity, scene);
-    return timeToProcess;
-  }
-}
-
-void processEntity(Entity *entity, Scene *scene, uint64_t ticksPassed) {
-  // Nothing to do
-  if (compare(entity->_vx, 0) && compare(entity->_vy, 0))
-    return;
-
-  double timeProcessed = (double)ticksPassed;
-
-  uint8_t steps = 5;
-  while (moreThan(timeProcessed, 0)) {
-    if (!--steps)
-      ERR(1, "TOO MANY STEPS");
-    timeProcessed -= stepEntity(entity, scene, timeProcessed);
-  }
-}
-*/
-
 double stepScene(Scene *scene, double timeToProcess) {
   double timeProcessed = (double) timeToProcess;
+
+  //bool needAdjustments[scene->numberOfEntities];
 
   // Adjust velocities, get next collision
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
-    if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) continue;
+    // if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) continue;
     adjustEntityVelocity(entity, scene);
     double t = getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
     if (t < timeProcessed) timeProcessed = t;
@@ -138,7 +106,7 @@ double stepScene(Scene *scene, double timeToProcess) {
   // Move entities
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
-    if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) continue;
+    if (compare(entity->_avx, 0) && compare(entity->_avy, 0)) continue;
     moveEntity(entity,
         entity->_avx * timeProcessed,
         entity->_avy * timeProcessed);
@@ -149,21 +117,16 @@ double stepScene(Scene *scene, double timeToProcess) {
   return timeProcessed;
 }
 
-
 void processScene(Scene *scene, uint64_t ticksPassed) {
-  // INFOF("Processing scene; ticksPassed: %li", ticksPassed);
-  //for (unsigned int i = 0; i < scene->numberOfEntities; i++)
-  //  processEntity(scene->entities[i], scene, ticksPassed);
-
   INFOF("Processing scene, ticksPassed: %u", ticksPassed);
-  double timeProcessed = (double)ticksPassed;
+  double timeToProcess = (double) ticksPassed;
 
   uint16_t steps = 1000;
-  while (moreThan(timeProcessed, 0)) {
+  while (moreThan(timeToProcess, 0)) {
     if (!--steps)
       ERR(1, "TOO MANY STEPS");
-    timeProcessed -= stepScene(scene, timeProcessed);
-    INFOF("Time left to process: %5.10lf", timeProcessed);
+    timeToProcess -= stepScene(scene, timeToProcess);
+    INFOF("Time left to process: %5.10lf", timeToProcess);
   }
 
   INFOF("Scene processed, steps: %u", 1000 - steps);

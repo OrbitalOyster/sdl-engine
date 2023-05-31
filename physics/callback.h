@@ -8,8 +8,12 @@
 typedef struct {
   OrthoRect *r1;
   OrthoRect *r2;
-  double *vx;
-  double *vy;
+  double vx1;
+  double vy1;
+  double vx2;
+  double vy2;
+  double *avx;
+  double *avy;
   uint8_t collisionChangeMask;
 } physicsCallbackStats;
 

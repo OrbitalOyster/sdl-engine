@@ -76,8 +76,7 @@ void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption) {
   uint8_t ln = 0;
   char line[MAX_CAPTION_LINE_SIZE];
   char c;
-  bool done = false;
-  while (!done) {
+  do {
     c = caption->text[n++];
     line[ln] = c;
 
@@ -89,12 +88,10 @@ void updateCaptionTexture(SDL_Renderer *renderer, Caption *caption) {
       caption->textures[caption->numberOfLines] = createOutlinedCaptionTexture(renderer, line, caption->font, caption->color, caption->outlineColor);
       caption->numberOfLines++;
       ln = 0;
-      if (c == '\0') done = true;
-    }
-    else ln++;
-  }
+    } else ln++;
+  } while (c != '\0');
 
-  INFOF("Updating caption texture. Number of lines: %u", caption->numberOfLines);
+  // INFOF("Updating caption texture. Number of lines: %u", caption->numberOfLines);
 }
 
 Caption *createCaption(SDL_Renderer *renderer, int32_t x, int32_t y,

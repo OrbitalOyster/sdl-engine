@@ -26,7 +26,7 @@ Line createLineFromPoints(Point p1, Point p2) {
 
 double getLineX(Line l, double y) {
 #ifdef GEOMETRY_DEBUG
-  if (compareEps(l.k, 0))
+  if (compare(l.k, 0))
     WARN("Getting X of horizontal line");
 #endif
   return l.x0 + y / l.k;
@@ -34,7 +34,7 @@ double getLineX(Line l, double y) {
 
 double getLineY(Line l, double x) {
 #ifdef GEOMETRY_DEBUG
-  if (l.k == INFINITY)
+  if (isinf(l.k))
     WARN("Getting Y of vertical line");
 #endif
   return l.y0 + l.k * x;
