@@ -37,7 +37,6 @@ void initSceneCollisions(Scene *scene) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
       getEntityCollisionState(scene->entities[i], scene);
-//if (scene){};
 }
 
 // Returns true if any immediate collision changes has been found
@@ -45,43 +44,42 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
   EntityImmediateCollisionChange eicc =
       getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
   if (eicc.size) {
-  entity->_avx = entity->_vx;
-  entity->_avy = entity->_vy;
-//    INFOF("Found %u", eicc.size);
-    for (uint8_t i = 0; i < eicc.size; i++) {
-      void *agent = eicc.changes[i].agent;
-      uint8_t collisionId = 0;
-      OrthoRect *agentRect = NULL;
-      double agentVx = 0;
-      double agentVy = 0;
-//      INFOF("Agent type: %i", eicc.changes[i].agentType);
-      switch (eicc.changes[i].agentType) {
-        case CAT_PROP:
-          agentRect = ((Prop*) agent) -> rect;
-          collisionId = ((Prop*) agent) -> collisionId;
-          break;
-        case CAT_ENTITY:
-          agentRect = ((Entity*) agent) -> rect;
-          collisionId = ((Entity*) agent) -> collisionId;
-          agentVx = ((Entity*) agent) -> _avx;
-          agentVy = ((Entity*) agent) -> _avy;
-          break;
-      }
-//      INFOF("Collision id: %u", collisionId);
-      uint8_t mask = entity->collisionMask & collisionId;
-//      INFOF("Collision mask: %u", mask);
-      if (scene->callbacks[mask]) {
-        physicsCallbackStats s = {.r1 = entity->rect,
-                                  .r2 = agentRect,
-                                  .vx1 = entity->_avx,
-                                  .vy1 = entity->_avy,
-                                  .vx2 = agentVx,
-                                  .vy2 = agentVy,
-                                  .avx = &entity->_avx,
-                                  .avy = &entity->_avy,
-                                  .collisionChangeMask = eicc.changes[i].mask};
-        scene->callbacks[mask](s);
-  //      INFOF("%.8f %.8f", entity->_avx, entity->_avy);
+    entity->_avx = entity->_vx;
+    entity->_avy = entity->_vy;
+    // Two passes, first for non-corner collisions
+    for (int j = 0; j < 2; j++) {
+      for (uint8_t i = 0; i < eicc.size; i++) {
+        if (isCornerCollisionMask(eicc.changes[i].mask) != j) continue;
+        void *agent = eicc.changes[i].agent;
+        uint8_t collisionId = 0;
+        OrthoRect *agentRect = NULL;
+        double agentVx = 0;
+        double agentVy = 0;
+        switch (eicc.changes[i].agentType) {
+          case CAT_PROP:
+            agentRect = ((Prop*) agent) -> rect;
+            collisionId = ((Prop*) agent) -> collisionId;
+            break;
+          case CAT_ENTITY:
+            agentRect = ((Entity*) agent) -> rect;
+            collisionId = ((Entity*) agent) -> collisionId;
+            agentVx = ((Entity*) agent) -> _avx;
+            agentVy = ((Entity*) agent) -> _avy;
+            break;
+        }
+        uint8_t mask = entity->collisionMask & collisionId;
+        if (scene->callbacks[mask]) {
+          physicsCallbackStats s = {.r1 = entity->rect,
+                                    .r2 = agentRect,
+                                    .vx1 = entity->_avx,
+                                    .vy1 = entity->_avy,
+                                    .vx2 = agentVx,
+                                    .vy2 = agentVy,
+                                    .avx = &entity->_avx,
+                                    .avy = &entity->_avy,
+                                    .collisionChangeMask = eicc.changes[i].mask};
+          scene->callbacks[mask](s);
+        }
       }
     }
   }

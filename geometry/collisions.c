@@ -77,7 +77,7 @@ bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
   if (!checkOrthoSegmentsInterlacing(s1, s2))
     WARN("Segments are not interlacing");
   if (compare(vx, 0) && compare(vy, 0))
-    printf("vx == 0 && vy == 0");
+    WARN("vx == 0 && vy == 0");
 #endif
 
   // Easy case
@@ -297,7 +297,14 @@ double getMovingOrthoRectsNextCollisionTime(OrthoRect *r1, OrthoRect *r2,
   return result;
 }
 
-// Returns time and "couple" mask
+// If rects collide by two opposing edges - it's a corner collision
+bool isCornerCollisionMask(uint8_t mask) {
+  uint8_t a = mask >> 4;
+  uint8_t b = mask & 0xF;
+  return a + b == 0xF;
+}
+
+// Returns time and colliding edges mask
 OrthoRectCollisionChange
 getMovingOrthoRectsNextCollisionChange(OrthoRect *r1, OrthoRect *r2, double vx1,
                                        double vy1, double vx2, double vy2) {
