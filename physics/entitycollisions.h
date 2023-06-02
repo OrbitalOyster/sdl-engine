@@ -36,4 +36,6 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
 /* EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene
  * *scene, double vx, double vy); */
 
+void freeEntityCollisionState(Entity* entity);
+
 #endif

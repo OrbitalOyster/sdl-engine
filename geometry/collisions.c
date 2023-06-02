@@ -221,7 +221,7 @@ uint16_t getOrthoCollisionMask(OrthoRect* r1, OrthoRect* r2) {
 OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
   // End result
   OrthoRectCollision result = {
-      .type = NO_COLLISION, .edgeCollisionMask = 0, .orthoCollisionMask = 0};
+      .type = NO_COLLISION, .edgeCollisionMask = 0/* , .orthoCollisionMask = 0 */ };
 
   // No collision
   if (checkOrthoRectsHardSeparated(r1, r2))

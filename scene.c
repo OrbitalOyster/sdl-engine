@@ -73,6 +73,7 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc, S
                                   .avx = &entity->_avx,
                                   .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask};
+        INFOF("DEBUG %lf %lf %s", entity->_avx, entity->_avy, intToBinary(eicc.changes[i].mask, 8));
         INFOF("Triggering callback for entity #%u", entity->tag);
         scene->callbacks[mask](s);
       }
@@ -91,12 +92,19 @@ double stepScene(Scene *scene, double timeToProcess) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
     // if (compare(entity->_vx, 0) && compare(entity->_vy, 0)) continue;
-    eiccs[i] = getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
+    eiccs[i] = getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
     // eiccs[i] = adjustEntityVelocity(entity, scene);
     if (eiccs[i].size) {
       entity->_avx = entity->_vx;
       entity->_avy = entity->_vy;
-      adjustEntityVelocity(entity,eiccs[i], scene);
+
+      //freeEntityCollisionState(entity);
+      //entity->collisionState = getEntityCollisionState(entity, scene);
+
+      EntityImmediateCollisionChange tmp = getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
+      
+      //adjustEntityVelocity(entity,eiccs[i], scene);
+      adjustEntityVelocity(entity,tmp, scene);
     }
     double t = getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
     if (t < timeProcessed) timeProcessed = t;
@@ -110,6 +118,7 @@ double stepScene(Scene *scene, double timeToProcess) {
         entity->_avx * timeProcessed,
         entity->_avy * timeProcessed);
     //TODO Don't need to get collision state every time
+    freeEntityCollisionState(entity);
     entity->collisionState = getEntityCollisionState(entity, scene);
   }
 

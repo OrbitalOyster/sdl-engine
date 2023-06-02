@@ -125,6 +125,7 @@ int main() {
   registerOnKeyUpFunc(onKeyUp);
 
   player = createEntity(152, 152, 48, 48);
+  //player = createEntity(340, 290, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
   player->tag = 0;

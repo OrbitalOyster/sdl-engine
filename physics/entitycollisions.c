@@ -6,6 +6,8 @@
 #include "../debug.h"
 #include "../dmath/dmath.h"
 
+#include "../binary.h"
+
 EntityCollisionState *createEmptyHeapEntityCollisionState() {
   EntityCollisionState *result = calloc(1, sizeof(EntityCollisionState));
   result->collisions =
@@ -22,14 +24,14 @@ void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType
   cs->size++;
 }
 
-EntityCollision *checkCollisionStateIncludesProp(EntityCollisionState *cs,
+/* EntityCollision *checkCollisionStateIncludesProp(EntityCollisionState *cs,
                                                  Prop *p) {
   for (uint8_t i = 0; i < cs->size; i++)
     if (cs->collisions[i]->agentType == CAT_PROP && cs->collisions[i]->agent == p)
       return cs->collisions[i];
 
   return NULL;
-}
+} */
 
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
   INFOF("Getting entity #%u collision state", entity->tag);
@@ -45,7 +47,7 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
     OrthoRectCollision rc = getOrthoRectCollision(entity->rect, prop->rect);
     if (rc.type) {
-      INFOF("Found [%u] collision with prop #%u", rc.type, prop->tag);
+      INFOF("Found [%u] collision (%s) with prop #%u", rc.type, intToBinary(rc.edgeCollisionMask, 8), prop->tag);
       updateCollisionState(result, CAT_PROP, prop, rc);
     }
   }
@@ -88,7 +90,6 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
         break;
       case CAT_ENTITY:
         rect = ((Entity*) agent) -> rect;
-        // TODO: _vx and _vy is wrong and temporary, should use actual velocity
         avx = ((Entity*) agent) -> _avx;
         avy = ((Entity*) agent) -> _avy;
         break;
@@ -137,5 +138,10 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
   }
 
   return result;
+}
+
+void freeEntityCollisionState(Entity* entity) {
+  for (unsigned int i = 0; i < entity->collisionState->size; i++)
+    free(entity->collisionState->collisions[i]);
 }
 
