@@ -100,7 +100,7 @@ void slideCallback(physicsCallbackStats s) {
       getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
 
   if (rmt != RMT_CONVERGE) {
-    INFO("Not convergig, skipping");
+    INFO("Not converging, skipping");
     return;
   }
 
@@ -124,7 +124,7 @@ int main() {
   registerOnKeyDownFunc(onKeyDown);
   registerOnKeyUpFunc(onKeyUp);
 
-  player = createEntity(170, 152, 48, 48);
+  player = createEntity(152, 152, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
   player->tag = 0;
@@ -151,15 +151,15 @@ int main() {
   box->tag = 5;
  
   // So wrong
-  //box->_vy = 0.1;
-  //box->_avy = 0.1;
+  box->_vy = 0.1;
+  box->_avy = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addPropToScene(getMainScene(), prop3);
   addEntityToScene(getMainScene(), player);
-//  addEntityToScene(getMainScene(), box);
+  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);

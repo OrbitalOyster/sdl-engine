@@ -18,7 +18,6 @@ typedef struct {
   double x0;
 } Line;
 
-
 Line createLineFromPoints(Point p1, Point p2);
 double getLineX(Line l, double y);
 double getLineY(Line l, double x);

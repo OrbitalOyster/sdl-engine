@@ -89,8 +89,8 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
       case CAT_ENTITY:
         rect = ((Entity*) agent) -> rect;
         // TODO: _vx and _vy is wrong and temporary, should use actual velocity
-        avx = ((Entity*) agent) -> _vx;
-        avy = ((Entity*) agent) -> _vy;
+        avx = ((Entity*) agent) -> _avx;
+        avy = ((Entity*) agent) -> _avy;
         break;
     }
 
@@ -131,7 +131,7 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
     if (entity == entity2) continue;
     // NOTE: Skipping props from collisionState leads to bugs
     double t = getMovingOrthoRectsNextCollisionTime(entity->rect, entity2->rect,
-                                                    vx, vy, entity2->_vx, entity2->_vy);
+                                                    vx, vy, entity2->_avx, entity2->_avy);
     if (lessThan(t, result))
       result = t;
   }

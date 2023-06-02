@@ -40,11 +40,14 @@ void renderGUI(GUI *gui) {
   // Captions
   for (unsigned int i = 0; i < gui->numberOfCaptions; i++) {
     for (int j = 0; j < gui->captions[i]->numberOfLines; j++) {
-      int totalLineHeight = gui->captions[i]->font->lineHeight + gui->captions[i]->leading;
-      SDL_Rect dstRect = {gui->captions[i]->x, gui->captions[i]->y + j * totalLineHeight,
-                          0, 0};
-      TTF_SizeUTF8(gui->captions[i]->font->outline, gui->captions[i]->lines[j], &dstRect.w, &dstRect.h);
-      SDL_RenderCopy(gui->renderer, gui->captions[i]->textures[j], NULL, &dstRect);
+      int totalLineHeight =
+          gui->captions[i]->font->lineHeight + gui->captions[i]->leading;
+      SDL_Rect dstRect = {gui->captions[i]->x,
+                          gui->captions[i]->y + j * totalLineHeight, 0, 0};
+      TTF_SizeUTF8(gui->captions[i]->font->outline, gui->captions[i]->lines[j],
+                   &dstRect.w, &dstRect.h);
+      SDL_RenderCopy(gui->renderer, gui->captions[i]->textures[j], NULL,
+                     &dstRect);
     }
   }
 }

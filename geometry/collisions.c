@@ -15,7 +15,6 @@
 // Returns time before moving p1 will collide with static p2
 double getMovingPointPointCollisionTime(Point p1, Point p2, double vx,
                                         double vy) {
-
   // Special case
   if (comparePoints(p1, p2))
     return 0;
@@ -142,7 +141,7 @@ RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
       (moreEqThan(r1->x, r2->x + r2->w) && moreThan(vx, 0)))
     return RMT_DIVERGE;
 
-  /* Horizontal movement */
+  // Horizontal movement
   if (compare(vy, 0)) {
     if (moreThan(r1->y, r2->y + r2->h) || lessThan(r1->y + r1->h, r2->y))
       return RMT_DIVERGE;
@@ -152,7 +151,7 @@ RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
       return RMT_SLIP;
   }
 
-  /* Vertical movement */
+  // Vertical movement
   if (compare(vx, 0)) {
     if (lessThan(r1->x + r1->w, r2->x) || moreThan(r1->x, r2->x + r2->w))
       return RMT_DIVERGE;
