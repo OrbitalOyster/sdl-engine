@@ -23,7 +23,9 @@ typedef struct {
   EntityCollision **collisions;
 } EntityCollisionState;
 
-typedef struct {
+typedef struct Entity Entity;
+
+struct Entity {
   // Dimensions
   double x;
   double y;
@@ -42,7 +44,7 @@ typedef struct {
   // Tag
   uint16_t tag;
   EntityCollisionState *collisionState;
-} Entity;
+};
 
 Entity *createEntity(double x, double y, double w, double h);
 void jumpEntity(Entity *entity, double x, double y);

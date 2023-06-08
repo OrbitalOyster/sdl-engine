@@ -15,7 +15,7 @@ void jumpEntity(Entity *entity, double x, double y) {
   entity->x = x;
   entity->y = y;
   jumpOrthoRect(entity->rect, x, y);
-  INFOF("Jumped entity [] to (%.8f %.8f)", entity->tag, entity->x, entity->y);
+  INFOF("Jumped entity #%u to (%.8f %.8f)", entity->tag, entity->x, entity->y);
 }
 
 void setEntityVelocity(Entity *entity, double vx, double vy) {

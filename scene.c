@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include <math.h>
+
 #include "binary.h"
 #include "debug.h"
 #include "dmath/dmath.h"
@@ -11,6 +13,8 @@ Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));
   scene->props = calloc(MAX_NUMBER_OF_PROPS, sizeof(Prop *));
   scene->entities = calloc(MAX_NUMBER_OF_ENTITIES, sizeof(Entity *));
+  scene->fooNumber = 0;
+  scene->timeToNextCollisionChange = INFINITY;
   scene->callbacks = calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(void *));
   return scene;
 }
@@ -24,23 +28,10 @@ void addPropToScene(Scene *scene, Prop *prop) {
   scene->numberOfProps++;
 }
 
-void addEntityToScene(Scene *scene, Entity *entity) {
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
-    if (scene->entities[i] == entity)
-      WARN("Entity already added");
-
-  scene->entities[scene->numberOfEntities] = entity;
-  scene->numberOfEntities++;
-}
-
-void initSceneCollisions(Scene *scene) {
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
-    scene->entities[i]->collisionState =
-        getEntityCollisionState(scene->entities[i], scene);
-}
-
 void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                           Scene *scene) {
+  entity->_avx = entity->_vx;
+  entity->_avy = entity->_vy;
   // Two passes, first for non-corner collisions
   for (int j = 0; j < 2; j++) {
     for (uint8_t i = 0; i < eicc.size; i++) {
@@ -83,22 +74,71 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
   }
 }
 
+void adjustSceneVelocities(Scene *scene) {
+  INFO("Adjusting scene velocities");
+  for (unsigned int i = 0; i < scene->fooNumber; i++) {
+    Entity *entity = scene->foo[i];
+    EntityImmediateCollisionChange eicc =
+        getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
+    adjustEntityVelocity(entity, eicc, scene);
+  }
+  scene->fooNumber = 0;
+}
+
+void setSceneNextCollisionChange(Scene *scene) {
+  INFO("Setting next scene collision change");
+  scene->timeToNextCollisionChange = INFINITY;
+  scene->fooNumber = 0;
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+    Entity *entity = scene->entities[i];
+    double t =
+        getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
+    if (compare(t, scene->timeToNextCollisionChange))
+      scene->foo[scene->fooNumber++] = entity;
+    else if (lessThan(t, scene->timeToNextCollisionChange)) {
+      scene->fooNumber = 1;
+      scene->foo[0] = entity;
+      scene->timeToNextCollisionChange = t;
+    }
+  }
+  INFOF("Scene next collision change in %lf", scene->timeToNextCollisionChange);
+}
+
+void initSceneCollisions(Scene *scene) {
+/*  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
+    scene->entities[i]->collisionState =
+        getEntityCollisionState(scene->entities[i], scene);
+        */
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+    scene->entities[i]->collisionState =
+        getEntityCollisionState(scene->entities[i], scene);
+    scene->foo[i] = scene->entities[i];
+  }
+  scene->fooNumber = scene->numberOfEntities;
+  scene->timeToNextCollisionChange = 0;
+  adjustSceneVelocities(scene);
+  setSceneNextCollisionChange(scene);
+}
+
+void addEntityToScene(Scene *scene, Entity *entity) {
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
+    if (scene->entities[i] == entity)
+      WARN("Entity already added");
+  scene->entities[scene->numberOfEntities] = entity;
+  scene->numberOfEntities++;
+}
+
+
+/*
 double stepScene(Scene *scene, double timeToProcess) {
-  double timeProcessed = (double)timeToProcess;
-
-  EntityImmediateCollisionChange *eiccs =
-      calloc(scene->numberOfEntities, sizeof(EntityImmediateCollisionChange));
-
-  // TODO: Proper name
-  Entity *foo[MAX_NUMBER_OF_ENTITIES];
-  uint32_t fooNumber = 0;
+  double timeProcessed = (double) timeToProcess;
 
   // Adjust velocities, get next collision
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
-    eiccs[i] =
+    EntityImmediateCollisionChange eicc =
         getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
-    if (eiccs[i].size) {
+    if (eicc.size) {
       entity->_avx = entity->_vx;
       entity->_avy = entity->_vy;
       EntityImmediateCollisionChange tmp =
@@ -109,14 +149,8 @@ double stepScene(Scene *scene, double timeToProcess) {
         getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
 
     // Remember entity to have collision change next step
-    if (compare(t, timeProcessed))
-      foo[fooNumber++] = entity;
-    else if (lessThan(t, timeProcessed)) {
-      fooNumber = 0;
-      foo[fooNumber] = entity;
+    if (lessThan(t, timeProcessed))
       timeProcessed = t;
-    }
-
   }
 
   // Move entities
@@ -131,10 +165,34 @@ double stepScene(Scene *scene, double timeToProcess) {
     entity->collisionState = getEntityCollisionState(entity, scene);
   }
 
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
-    freeEntityImmediateCollisionChange(eiccs[i]);
-  free(eiccs);
+  return timeProcessed;
+}
+*/
 
+double stepScene(Scene *scene, double timeToProcess) {
+  double timeProcessed = (double) timeToProcess;
+  
+  if (compare(scene->timeToNextCollisionChange, 0)) {
+    adjustSceneVelocities(scene);
+    setSceneNextCollisionChange(scene);
+  }
+
+  if (lessEqThan(scene->timeToNextCollisionChange, timeProcessed))
+    timeProcessed = scene->timeToNextCollisionChange;
+
+  // Move entities
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+    Entity *entity = scene->entities[i];
+    if (compare(entity->_avx, 0) && compare(entity->_avy, 0))
+      continue;
+    moveEntity(entity, entity->_avx * timeProcessed,
+               entity->_avy * timeProcessed);
+    // TODO Don't need to get collision state every time
+    freeEntityCollisionState(entity);
+    entity->collisionState = getEntityCollisionState(entity, scene);
+  }
+
+  scene->timeToNextCollisionChange -= timeProcessed;
   return timeProcessed;
 }
 

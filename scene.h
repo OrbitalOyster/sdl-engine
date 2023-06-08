@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include "geometry/orthorect.h"
 #include "physics/entity.h"
 #include "physics/prop.h"
 #include "physics/callback.h"
@@ -17,6 +16,12 @@ typedef struct {
   Prop **props;
   uint32_t numberOfEntities;
   Entity **entities;
+
+  // TODO: Proper name
+  Entity *foo[MAX_NUMBER_OF_ENTITIES];
+  uint32_t fooNumber;
+  double timeToNextCollisionChange;
+
   void (**callbacks)(physicsCallbackStats);
 } Scene;
 

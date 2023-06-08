@@ -153,14 +153,17 @@ int main() {
  
   // So wrong
   box->_vy = 0.1;
-  box->_avy = 0.1;
+//  box->_avy = 0.1;
+
+//  player->_vx = 0.1;
+//  player->_avx = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addPropToScene(getMainScene(), prop3);
   addEntityToScene(getMainScene(), player);
-  addEntityToScene(getMainScene(), box);
+//  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);
