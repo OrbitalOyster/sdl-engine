@@ -47,9 +47,5 @@ struct Entity {
 };
 
 Entity *createEntity(double x, double y, double w, double h);
-void jumpEntity(Entity *entity, double x, double y);
-void setEntityVelocity(Entity *entity, double vx, double vy);
-void increaseEntityVelocity(Entity *entity, double dvx, double dvy);
-void moveEntity(Entity *entity, double dx, double dy);
 
 #endif

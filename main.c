@@ -28,19 +28,19 @@ void onKeyDown(SDL_Scancode key) {
       stopGame();
       break;
     case 26: // w
-      increaseEntityVelocity(player, 0, -.13);
+      increaseEntityVelocity(player, 0, -.13, getMainScene());
       //player->_vy -= .13;
       break;
     case 7: // d
-      increaseEntityVelocity(player, .13, 0);
+      increaseEntityVelocity(player, .13, 0, getMainScene());
       //player->_vx += .13;
       break;
     case 22: // s
-      increaseEntityVelocity(player, 0, .13);
+      increaseEntityVelocity(player, 0, .13, getMainScene());
       //player->_vy += .13;
       break;
     case 4: // a
-      increaseEntityVelocity(player, -.13, 0);
+      increaseEntityVelocity(player, -.13, 0, getMainScene());
       //player->_vx -= .13;
       break;
     // Debug section
@@ -59,19 +59,19 @@ void onKeyUp(SDL_Scancode key) {
   INFOF("Key released: %i/%c", key, SDL_GetKeyFromScancode(key));
   switch (key) {
     case 26: // w
-      increaseEntityVelocity(player, 0, .13);
+      increaseEntityVelocity(player, 0, .13, getMainScene());
       // player->_vy += .13;
       break;
     case 7: // d
-      increaseEntityVelocity(player, -.13, 0);
+      increaseEntityVelocity(player, -.13, 0, getMainScene());
       // player->_vx -= .13;
       break;
     case 22: // s
-      increaseEntityVelocity(player, 0, -.13);
+      increaseEntityVelocity(player, 0, -.13, getMainScene());
       //player->_vy -= .13;
       break;
     case 4: // a
-      increaseEntityVelocity(player, .13, 0);
+      increaseEntityVelocity(player, .13, 0, getMainScene());
       //player->_vx += .13;
       break;
     default:
@@ -151,19 +151,14 @@ int main() {
   box->collisionMask = 3;
   box->tag = 5;
  
-  // So wrong
   box->_vy = 0.1;
-//  box->_avy = 0.1;
-
-//  player->_vx = 0.1;
-//  player->_avx = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addPropToScene(getMainScene(), prop3);
   addEntityToScene(getMainScene(), player);
-//  addEntityToScene(getMainScene(), box);
+  addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback);
   registerCollisionCallback(1, slideCallback);

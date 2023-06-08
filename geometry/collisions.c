@@ -21,13 +21,13 @@ double getMovingPointPointCollisionTime(Point p1, Point p2, double vx,
 
 #ifdef GEOMETRY_DEBUG
   double k1 = (p2.y - p1.y) / (p2.x - p1.x);
-  if (isinf(k1) && k1 < 0)
+  if ((isinf(k1) && k1 < 0) || compare(p2.x, p1.x))
     k1 = INFINITY;
   double k2 = vy / vx;
   if (isinf(k2) && k2 < 0)
     k2 = INFINITY;
   if (!(isinf(k1) && isinf(k2)) && !compare(k1, k2))
-    WARNF("Points are not alligned: %f, %f", k1, k2);
+    WARNF("Points are not alligned: %lf, %lf", k1, k2);
 #endif
 
   double k = vy / vx;
@@ -66,8 +66,8 @@ double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
 
 // ============================================================================
 
-// Returns true if two interlasing segments will change collision state in next
-// moment
+// Returns true if two interlasing segments will change collision state in the 
+// next moment
 bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
                                        double vx, double vy) {
 #ifdef GEOMETRY_DEBUG
@@ -220,8 +220,9 @@ uint16_t getOrthoCollisionMask(OrthoRect* r1, OrthoRect* r2) {
 
 OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
   // End result
-  OrthoRectCollision result = {
-      .type = NO_COLLISION, .edgeCollisionMask = 0/* , .orthoCollisionMask = 0 */ };
+  OrthoRectCollision result = {.type = NO_COLLISION,
+                               .edgeCollisionMask =
+                                   0 /* , .orthoCollisionMask = 0 */};
 
   // No collision
   if (checkOrthoRectsHardSeparated(r1, r2))

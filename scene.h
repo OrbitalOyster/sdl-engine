@@ -29,6 +29,10 @@ Scene *initScene();
 void addPropToScene(Scene *scene, Prop *prop);
 void addEntityToScene(Scene *scene, Entity *entity);
 void initSceneCollisions(Scene *scene);
+void jumpEntity(Entity *entity, double x, double y, Scene *scene);
+void setEntityVelocity(Entity *entity, double vx, double vy, Scene *scene);
+void increaseEntityVelocity(Entity *entity, double dvx, double dvy, Scene *scene);
+void moveEntity(Entity *entity, double dx, double dy);
 void processScene(Scene* scene, uint64_t ticksPassed);
 void freeScene(Scene *scene);
 
