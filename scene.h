@@ -17,9 +17,8 @@ typedef struct {
   uint32_t numberOfEntities;
   Entity **entities;
 
-  // TODO: Proper name
-  Entity *foo[MAX_NUMBER_OF_ENTITIES];
-  uint32_t fooNumber;
+  Entity *collisionTracker[MAX_NUMBER_OF_ENTITIES];
+  uint32_t collisionTrackerSize;
   double timeToNextCollisionChange;
 
   void (**callbacks)(physicsCallbackStats);
