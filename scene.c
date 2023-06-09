@@ -64,8 +64,6 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                                   .avx = &entity->_avx,
                                   .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask};
-        INFOF("DEBUG %lf %lf %s", entity->_avx, entity->_avy,
-              intToBinary(eicc.changes[i].mask, 8));
         INFOF("Triggering callback for entity #%u", entity->tag);
         scene->callbacks[mask](s);
       }
@@ -91,8 +89,7 @@ void setSceneNextCollisionChange(Scene *scene) {
   scene->timeToNextCollisionChange = INFINITY;
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity = scene->entities[i];
-    double t =
-        getEntityNextCollisionTime(entity, scene, entity->_avx, entity->_avy);
+    double t = getEntityNextCollisionTime(entity, scene);
     if (compare(t, scene->timeToNextCollisionChange))
       scene->collisionTracker[scene->collisionTrackerSize++] = entity;
     else if (lessThan(t, scene->timeToNextCollisionChange)) {

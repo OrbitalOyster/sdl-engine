@@ -21,21 +21,11 @@ typedef struct {
   EntityCollisionChange *changes;
 } EntityImmediateCollisionChange;
 
-typedef struct {
-  double time;
-  uint8_t size;
-  EntityCollisionChange *changes;
-} EntityNextCollisionChange;
-
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
 EntityImmediateCollisionChange
 getEntityImmediateCollisionChange(Entity *entity, double vx, double vy);
 void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc);
-double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
-                                  double vy);
-/* EntityNextCollisionChange getEntityNextCollisionChange(Entity *entity, Scene
- * *scene, double vx, double vy); */
-
+double getEntityNextCollisionTime(Entity *entity, Scene *scene);
 void freeEntityCollisionState(Entity* entity);
 
 #endif

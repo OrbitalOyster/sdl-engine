@@ -15,7 +15,9 @@ EntityCollisionState *createEmptyHeapEntityCollisionState() {
   return result;
 }
 
-void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType, void *agent, OrthoRectCollision rc) {
+void updateCollisionState(EntityCollisionState *cs,
+                          CollisionAgentType agentType, void *agent,
+                          OrthoRectCollision rc) {
   EntityCollision *ec = calloc(1, sizeof(EntityCollision));
   ec->agentType = agentType;
   ec->agent = agent;
@@ -23,15 +25,6 @@ void updateCollisionState(EntityCollisionState *cs, CollisionAgentType agentType
   cs->collisions[cs->size] = ec;
   cs->size++;
 }
-
-/* EntityCollision *checkCollisionStateIncludesProp(EntityCollisionState *cs,
-                                                 Prop *p) {
-  for (uint8_t i = 0; i < cs->size; i++)
-    if (cs->collisions[i]->agentType == CAT_PROP && cs->collisions[i]->agent == p)
-      return cs->collisions[i];
-
-  return NULL;
-} */
 
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
   INFOF("Getting entity #%u collision state", entity->tag);
@@ -47,7 +40,8 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
     OrthoRectCollision rc = getOrthoRectCollision(entity->rect, prop->rect);
     if (rc.type) {
-      INFOF("Found [%u] collision (%s) with prop #%u", rc.type, intToBinary(rc.edgeCollisionMask, 8), prop->tag);
+      INFOF("Found [%u] collision (%s) with prop #%u", rc.type,
+            intToBinary(rc.edgeCollisionMask, 8), prop->tag);
       updateCollisionState(result, CAT_PROP, prop, rc);
     }
   }
@@ -75,30 +69,32 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
   EntityImmediateCollisionChange result = {
       .size = 0,
       .changes = calloc(MAX_ENTITY_COLLISION_CHANGE_SIZE,
-                        sizeof(EntityNextCollisionChange))};
+                        sizeof(EntityCollisionChange))};
 
   for (uint8_t i = 0; i < entity->collisionState->size; i++) {
-    CollisionAgentType agentType = entity->collisionState->collisions[i]->agentType;
-    void* agent = entity->collisionState->collisions[i]->agent;
+    CollisionAgentType agentType =
+        entity->collisionState->collisions[i]->agentType;
+    void *agent = entity->collisionState->collisions[i]->agent;
     double avx = 0;
     double avy = 0;
     OrthoRect *rect = NULL;
 
     switch (agentType) {
-      case CAT_PROP:
-        rect = ((Prop*) agent) -> rect;
-        break;
-      case CAT_ENTITY:
-        rect = ((Entity*) agent) -> rect;
-        avx = ((Entity*) agent) -> _avx;
-        avy = ((Entity*) agent) -> _avy;
-        break;
+    case CAT_PROP:
+      rect = ((Prop *)agent)->rect;
+      break;
+    case CAT_ENTITY:
+      rect = ((Entity *)agent)->rect;
+      avx = ((Entity *)agent)->_avx;
+      avy = ((Entity *)agent)->_avy;
+      break;
     }
 
     uint8_t mask = getMovingOrthoRectsImmediateCollisionChange(
         entity->rect, rect, vx, vy, avx, avy);
     if (mask) {
-      EntityCollisionChange ncc = {.mask = mask, .agentType = agentType, .agent = agent};
+      EntityCollisionChange ncc = {
+          .mask = mask, .agentType = agentType, .agent = agent};
       result.changes[result.size++] = ncc;
       if (result.size == MAX_ENTITY_COLLISION_CHANGE_SIZE)
         ERR(1, "Too many collisions");
@@ -112,16 +108,15 @@ void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc) {
   free(cc.changes);
 }
 
-double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
-                                  double vy) {
+double getEntityNextCollisionTime(Entity *entity, Scene *scene) {
   double result = INFINITY;
 
   // Props
   for (unsigned int i = 0; i < scene->numberOfProps; i++) {
     Prop *prop = scene->props[i];
     // NOTE: Skipping props from collisionState leads to bugs
-    double t = getMovingOrthoRectsNextCollisionTime(entity->rect, prop->rect,
-                                                    vx, vy, 0, 0);
+    double t = getMovingOrthoRectsNextCollisionTime(
+        entity->rect, prop->rect, entity->_avx, entity->_avy, 0, 0);
     if (lessThan(t, result))
       result = t;
   }
@@ -129,10 +124,12 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
   // Entities
   for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
     Entity *entity2 = scene->entities[i];
-    if (entity == entity2) continue;
+    if (entity == entity2)
+      continue;
     // NOTE: Skipping props from collisionState leads to bugs
-    double t = getMovingOrthoRectsNextCollisionTime(entity->rect, entity2->rect,
-                                                    vx, vy, entity2->_avx, entity2->_avy);
+    double t = getMovingOrthoRectsNextCollisionTime(
+        entity->rect, entity2->rect, entity->_avx, entity->_avy, entity2->_avx,
+        entity2->_avy);
     if (lessThan(t, result))
       result = t;
   }
@@ -140,7 +137,7 @@ double getEntityNextCollisionTime(Entity *entity, Scene *scene, double vx,
   return result;
 }
 
-void freeEntityCollisionState(Entity* entity) {
+void freeEntityCollisionState(Entity *entity) {
   for (unsigned int i = 0; i < entity->collisionState->size; i++)
     free(entity->collisionState->collisions[i]);
 }
