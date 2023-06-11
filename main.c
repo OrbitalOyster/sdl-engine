@@ -92,8 +92,7 @@ uint8_t getCleanMask(uint8_t mask) {
 }
 
 void slideCallback(physicsCallbackStats s) {
-  INFOF("Physics callback mask: %s", intToBinary(s.collisionChangeMask, 8));
-
+  INFOF("Physics slide callback mask: %s", intToBinary(s.collisionChangeMask, 8));
   INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
 
   RelativeMovementType rmt =
@@ -117,6 +116,13 @@ void slideCallback(physicsCallbackStats s) {
     INFO("avy = 0");
   }
 }
+
+/*
+void getPushedCallback(physicsCallbacksStats s) {
+  INFOF("Physics getPushed callback mask: %s", intToBinary(s.collisionChangeMask, 8));
+  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
+}
+*/
 
 int main() {
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
@@ -146,7 +152,7 @@ int main() {
   prop3->tag = 4;
   prop3->collisionId = 2;
 
-  box = createEntity(120, 32, 32, 32);
+  box = createEntity(120, 30, 32, 32);
   box->collisionId = 4;
   box->collisionMask = 3;
   box->tag = 5;
