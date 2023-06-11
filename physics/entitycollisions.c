@@ -56,7 +56,8 @@ EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene) {
 
     OrthoRectCollision rc = getOrthoRectCollision(entity->rect, entity2->rect);
     if (rc.type) {
-      INFOF("Found [%u] collision with entity #%u", rc.type, entity2->tag);
+      INFOF("Found [%u] collision (%s) with entity #%u", rc.type,
+            intToBinary(rc.edgeCollisionMask, 8), entity2->tag);
       updateCollisionState(result, CAT_ENTITY, entity2, rc);
     }
   }
