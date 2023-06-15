@@ -29,6 +29,7 @@ void addPropToScene(Scene *scene, Prop *prop) {
 
 void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                           Scene *scene) {
+  INFOF("Adjusting entity #%u (cid: %s cmask: %s) velocity", entity->tag, intToBinary(entity->collisionId, 8), intToBinary(entity->collisionMask, 8));
   entity->_avx = entity->_vx;
   entity->_avy = entity->_vy;
   // Two passes, first for non-corner collisions
@@ -54,6 +55,7 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
         break;
       }
       uint8_t mask = entity->collisionMask & collisionId;
+      INFOF("Found %s collision", intToBinary(mask, 8));
       if (scene->callbacks[mask]) {
         physicsCallbackStats s = {.r1 = entity->rect,
                                   .r2 = agentRect,
@@ -64,21 +66,24 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                                   .avx = &entity->_avx,
                                   .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask};
-        INFOF("Triggering callback for entity #%u", entity->tag);
+        INFOF("Triggering callback %u [%s] for entity #%u", mask, intToBinary(mask, 8), entity->tag);
         scene->callbacks[mask](s);
-      }
+      } else INFO("No callback, skip");
     }
   }
 }
 
 void adjustSceneVelocities(Scene *scene) {
-  INFOF("Adjusting scene velocities (%u)", scene->collisionTrackerSize);
+  INFOF("Adjusting scene velocities (tracker size: %u)", scene->collisionTrackerSize);
   for (unsigned int i = 0; i < scene->collisionTrackerSize; i++) {
     Entity *entity = scene->collisionTracker[i];
+    // Update collisionState
     freeEntityCollisionState(entity);
     entity->collisionState = getEntityCollisionState(entity, scene);
+    // Get immediate collision change
     EntityImmediateCollisionChange eicc =
         getEntityImmediateCollisionChange(entity, entity->_vx, entity->_vy);
+    // Adjust velocity
     adjustEntityVelocity(entity, eicc, scene);
   }
 }
@@ -98,7 +103,7 @@ void setSceneNextCollisionChange(Scene *scene) {
       scene->timeToNextCollisionChange = t;
     }
   }
-  INFOF("Scene next collision change in %lf", scene->timeToNextCollisionChange);
+  INFOF("Scene next collision change in %lfms, tracker size: %u", scene->timeToNextCollisionChange, scene->collisionTrackerSize);
 }
 
 // Recalculate all collisions (in brutal fashion)

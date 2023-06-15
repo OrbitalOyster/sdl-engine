@@ -66,7 +66,7 @@ double getMovingPointOrthoSegmentIntersection(Point p, double vx, double vy,
 
 // ============================================================================
 
-// Returns true if two interlasing segments will change collision state in the 
+// Returns true if two interlasing segments will change collision state in the
 // next moment
 bool checkOrthoSegmentsAboutToDecouple(OrthoSegment s1, OrthoSegment s2,
                                        double vx, double vy) {
@@ -124,7 +124,9 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
 
 // ============================================================================
 
-// NOTE: Only works for separated rects, otherwise returns RMT_CONVERGE
+/*
+// NOTE: Only works for separated (< GHOST) rects, otherwise returns
+// RMT_CONVERGE
 RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
                                                        OrthoRect *r2,
                                                        double vx1, double vy1,
@@ -132,9 +134,11 @@ RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
   double vx = vx1 - vx2;
   double vy = vy1 - vy2;
 
+  // No relative movement
   if (compare(vx, 0) && compare(vy, 0))
     return RMT_NONE;
 
+  // Diverging
   if ((moreEqThan(r1->y, r2->y + r2->h) && moreThan(vy, 0)) ||
       (lessEqThan(r1->x + r1->w, r2->x) && lessThan(vx, 0)) ||
       (lessEqThan(r1->y + r1->h, r2->y) && lessThan(vy, 0)) ||
@@ -162,6 +166,47 @@ RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
   }
 
   return RMT_CONVERGE;
+}
+*/
+
+/*
+ * 0 - no interaction
+ * 1 - r1 pushing r2
+ * 2 - r2 pushing r1
+ * 3 - both 1 and 2
+ */
+RelativeFooType getOrthoRectsFoo(OrthoRect *r1, OrthoRect *r2, double vx1,
+                                 double vy1, double vx2, double vy2) {
+  // TODO: Make sure rects are colliding
+
+  RelativeFooType result = 0;
+
+  if (compare(vx1, vx2) && compare(vy1, vy2))
+    return result;
+
+  // r1
+  if (!((compareOrthoLines(*r1->edges[0]->line, *r2->edges[2]->line) &&
+         moreEqThan(vy1, 0)) ||
+        (compareOrthoLines(*r1->edges[1]->line, *r2->edges[3]->line) &&
+         lessEqThan(vx1, 0)) ||
+        (compareOrthoLines(*r1->edges[2]->line, *r2->edges[0]->line) &&
+         lessEqThan(vy1, 0)) ||
+        (compareOrthoLines(*r1->edges[3]->line, *r2->edges[1]->line) &&
+         moreEqThan(vx1, 0))))
+    result += 1;
+
+  // r2
+  if (!((compareOrthoLines(*r2->edges[0]->line, *r1->edges[2]->line) &&
+         moreEqThan(vy2, 0)) ||
+        (compareOrthoLines(*r2->edges[1]->line, *r1->edges[3]->line) &&
+         lessEqThan(vx2, 0)) ||
+        (compareOrthoLines(*r2->edges[2]->line, *r1->edges[0]->line) &&
+         lessEqThan(vy2, 0)) ||
+        (compareOrthoLines(*r2->edges[3]->line, *r1->edges[1]->line) &&
+         moreEqThan(vx2, 0))))
+    result += 2;
+
+  return result;
 }
 
 bool checkOrthoRectsSeparated(OrthoRect *r1, OrthoRect *r2) {

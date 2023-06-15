@@ -95,22 +95,25 @@ void slideCallback(physicsCallbackStats s) {
   INFOF("Physics slide callback mask: %s", intToBinary(s.collisionChangeMask, 8));
   INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
 
-  RelativeMovementType rmt =
-      getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
+//  RelativeMovementType rmt =
+//      getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
+  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
 
-  if (rmt != RMT_CONVERGE) {
-    INFO("Not converging, skipping");
+  if (rft != RFT_R1R2) {
+    INFO("Not converging, skip");
     return;
   }
 
   uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
   INFOF("Clean callback mask: %s", intToBinary(cleanMask, 8));
 
+  // Vertical edge collision
   if (cleanMask & (32 + 128)) {
     *s.avx = 0;
     INFO("avx = 0");
   }
 
+  // Horizontal edge collision
   if (cleanMask & (16 + 64)) {
     *s.avy = 0;
     INFO("avy = 0");
@@ -118,7 +121,7 @@ void slideCallback(physicsCallbackStats s) {
 }
 
 /*
-void getPushedCallback(physicsCallbacksStats s) {
+void getPushedCallback(physicsCallbackStats s) {
   INFOF("Physics getPushed callback mask: %s", intToBinary(s.collisionChangeMask, 8));
   INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
 }
@@ -130,7 +133,7 @@ int main() {
   registerOnKeyDownFunc(onKeyDown);
   registerOnKeyUpFunc(onKeyUp);
 
-  player = createEntity(152, 152, 48, 48);
+  player = createEntity(132, 145, 48, 48);
   //player = createEntity(340, 290, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
@@ -166,8 +169,8 @@ int main() {
   addEntityToScene(getMainScene(), player);
   addEntityToScene(getMainScene(), box);
 
-  registerCollisionCallback(2, slideCallback);
-  registerCollisionCallback(1, slideCallback);
+  registerCollisionCallback(2, slideCallback); // Player, Box -> Prop
+//  registerCollisionCallback(1, slideCallback); // Box -> Player
 
   startGame();
   return 0;
