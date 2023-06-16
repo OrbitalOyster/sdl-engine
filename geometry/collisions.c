@@ -179,32 +179,49 @@ RelativeFooType getOrthoRectsFoo(OrthoRect *r1, OrthoRect *r2, double vx1,
                                  double vy1, double vx2, double vy2) {
   // TODO: Make sure rects are colliding
 
+  // TODO: Very clunky
+
   RelativeFooType result = 0;
 
-  if (compare(vx1, vx2) && compare(vy1, vy2))
+  double vx = vx1 - vx2;
+  double vy = vy1 - vy2;
+
+  // No relative movement
+  if (compare(vx, 0) && compare(vy, 0))
+    return result;
+
+  // Diverging
+   if ((compareOrthoLines(*r1->edges[0]->line, *r2->edges[2]->line) &&
+       moreEqThan(vy, 0)) ||
+      (compareOrthoLines(*r1->edges[1]->line, *r2->edges[3]->line) &&
+       lessEqThan(vx, 0)) ||
+      (compareOrthoLines(*r1->edges[2]->line, *r2->edges[0]->line) &&
+       lessEqThan(vy, 0)) ||
+      (compareOrthoLines(*r1->edges[3]->line, *r2->edges[1]->line) &&
+       moreEqThan(vx, 0)))
     return result;
 
   // r1
   if (!((compareOrthoLines(*r1->edges[0]->line, *r2->edges[2]->line) &&
-         moreEqThan(vy1, 0)) ||
-        (compareOrthoLines(*r1->edges[1]->line, *r2->edges[3]->line) &&
-         lessEqThan(vx1, 0)) ||
-        (compareOrthoLines(*r1->edges[2]->line, *r2->edges[0]->line) &&
-         lessEqThan(vy1, 0)) ||
-        (compareOrthoLines(*r1->edges[3]->line, *r2->edges[1]->line) &&
-         moreEqThan(vx1, 0))))
-    result += 1;
+       moreEqThan(vy1, 0)) ||
+      (compareOrthoLines(*r1->edges[1]->line, *r2->edges[3]->line) &&
+       lessEqThan(vx1, 0)) ||
+      (compareOrthoLines(*r1->edges[2]->line, *r2->edges[0]->line) &&
+       lessEqThan(vy1, 0)) ||
+      (compareOrthoLines(*r1->edges[3]->line, *r2->edges[1]->line) &&
+       moreEqThan(vx1, 0))))
+  result += 1;
 
   // r2
   if (!((compareOrthoLines(*r2->edges[0]->line, *r1->edges[2]->line) &&
-         moreEqThan(vy2, 0)) ||
-        (compareOrthoLines(*r2->edges[1]->line, *r1->edges[3]->line) &&
-         lessEqThan(vx2, 0)) ||
-        (compareOrthoLines(*r2->edges[2]->line, *r1->edges[0]->line) &&
-         lessEqThan(vy2, 0)) ||
-        (compareOrthoLines(*r2->edges[3]->line, *r1->edges[1]->line) &&
-         moreEqThan(vx2, 0))))
-    result += 2;
+       moreEqThan(vy2, 0)) ||
+      (compareOrthoLines(*r2->edges[1]->line, *r1->edges[3]->line) &&
+       lessEqThan(vx2, 0)) ||
+      (compareOrthoLines(*r2->edges[2]->line, *r1->edges[0]->line) &&
+       lessEqThan(vy2, 0)) ||
+      (compareOrthoLines(*r2->edges[3]->line, *r1->edges[1]->line) &&
+       moreEqThan(vx2, 0))))
+  result += 2;
 
   return result;
 }

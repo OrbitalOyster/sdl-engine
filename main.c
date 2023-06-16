@@ -120,12 +120,33 @@ void slideCallback(physicsCallbackStats s) {
   }
 }
 
-/*
 void getPushedCallback(physicsCallbackStats s) {
   INFOF("Physics getPushed callback mask: %s", intToBinary(s.collisionChangeMask, 8));
   INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
+ 
+  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
+
+  INFOF("rft == %u", rft);
+
+  if (rft == RFT_R2R1 || rft == RFT_BOTH) { 
+    uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
+    INFOF("Clean callback mask: %s", intToBinary(cleanMask, 8));
+
+    // Vertical edge collision
+    if (cleanMask & (32 + 128)) {
+      *s.avx = s.vx2;
+      INFOF("avx = %lf", s.vx2);
+    }
+
+    // Horizontal edge collision
+    if (cleanMask & (16 + 64)) {
+      *s.avy = s.vy2;
+      INFOF("avy = %lf", s.vy2);
+    }
+  }
+
+  if (rft == RFT_R1R2) slideCallback(s);
 }
-*/
 
 int main() {
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
@@ -170,7 +191,7 @@ int main() {
   addEntityToScene(getMainScene(), box);
 
   registerCollisionCallback(2, slideCallback); // Player, Box -> Prop
-//  registerCollisionCallback(1, slideCallback); // Box -> Player
+  registerCollisionCallback(1, getPushedCallback); // Box -> Player
 
   startGame();
   return 0;
