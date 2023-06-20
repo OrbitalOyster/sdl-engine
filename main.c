@@ -11,7 +11,7 @@
 #include "physics/prop.h"
 #include "physics/callback.h"
 #include "game.h"
-
+#include "utils/qsort.h"
 #include "geometry/collisions.h"
 
 Entity *player = NULL;
@@ -149,6 +149,10 @@ void getPushedCallback(physicsCallbackStats s) {
 }
 
 int main() {
+
+  sortTest();
+  exit(0);
+
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
