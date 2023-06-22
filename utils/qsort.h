@@ -1,16 +1,8 @@
 #ifndef QSORT_H
 #define QSORT_H
 
-#define MAX 10
+#include <stdbool.h>
 
-typedef struct {
-  int n;
-
-  int a;
-  int b;
-  int c;
-} Sample;
-
-void sortTest();
+void sort(void **arr, int i1, int i2, bool(*sortFunc)(void** arr, int i1, int i2));
 
 #endif

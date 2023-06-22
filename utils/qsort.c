@@ -1,49 +1,71 @@
 #include "qsort.h"
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
-Sample** array;
-
-void fillArray() {
-  array = calloc(MAX, sizeof(Sample*));
-  for (unsigned int i = 0; i < MAX; i++)
-    array[i] = calloc(1, sizeof(Sample));
-
-  *array[0] = (Sample){ .n = 6, .a = 100, .b = 100, .c = 100};
-  *array[1] = (Sample){ .n = 5, .a = 100, .b = 100, .c = 100};
-  *array[2] = (Sample){ .n = 7, .a = 100, .b = 100, .c = 100};
-  *array[3] = (Sample){ .n = 4, .a = 100, .b = 100, .c = 100};
-  *array[4] = (Sample){ .n = 8, .a = 100, .b = 100, .c = 100};
-  *array[5] = (Sample){ .n = 3, .a = 100, .b = 100, .c = 100};
-  *array[6] = (Sample){ .n = 9, .a = 100, .b = 100, .c = 100};
-  *array[7] = (Sample){ .n = 2, .a = 100, .b = 100, .c = 100};
-  *array[8] = (Sample){ .n = 0, .a = 100, .b = 100, .c = 100};
-  *array[9] = (Sample){ .n = 1, .a = 100, .b = 100, .c = 100};
-}
-
-bool compareArr(void** arr, unsigned int i1, unsigned int i2) {
-  return ((Sample*)arr[i1])->n < ((Sample*)arr[i2])->n;
-}
-
-void swap(void** arr, unsigned int i1, unsigned int i2) {
-  void* tmp = arr[i1];
+void swap(void **arr, int i1, int i2) {
+  void *tmp = arr[i1];
   arr[i1] = arr[i2];
   arr[i2] = tmp;
 }
 
-void printArray() {
-  for (unsigned int i = 0; i < MAX; i++)
-    printf("%i ", array[i]->n);
-  printf("\n");
+int getPivot(void **arr, int i1, int i2) {
+  if (arr && i1) {
+  };
+  return i2;
 }
 
-void sortTest() {
-  fillArray();
-  printArray();
-  swap((void**)array, 8, 3);
-  printArray();
-  printf("compareArr %i\n", compareArr((void**)array, 9, 0));
-  free(array);
+int getLeftInd(void **arr, int pivotInd, int i1, int i2,
+               bool (*sortFunc)(void **arr, int i1, int i2)) {
+  int i = i1;
+  while (i <= i2)
+    if (!sortFunc(arr, i, pivotInd))
+      return i;
+    else
+      i++;
+  return i;
 }
+
+int getRightInd(void **arr, int pivotInd, int i1, int i2,
+                bool (*sortFunc)(void **arr, int i1, int i2)) {
+  int i = i2;
+  while (i >= i1)
+    if (sortFunc(arr, i, pivotInd))
+      return i;
+    else
+      i--;
+  return i;
+}
+
+void step(void **arr, int i1, int i2,
+          bool (*sortFunc)(void **arr, int i1, int i2)) {
+  if (i1 >= i2)
+    return;
+  if (i1 + 1 == i2) {
+    if (!sortFunc(arr, i1, i2))
+      swap(arr, i1, i2);
+    return;
+  }
+
+  int pivotInd = getPivot(arr, i1, i2);
+  swap(arr, i2, pivotInd);
+
+  int leftInd = i1;
+  int rightInd = i2 - 1;
+
+  bool done = false;
+  while (!done) {
+    leftInd = getLeftInd(arr, pivotInd, i1, i2 - 1, sortFunc);
+    rightInd = getRightInd(arr, pivotInd, i1, i2 - 1, sortFunc);
+    if (leftInd > rightInd) {
+      swap(arr, leftInd, pivotInd);
+      done = true;
+    } else
+      swap(arr, leftInd, rightInd);
+  }
+  step(arr, i1, leftInd - 1, sortFunc);
+  step(arr, leftInd + 1, i2, sortFunc);
+}
+
+void sort(void **arr, int i1, int i2,
+          bool (*sortFunc)(void **arr, int i1, int i2)) {
+  step(arr, i1, i2, sortFunc);
+}
+
