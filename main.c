@@ -149,6 +149,10 @@ void getPushedCallback(physicsCallbackStats s) {
 }
 
 int main() {
+
+//  test();
+//  exit(0);
+
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
@@ -190,8 +194,8 @@ int main() {
   addEntityToScene(getMainScene(), player);
   addEntityToScene(getMainScene(), box);
 
-  registerCollisionCallback(2, slideCallback); // Player, Box -> Prop
-  registerCollisionCallback(1, getPushedCallback); // Box -> Player
+  registerCollisionCallback(2, 1, slideCallback); // Player, Box -> Prop
+  registerCollisionCallback(1, 1, getPushedCallback); // Box -> Player
 
   startGame();
   return 0;

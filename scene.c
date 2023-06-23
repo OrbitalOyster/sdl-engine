@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "dmath/dmath.h"
 #include "physics/entitycollisions.h"
+#include "utils/qsort.h"
 
 Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));
@@ -14,7 +15,8 @@ Scene *initScene() {
   scene->entities = calloc(MAX_NUMBER_OF_ENTITIES, sizeof(Entity *));
   scene->collisionTrackerSize = 0;
   scene->timeToNextCollisionChange = INFINITY;
-  scene->callbacks = calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(void *));
+  scene->physicsCallbacks = calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(PhysicsCallback*));
+  // scene->callbacks = calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(void *));
   return scene;
 }
 
@@ -27,16 +29,34 @@ void addPropToScene(Scene *scene, Prop *prop) {
   scene->numberOfProps++;
 }
 
+bool comparePhysicsCallbacks(void** arr, int i1, int i2) {
+  physicsCallbackStats *s1 = (physicsCallbackStats*)arr[i1];
+  physicsCallbackStats *s2 = (physicsCallbackStats*)arr[i2];
+  PhysicsCallback *c1 = s1->callback;
+  PhysicsCallback *c2 = s2->callback;
+  uint8_t m1 = s1 -> collisionChangeMask;
+  uint8_t m2 = s2 -> collisionChangeMask;
+  uint8_t p1 = (uint8_t)(c1 -> priority + isCornerCollisionMask(m1) * 100);
+  uint8_t p2 = (uint8_t)(c2 -> priority + isCornerCollisionMask(m2) * 100);
+  WARNF("%i %i %u %u %u %u", i1, i2, c1 -> priority, c2 -> priority, p1, p2);
+  return p1 < p2;
+}
+
 void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                           Scene *scene) {
+
+  //PhysicsCallback **callbacks = calloc(10, sizeof(PhysicsCallback*));
+  physicsCallbackStats *callbackStats = calloc(10, sizeof(physicsCallbackStats));
+  uint8_t numberOfCallbacks = 0;
+
   INFOF("Adjusting entity #%u (cid: %s cmask: %s) velocity", entity->tag, intToBinary(entity->collisionId, 8), intToBinary(entity->collisionMask, 8));
   entity->_avx = entity->_vx;
   entity->_avy = entity->_vy;
   // Two passes, first for non-corner collisions
-  for (int j = 0; j < 2; j++) {
+//  for (int j = 0; j < 2; j++) {
     for (uint8_t i = 0; i < eicc.size; i++) {
-      if (isCornerCollisionMask(eicc.changes[i].mask) != j)
-        continue;
+//      if (isCornerCollisionMask(eicc.changes[i].mask) != j)
+//        continue;
       void *agent = eicc.changes[i].agent;
       uint8_t collisionId = 0;
       OrthoRect *agentRect = NULL;
@@ -56,7 +76,8 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
       }
       uint8_t mask = entity->collisionMask & collisionId;
       INFOF("Found %s collision", intToBinary(mask, 8));
-      if (scene->callbacks[mask]) {
+      if (scene->physicsCallbacks[mask]) {
+        /*
         physicsCallbackStats s = {.r1 = entity->rect,
                                   .r2 = agentRect,
                                   .vx1 = entity->_avx,
@@ -66,11 +87,36 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                                   .avx = &entity->_avx,
                                   .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask};
-        INFOF("Triggering callback %u [%s] for entity #%u", mask, intToBinary(mask, 8), entity->tag);
-        scene->callbacks[mask](s);
+        INFOF("Triggering callback %u [%s], priority %u, for entity #%u",
+          mask, intToBinary(mask, 8), scene->physicsCallbacks[mask]->priority, entity->tag);
+        scene->physicsCallbacks[mask]->func(s);
+        */
+//        callbacks[numberOfCallbacks] = scene->physicsCallbacks[mask];
+        callbackStats[numberOfCallbacks] = (physicsCallbackStats) {.r1 = entity->rect,
+                                  .r2 = agentRect,
+                                  .vx1 = entity->_avx,
+                                  .vy1 = entity->_avy,
+                                  .vx2 = agentVx,
+                                  .vy2 = agentVy,
+                                  .avx = &entity->_avx,
+                                  .avy = &entity->_avy,
+                                  .collisionChangeMask = eicc.changes[i].mask,
+                                  .callback = scene->physicsCallbacks[mask]};
+        numberOfCallbacks++;
       } else INFO("No callback, skip");
     }
+  // }
+
+  // TODO: Problems start here
+  sort((void**)callbackStats, 0, numberOfCallbacks - 1, comparePhysicsCallbacks);
+
+  for (uint8_t i = 0; i < numberOfCallbacks; i++) {
+    callbackStats[i].callback->func(callbackStats[i]);
   }
+
+  // free(callbacks);
+  free(callbackStats);
+
 }
 
 void adjustSceneVelocities(Scene *scene) {

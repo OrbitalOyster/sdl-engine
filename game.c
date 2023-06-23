@@ -55,10 +55,15 @@ Scene *getMainScene() {
   return mainScene;
 }
 
-void registerCollisionCallback(uint16_t mask, void (*func)(physicsCallbackStats)) {
-  if (mainScene->callbacks[mask] != NULL)
+void registerCollisionCallback(uint16_t mask, uint8_t priority, void (*func)(physicsCallbackStats)) {
+  if (mainScene->physicsCallbacks[mask] != NULL)
     WARN("Callback already taken");
-  mainScene->callbacks[mask] = func;
+  mainScene->physicsCallbacks[mask] = calloc(1, sizeof(PhysicsCallback));
+  *mainScene->physicsCallbacks[mask] = (PhysicsCallback){ .priority = priority, .func = func }; 
+
+  //if (mainScene->callbacks[mask] != NULL)
+  //  WARN("Callback already taken");
+  //mainScene->callbacks[mask] = func;
 }
 
 void renderScene(Scene *scene, SDL_Renderer *renderer) {

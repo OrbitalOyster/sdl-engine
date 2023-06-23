@@ -16,7 +16,7 @@ typedef struct {
 
 bool initGame(GameParameters *gameParameters);
 Scene *getMainScene();
-void registerCollisionCallback(uint16_t mask, void (*func)(physicsCallbackStats));
+void registerCollisionCallback(uint16_t mask, uint8_t priority, void (*func)(physicsCallbackStats));
 void startGame();
 void debugGame(bool togglePause, uint8_t step);
 void stopGame();

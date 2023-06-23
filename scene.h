@@ -21,7 +21,9 @@ typedef struct {
   uint32_t collisionTrackerSize;
   double timeToNextCollisionChange;
 
-  void (**callbacks)(physicsCallbackStats);
+  PhysicsCallback** physicsCallbacks;
+
+  // void (**callbacks)(physicsCallbackStats);
 } Scene;
 
 Scene *initScene();

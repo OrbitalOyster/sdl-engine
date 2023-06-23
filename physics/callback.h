@@ -5,6 +5,8 @@
 
 #include "../geometry/orthorect.h"
 
+typedef struct PhysicsCallback PhysicsCallback;
+
 typedef struct {
   OrthoRect *r1;
   OrthoRect *r2;
@@ -15,6 +17,13 @@ typedef struct {
   double *avx;
   double *avy;
   uint8_t collisionChangeMask;
+  // TODO: Better way to do this?
+  PhysicsCallback *callback;
 } physicsCallbackStats;
+
+struct PhysicsCallback {
+  uint8_t priority;
+  void (*func)(physicsCallbackStats);
+};
 
 #endif
