@@ -10,12 +10,10 @@ typedef struct PhysicsCallback PhysicsCallback;
 typedef struct {
   OrthoRect *r1;
   OrthoRect *r2;
-  double vx1;
-  double vy1;
+  double *vx1;
+  double *vy1;
   double vx2;
   double vy2;
-  double *avx;
-  double *avy;
   uint8_t collisionChangeMask;
   // TODO: Better way to do this?
   PhysicsCallback *callback;

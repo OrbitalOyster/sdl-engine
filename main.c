@@ -93,16 +93,12 @@ uint8_t getCleanMask(uint8_t mask) {
 
 void slideCallback(physicsCallbackStats s) {
   INFOF("Physics slide callback mask: %s", intToBinary(s.collisionChangeMask, 8));
-  INFOF("vx1: %lf, vy1: %lf, avx1: %lf, avy1: %lf, vx2: %lf, vy2: %lf",
-         s.vx1, s.vy1, *s.avx, *s.avy, s.vx2, s.vy2);
-
-  // TODO: Stoopid but works, get rid of s.vx1 / s.vy1 ?
-  s.vx1 = *s.avx;
-  s.vy1 = *s.avy;
+  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf",
+         *s.vx1, *s.vy1,  s.vx2, s.vy2);
 
 //  RelativeMovementType rmt =
 //      getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
-  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
+  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, *s.vx1, *s.vy1, s.vx2, s.vy2);
 
   if (rft != RFT_R1R2) {
     INFO("Not converging, skip");
@@ -114,22 +110,22 @@ void slideCallback(physicsCallbackStats s) {
 
   // Vertical edge collision
   if (cleanMask & (32 + 128)) {
-    *s.avx = 0;
+    *s.vx1 = 0;
     INFO("avx = 0");
   }
 
   // Horizontal edge collision
   if (cleanMask & (16 + 64)) {
-    *s.avy = 0;
+    *s.vy1 = 0;
     INFO("avy = 0");
   }
 }
 
 void getPushedCallback(physicsCallbackStats s) {
   INFOF("Physics getPushed callback mask: %s", intToBinary(s.collisionChangeMask, 8));
-  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
+  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", *s.vx1, *s.vy1, s.vx2, s.vy2);
 
-  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
+  RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, *s.vx1, *s.vy1, s.vx2, s.vy2);
 
   INFOF("rft == %u", rft);
 
@@ -139,13 +135,13 @@ void getPushedCallback(physicsCallbackStats s) {
 
     // Vertical edge collision
     if (cleanMask & (32 + 128)) {
-      *s.avx = s.vx2;
+      *s.vx1 = s.vx2;
       INFOF("avx = %lf", s.vx2);
     }
 
     // Horizontal edge collision
     if (cleanMask & (16 + 64)) {
-      *s.avy = s.vy2;
+      *s.vy1 = s.vy2;
       INFOF("avy = %lf", s.vy2);
     }
   }
