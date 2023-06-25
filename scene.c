@@ -38,7 +38,8 @@ bool comparePhysicsCallbacks(void** arr, int i1, int i2) {
   uint8_t m2 = s2 -> collisionChangeMask;
   uint8_t p1 = (uint8_t)(c1 -> priority + isCornerCollisionMask(m1) * 100);
   uint8_t p2 = (uint8_t)(c2 -> priority + isCornerCollisionMask(m2) * 100);
-  WARNF("%i %i %u %u %u %u", i1, i2, c1 -> priority, c2 -> priority, p1, p2);
+  WARNF("%s %s %i %i %u %u", intToBinary(m1, 8), intToBinary(m2, 8), isCornerCollisionMask(m1), isCornerCollisionMask(m2), p1, p2);
+//  exit(0);
   return p1 < p2;
 }
 
@@ -46,7 +47,7 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                           Scene *scene) {
 
   //PhysicsCallback **callbacks = calloc(10, sizeof(PhysicsCallback*));
-  physicsCallbackStats *callbackStats = calloc(10, sizeof(physicsCallbackStats));
+  physicsCallbackStats **callbackStats = calloc(10, sizeof(physicsCallbackStats*));
   uint8_t numberOfCallbacks = 0;
 
   INFOF("Adjusting entity #%u (cid: %s cmask: %s) velocity", entity->tag, intToBinary(entity->collisionId, 8), intToBinary(entity->collisionMask, 8));
@@ -92,7 +93,8 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
         scene->physicsCallbacks[mask]->func(s);
         */
 //        callbacks[numberOfCallbacks] = scene->physicsCallbacks[mask];
-        callbackStats[numberOfCallbacks] = (physicsCallbackStats) {.r1 = entity->rect,
+        callbackStats[numberOfCallbacks] = calloc(1, sizeof (physicsCallbackStats));
+        *callbackStats[numberOfCallbacks] = (physicsCallbackStats) {.r1 = entity->rect,
                                   .r2 = agentRect,
                                   .vx1 = entity->_avx,
                                   .vy1 = entity->_avy,
@@ -102,6 +104,7 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
                                   .avy = &entity->_avy,
                                   .collisionChangeMask = eicc.changes[i].mask,
                                   .callback = scene->physicsCallbacks[mask]};
+        // WARNF("DEBUG %lf", *callbackStats[numberOfCallbacks]->avx);
         numberOfCallbacks++;
       } else INFO("No callback, skip");
     }
@@ -111,7 +114,8 @@ void adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
   sort((void**)callbackStats, 0, numberOfCallbacks - 1, comparePhysicsCallbacks);
 
   for (uint8_t i = 0; i < numberOfCallbacks; i++) {
-    callbackStats[i].callback->func(callbackStats[i]);
+    WARNF("Firing callback %s", intToBinary(callbackStats[i]->collisionChangeMask, 8));
+    callbackStats[i]->callback->func(*callbackStats[i]);
   }
 
   // free(callbacks);

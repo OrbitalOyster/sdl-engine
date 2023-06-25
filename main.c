@@ -93,7 +93,12 @@ uint8_t getCleanMask(uint8_t mask) {
 
 void slideCallback(physicsCallbackStats s) {
   INFOF("Physics slide callback mask: %s", intToBinary(s.collisionChangeMask, 8));
-  INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
+  INFOF("vx1: %lf, vy1: %lf, avx1: %lf, avy1: %lf, vx2: %lf, vy2: %lf",
+         s.vx1, s.vy1, *s.avx, *s.avy, s.vx2, s.vy2);
+
+  // TODO: Stoopid but works, get rid of s.vx1 / s.vy1 ?
+  s.vx1 = *s.avx;
+  s.vy1 = *s.avy;
 
 //  RelativeMovementType rmt =
 //      getOrthoRectsRelativeMovementType(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
@@ -123,12 +128,12 @@ void slideCallback(physicsCallbackStats s) {
 void getPushedCallback(physicsCallbackStats s) {
   INFOF("Physics getPushed callback mask: %s", intToBinary(s.collisionChangeMask, 8));
   INFOF("vx1: %lf, vy1: %lf, vx2: %lf, vy2: %lf", s.vx1, s.vy1, s.vx2, s.vy2);
- 
+
   RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, s.vx1, s.vy1, s.vx2, s.vy2);
 
   INFOF("rft == %u", rft);
 
-  if (rft == RFT_R2R1 || rft == RFT_BOTH) { 
+  if (rft == RFT_R2R1 || rft == RFT_BOTH) {
     uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
     INFOF("Clean callback mask: %s", intToBinary(cleanMask, 8));
 
