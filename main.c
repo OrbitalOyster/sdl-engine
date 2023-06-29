@@ -159,7 +159,7 @@ int main() {
   registerOnKeyDownFunc(onKeyDown);
   registerOnKeyUpFunc(onKeyUp);
 
-  player = createEntity(132, 145, 48, 48);
+  player = createEntity(162, 145, 48, 48);
   //player = createEntity(340, 290, 48, 48);
   player->collisionId = 1;
   player->collisionMask = 6;
@@ -181,12 +181,13 @@ int main() {
   prop3->tag = 4;
   prop3->collisionId = 2;
 
-  box = createEntity(120, 30, 32, 32);
+  // box = createEntity(120, 30, 32, 32);
+  box = createEntity(120, 168, 32, 32);
   box->collisionId = 4;
   box->collisionMask = 3;
   box->tag = 5;
 
-  box->_vy = 0.1;
+  //box->_vy = 0.1;
 
   addPropToScene(getMainScene(), ground);
   addPropToScene(getMainScene(), prop1);
@@ -195,7 +196,7 @@ int main() {
   addEntityToScene(getMainScene(), player);
   addEntityToScene(getMainScene(), box);
 
-  registerCollisionCallback(2, 1, slideCallback); // Player, Box -> Prop
+  registerCollisionCallback(2, 2, slideCallback); // Player, Box -> Prop
   registerCollisionCallback(1, 1, getPushedCallback); // Box -> Player
 
   startGame();
