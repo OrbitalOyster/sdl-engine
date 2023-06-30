@@ -108,7 +108,10 @@ bool adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
     double avy = *callbackStats[i]->vy1;
     callbackStats[i]->callback->func(*callbackStats[i]);
 
-    if (!compare(*callbackStats[i]->vx1, avx) || !compare(*callbackStats[i]->vy1, avy)) result = true;
+    if (!compare(*callbackStats[i]->vx1, avx) || !compare(*callbackStats[i]->vy1, avy)) {
+      INFOF("%lf != %lf || %lf != %lf",*callbackStats[i]->vx1, avx, *callbackStats[i]->vy1, avy);
+      result = true;
+    }
 
     free(callbackStats[i]);
   }
@@ -135,7 +138,10 @@ bool adjustSceneVelocities(Scene *scene, unsigned int step) {
     EntityImmediateCollisionChange eicc1 =
         getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
     // Adjust velocity
-    if (adjustEntityVelocity(entity, eicc1, scene, entity->_avx, entity->_avy)) result = true;
+    if (adjustEntityVelocity(entity, eicc1, scene, entity->_avx, entity->_avy)){
+      INFOF("Entity %u changed velocity", entity->tag);
+      result = true;
+    }
   }
   return result;
 }
@@ -225,9 +231,10 @@ double stepScene(Scene *scene, double timeToProcess) {
   if (compare(scene->timeToNextCollisionChange, 0)) {
     unsigned int step = 0;
     while (step < 100) {
-    if (!adjustSceneVelocities(scene, step++)) break;
+      WARNF("STEP %u", step);
+      if (!adjustSceneVelocities(scene, step++)) break;
     }
-    WARNF("Step: %u", step);
+    WARNF("Steps done: %u", step);
     setSceneNextCollisionChange(scene);
   }
 

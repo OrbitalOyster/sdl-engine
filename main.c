@@ -128,7 +128,6 @@ void getPushedCallback(physicsCallbackStats s) {
   RelativeFooType rft = getOrthoRectsFoo(s.r1, s.r2, *s.vx1, *s.vy1, s.vx2, s.vy2);
 
   INFOF("rft == %u", rft);
-
   if (rft == RFT_R2R1 || rft == RFT_BOTH) {
     uint8_t cleanMask = getCleanMask(s.collisionChangeMask);
     INFOF("Clean callback mask: %s", intToBinary(cleanMask, 8));
@@ -193,11 +192,12 @@ int main() {
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addPropToScene(getMainScene(), prop3);
-  addEntityToScene(getMainScene(), player);
   addEntityToScene(getMainScene(), box);
+  addEntityToScene(getMainScene(), player);
 
-  registerCollisionCallback(2, 2, slideCallback); // Player, Box -> Prop
+  registerCollisionCallback(2, 1, slideCallback); // Player, Box -> Prop
   registerCollisionCallback(1, 1, getPushedCallback); // Box -> Player
+  registerCollisionCallback(4, 2, slideCallback); // Player -> Box
 
   startGame();
   return 0;
