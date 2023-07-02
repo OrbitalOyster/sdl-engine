@@ -120,30 +120,36 @@ bool adjustEntityVelocity(Entity *entity, EntityImmediateCollisionChange eicc,
   return result;
 }
 
-bool adjustSceneVelocities(Scene *scene, unsigned int step) {
+void adjustSceneVelocities(Scene *scene) {
   INFOF("Adjusting scene velocities (tracker size: %u)",
         scene->collisionTrackerSize);
-  bool result = false;
-  for (unsigned int i = 0; i < scene->collisionTrackerSize; i++) {
-    Entity *entity = scene->collisionTracker[i];
-    // Update collisionState
-    freeEntityCollisionState(entity);
-    entity->collisionState = getEntityCollisionState(entity, scene);
-    // Get immediate collision change
-   
-    if (!step) {
-    entity->_avx = entity->_vx;
-    entity->_avy = entity->_vy;}
+  unsigned int step = 0;
+  while (step < 10) {
+    bool vchanged = false;
+    for (unsigned int i = 0; i < scene->collisionTrackerSize; i++) {
+      Entity *entity = scene->collisionTracker[i];
+      // Update collisionState
+      freeEntityCollisionState(entity);
+      entity->collisionState = getEntityCollisionState(entity, scene);
+      // Get immediate collision change
+  //    INFOF("DEBUG %lf %lf", entity->_vx, entity->_vy);
 
-    EntityImmediateCollisionChange eicc1 =
-        getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
-    // Adjust velocity
-    if (adjustEntityVelocity(entity, eicc1, scene, entity->_avx, entity->_avy)){
-      INFOF("Entity %u changed velocity", entity->tag);
-      result = true;
+  //    if (!step) {
+  //    entity->_avx = entity->_vx;
+  //    entity->_avy = entity->_vy;}
+      EntityImmediateCollisionChange eicc1 =
+          getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
+      // Adjust velocity
+      if (adjustEntityVelocity(entity, eicc1, scene, entity->_avx, entity->_avy)){
+        INFOF("Entity %u changed velocity", entity->tag);
+        vchanged = true;
+      }
     }
+    INFOF("Step #%u done (%i), tracker size: %u", step, vchanged, scene->collisionTrackerSize);
+    if (step == 9) ERR(1, "9 steps!");
+    if (!vchanged) break;
+    step++;
   }
-  return result;
 }
 
 void setSceneNextCollisionChange(Scene *scene) {
@@ -165,14 +171,25 @@ void setSceneNextCollisionChange(Scene *scene) {
         scene->timeToNextCollisionChange, scene->collisionTrackerSize);
 }
 
+void resetSceneVelocities(Scene *scene) {
+  INFO("Resetting scene velocities");
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+    scene->entities[i]->_avx = scene->entities[i]->_vx;
+    scene->entities[i]->_avy = scene->entities[i]->_vy;
+  }
+}
+
 // Recalculate all collisions (in brutal fashion)
 // TODO: Optimization
 void resetSceneCollisionTracker(Scene *scene) {
   INFO("Resetting scene collision tracker");
+
+  resetSceneVelocities(scene);
+
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->collisionTracker[i] = scene->entities[i];
   scene->collisionTrackerSize = scene->numberOfEntities;
-  adjustSceneVelocities(scene, 0);
+  adjustSceneVelocities(scene);
   setSceneNextCollisionChange(scene);
 }
 
@@ -229,12 +246,10 @@ double stepScene(Scene *scene, double timeToProcess) {
 
   // At collision change - adjust velocities, refresh collisions
   if (compare(scene->timeToNextCollisionChange, 0)) {
-    unsigned int step = 0;
-    while (step < 100) {
-      WARNF("STEP %u", step);
-      if (!adjustSceneVelocities(scene, step++)) break;
-    }
-    WARNF("Steps done: %u", step);
+    INFO("At collision change time");
+    resetSceneCollisionTracker(scene);
+    //resetSceneVelocities(scene);
+    //adjustSceneVelocities(scene);
     setSceneNextCollisionChange(scene);
   }
 
