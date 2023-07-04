@@ -41,14 +41,14 @@ bool comparePhysicsCallbacks(void **arr, int i1, int i2) {
   return p1 < p2;
 }
 
-bool adjustEntityVelocity(Entity *entity, Scene *scene) {
+bool resolveEntityVelocity(Entity *entity, Scene *scene) {
   bool result = false;
   // TODO: No magic numbers
   physicsCallbackStats **callbackStats =
       calloc(10, sizeof(physicsCallbackStats *));
   uint8_t numberOfCallbacks = 0;
 
-   // Update collisionState
+  // Update collisionState
   freeEntityCollisionState(entity);
   entity->collisionState = getEntityCollisionState(entity, scene);
   // Get immediate collision change
@@ -119,9 +119,18 @@ bool adjustEntityVelocity(Entity *entity, Scene *scene) {
   return result;
 }
 
-void adjustSceneVelocities(Scene *scene) {
+void resetSceneVelocities(Scene *scene) {
+  INFO("Resetting scene velocities");
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
+    scene->entities[i]->_avx = scene->entities[i]->_vx;
+    scene->entities[i]->_avy = scene->entities[i]->_vy;
+  }
+}
+
+void resolveSceneImmediateCollisions(Scene *scene) {
   INFOF("Adjusting scene velocities (tracker size: %u)",
         scene->collisionTrackerSize);
+  resetSceneVelocities(scene);
   unsigned int step = 0;
   bool vchanged = false;
   // TODO: No magic numbers
@@ -129,7 +138,7 @@ void adjustSceneVelocities(Scene *scene) {
     vchanged = false;
     for (unsigned int i = 0; i < scene->collisionTrackerSize; i++)
       // Adjust velocity
-      if (adjustEntityVelocity(scene->collisionTracker[i], scene)) {
+      if (resolveEntityVelocity(scene->collisionTracker[i], scene)) {
         INFOF("Entity %u changed velocity", scene->collisionTracker[i]->tag);
         vchanged = true;
       }
@@ -176,23 +185,14 @@ void setSceneNextCollisionChange(Scene *scene) {
 }
 */
 
-void resetSceneVelocities(Scene *scene) {
-  INFO("Resetting scene velocities");
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
-    scene->entities[i]->_avx = scene->entities[i]->_vx;
-    scene->entities[i]->_avy = scene->entities[i]->_vy;
-  }
-}
-
 // Recalculate all collisions (in brutal fashion)
 // TODO: Optimization
 void resetSceneCollisionTracker(Scene *scene) {
   INFO("Resetting scene collision tracker");
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->collisionTracker[i] = scene->entities[i];
-  resetSceneVelocities(scene);
   scene->collisionTrackerSize = scene->numberOfEntities;
-  adjustSceneVelocities(scene);
+  resolveSceneImmediateCollisions(scene);
   setSceneNextCollisionTime(scene);
 }
 
