@@ -164,27 +164,6 @@ void setSceneNextCollisionTime(Scene *scene) {
         scene->timeToNextCollisionChange, scene->collisionTrackerSize);
 }
 
-/*
-void setSceneNextCollisionChange(Scene *scene) {
-  INFO("Setting next scene collision change");
-  scene->collisionTrackerSize = 0;
-  scene->timeToNextCollisionChange = INFINITY;
-  for (unsigned int i = 0; i < scene->numberOfEntities; i++) {
-    Entity *entity = scene->entities[i];
-    double t = getEntityNextCollisionTime(entity, scene);
-    if (compare(t, scene->timeToNextCollisionChange))
-      scene->collisionTracker[scene->collisionTrackerSize++] = entity;
-    else if (lessThan(t, scene->timeToNextCollisionChange)) {
-      scene->collisionTrackerSize = 1;
-      scene->collisionTracker[0] = entity;
-      scene->timeToNextCollisionChange = t;
-    }
-  }
-  INFOF("Scene next collision change in %lfms, tracker size: %u",
-        scene->timeToNextCollisionChange, scene->collisionTrackerSize);
-}
-*/
-
 // Recalculate all collisions (in brutal fashion)
 // TODO: Optimization
 void resetSceneCollisionTracker(Scene *scene) {

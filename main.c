@@ -192,8 +192,9 @@ int main() {
   addPropToScene(getMainScene(), prop1);
   addPropToScene(getMainScene(), prop2);
   addPropToScene(getMainScene(), prop3);
-  addEntityToScene(getMainScene(), box);
   addEntityToScene(getMainScene(), player);
+  addEntityToScene(getMainScene(), box);
+  //addEntityToScene(getMainScene(), player);
 
   registerCollisionCallback(2, 1, slideCallback); // Player, Box -> Prop
   registerCollisionCallback(1, 1, getPushedCallback); // Box -> Player
