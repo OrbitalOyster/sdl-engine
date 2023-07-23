@@ -195,11 +195,11 @@ int main() {
   box->_vy = 0.1;
 
   addPropToScene(getMainScene(), ground);
-  addPropToScene(getMainScene(), prop1);
-  addPropToScene(getMainScene(), prop2);
-  addPropToScene(getMainScene(), prop3);
+  //addPropToScene(getMainScene(), prop1);
+  //addPropToScene(getMainScene(), prop2);
+  //addPropToScene(getMainScene(), prop3);
   //addEntityToScene(getMainScene(), player);
-  addEntityToScene(getMainScene(), box);
+  //addEntityToScene(getMainScene(), box);
   addEntityToScene(getMainScene(), player);
 
   registerCollisionCallback(2, 10, slideCallback); // Player, Box -> Prop
