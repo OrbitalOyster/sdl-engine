@@ -201,7 +201,8 @@ void jumpEntity(Entity *entity, double x, double y, Scene *scene) {
 void setEntityVelocity(Entity *entity, double vx, double vy, Scene *scene) {
   entity->_vx = vx;
   entity->_vy = vy;
-  resetSceneCollisionTracker(scene);
+  if (scene){};
+  // resetSceneCollisionTracker(scene);
   INFOF("Set entity #%u velocity to (%.8f %.8f)", entity->tag, entity->_vx,
         entity->_vy);
 }
@@ -232,7 +233,12 @@ void resolveFoo(Scene *scene) {
   physicsCallbackStats **callbackStats =
       calloc(10, sizeof(physicsCallbackStats *));
 
-  uint8_t numberOfCallbacks = 0;
+  uint8_t numberOfCallbacks;
+  unsigned int steps = 0;
+
+  back:
+  steps++;
+  numberOfCallbacks = 0;
 
   // Get all callbacks
   for (unsigned int j = 0; j < scene->numberOfEntities; j++) {
@@ -309,8 +315,11 @@ void resolveFoo(Scene *scene) {
       free(callbackStats[i]);
     }
 
-  if (i < numberOfCallbacks)
-  WARN("NOT DONE!");
+  if (i < numberOfCallbacks) {
+    WARN("NOT DONE!");
+    if (steps > 10) ERR(1, "Too many steps");
+    goto back;
+  }
 
 }
 
