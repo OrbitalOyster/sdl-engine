@@ -125,55 +125,11 @@ double getMovingParallelOrthoSegmentsCollision(OrthoSegment s1, OrthoSegment s2,
 // ============================================================================
 
 /*
-// NOTE: Only works for separated (< GHOST) rects, otherwise returns
-// RMT_CONVERGE
-RelativeMovementType getOrthoRectsRelativeMovementType(OrthoRect *r1,
-                                                       OrthoRect *r2,
-                                                       double vx1, double vy1,
-                                                       double vx2, double vy2) {
-  double vx = vx1 - vx2;
-  double vy = vy1 - vy2;
-
-  // No relative movement
-  if (compare(vx, 0) && compare(vy, 0))
-    return RMT_NONE;
-
-  // Diverging
-  if ((moreEqThan(r1->y, r2->y + r2->h) && moreThan(vy, 0)) ||
-      (lessEqThan(r1->x + r1->w, r2->x) && lessThan(vx, 0)) ||
-      (lessEqThan(r1->y + r1->h, r2->y) && lessThan(vy, 0)) ||
-      (moreEqThan(r1->x, r2->x + r2->w) && moreThan(vx, 0)))
-    return RMT_DIVERGE;
-
-  // Horizontal movement
-  if (compare(vy, 0)) {
-    if (moreThan(r1->y, r2->y + r2->h) || lessThan(r1->y + r1->h, r2->y))
-      return RMT_DIVERGE;
-
-    if (compare(r1->edges[0]->line->xy, r2->edges[2]->line->xy) ||
-        compare(r1->edges[2]->line->xy, r2->edges[0]->line->xy))
-      return RMT_SLIP;
-  }
-
-  // Vertical movement
-  if (compare(vx, 0)) {
-    if (lessThan(r1->x + r1->w, r2->x) || moreThan(r1->x, r2->x + r2->w))
-      return RMT_DIVERGE;
-
-    if (compare(r1->edges[1]->line->xy, r2->edges[3]->line->xy) ||
-        compare(r1->edges[3]->line->xy, r2->edges[1]->line->xy))
-      return RMT_SLIP;
-  }
-
-  return RMT_CONVERGE;
-}
-*/
-
-/*
  * 0 - no interaction
  * 1 - r1 pushing r2
  * 2 - r2 pushing r1
  * 3 - both 1 and 2
+ * 4 - rects diverging
  */
 RelativeFooType getOrthoRectsFoo(OrthoRect *r1, OrthoRect *r2, double vx1,
                                  double vy1, double vx2, double vy2) {
@@ -199,7 +155,7 @@ RelativeFooType getOrthoRectsFoo(OrthoRect *r1, OrthoRect *r2, double vx1,
        lessEqThan(vy, 0)) ||
       (compareOrthoLines(*r1->edges[3]->line, *r2->edges[1]->line) &&
        moreEqThan(vx, 0)))
-    return result;
+    return RFT_DIVERGE;
 
   // r1
   if (!((compareOrthoLines(*r1->edges[0]->line, *r2->edges[2]->line) &&
@@ -262,29 +218,10 @@ uint8_t getEdgeCollisionMask(OrthoRect *r1, OrthoRect *r2) {
   return result;
 }
 
-/*
-uint16_t getOrthoCollisionMask(OrthoRect* r1, OrthoRect* r2) {
-  uint16_t result = 0;
-  for (uint8_t i = 0; i < 4; i++) {
-    OrthoSegment edge1 = *r1->edges[i];
-    for (uint8_t j = 0; j <= 2; j+=2) {
-      uint8_t k = (i + 1 + j) % 4;
-      OrthoSegment edge2 = *r2->edges[k];
-      if (checkOrthoSegmentsIntersecting(edge1, edge2, true)) {
-        uint16_t m = (uint16_t) pow(2, k);
-        result |= m << i * 4;
-      }
-    }
-  }
-  return result;
-}
-*/
-
 OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
   // End result
   OrthoRectCollision result = {.type = NO_COLLISION,
-                               .edgeCollisionMask =
-                                   0 /* , .orthoCollisionMask = 0 */};
+                               .edgeCollisionMask = 0 };
 
   // No collision
   if (checkOrthoRectsHardSeparated(r1, r2))
@@ -303,7 +240,6 @@ OrthoRectCollision getOrthoRectCollision(OrthoRect *r1, OrthoRect *r2) {
       result.type = result.edgeCollisionMask ? INNER_TOUCH : OUTSIDE;
     else // Ghost
     {
-      // result.orthoCollisionMask = getOrthoCollisionMask(r1, r2);
       result.type = GHOST;
     }
   }

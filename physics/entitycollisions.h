@@ -5,21 +5,9 @@
 
 #include "../scene.h"
 #include "entity.h"
-#include "prop.h"
 
 #define MAX_ENTITY_COLLISION_SIZE 100
 #define MAX_ENTITY_COLLISION_CHANGE_SIZE 25
-
-typedef struct {
-  CollisionAgentType agentType;
-  void *agent;
-  uint8_t mask;
-} EntityCollisionChange;
-
-typedef struct {
-  uint8_t size;
-  EntityCollisionChange *changes;
-} EntityImmediateCollisionChange;
 
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
 EntityImmediateCollisionChange

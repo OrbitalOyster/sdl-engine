@@ -28,7 +28,8 @@ typedef enum {
   RFT_NONE,
   RFT_R1R2,
   RFT_R2R1,
-  RFT_BOTH
+  RFT_BOTH,
+  RFT_DIVERGE,
 } RelativeFooType;
 
 typedef struct {

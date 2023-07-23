@@ -5,12 +5,22 @@
 
 #include "../geometry/collisions.h"
 #include "../geometry/orthorect.h"
-#include "prop.h"
 
 typedef enum {
   CAT_PROP,
   CAT_ENTITY
 } CollisionAgentType;
+
+typedef struct {
+  CollisionAgentType agentType;
+  void *agent;
+  uint8_t mask;
+} EntityCollisionChange;
+
+typedef struct {
+  uint8_t size;
+  EntityCollisionChange *changes;
+} EntityImmediateCollisionChange;
 
 typedef struct {
   CollisionAgentType agentType;
@@ -44,6 +54,8 @@ typedef struct {
   // Tag
   uint16_t tag;
   EntityCollisionState *collisionState;
+  // Immediate collision changes
+  EntityImmediateCollisionChange *immediateCollisionChange;
 } Entity;
 
 Entity *createEntity(double x, double y, double w, double h);
