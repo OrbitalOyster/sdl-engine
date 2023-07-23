@@ -223,13 +223,108 @@ void moveEntity(Entity *entity, double dx, double dy) {
         entity->x, entity->y);
 }
 
+// New, improved bollocks
+void resolveFoo(Scene *scene) {
+  // Reset velocities
+  resetSceneVelocities(scene);
+
+  // TODO: No magic numbers
+  physicsCallbackStats **callbackStats =
+      calloc(10, sizeof(physicsCallbackStats *));
+
+  uint8_t numberOfCallbacks = 0;
+
+  // Get all callbacks
+  for (unsigned int j = 0; j < scene->numberOfEntities; j++) {
+    Entity* entity = scene->entities[j];
+    // Update collisionState
+    freeEntityCollisionState(entity);
+    entity->collisionState = getEntityCollisionState(entity, scene);
+
+  // Get immediate collision change
+  EntityImmediateCollisionChange eicc =
+      getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
+
+    INFOF("Getting entity #%u (cid: %s cmask: %s) callbacks, collision changes: "
+          "%u", entity->tag, intToBinary(entity->collisionId, 8), intToBinary(entity->collisionMask, 8), eicc.size);
+    for (uint8_t i = 0; i < eicc.size; i++) {
+      void *agent = eicc.changes[i].agent;
+      uint8_t agentCollisionId = 0;
+      OrthoRect *agentRect = NULL;
+      double agentVx = 0, agentVy = 0;
+      uint16_t agentTag = 0;
+      switch (eicc.changes[i].agentType) {
+      case CAT_PROP:
+        agentRect = ((Prop *)agent)->rect;
+        agentCollisionId = ((Prop *)agent)->collisionId;
+        agentTag = ((Prop *)agent)->tag;
+        break;
+      case CAT_ENTITY:
+        agentRect = ((Entity *)agent)->rect;
+        agentCollisionId = ((Entity *)agent)->collisionId;
+        agentVx = ((Entity *)agent)->_avx;
+        agentVy = ((Entity *)agent)->_avy;
+        agentTag = ((Entity *)agent)->tag;
+        break;
+      }
+      uint8_t mask = entity->collisionMask & agentCollisionId;
+      INFOF("Found %s collision with agent #%u", intToBinary(mask, 8), agentTag);
+      if (scene->physicsCallbacks[mask]) {
+        callbackStats[numberOfCallbacks] =
+            calloc(1, sizeof(physicsCallbackStats));
+        *callbackStats[numberOfCallbacks++] =
+            (physicsCallbackStats){.r1 = entity->rect,
+                                   .r2 = agentRect,
+                                   .vx1 = &entity->_avx,
+                                   .vy1 = &entity->_avy,
+                                   .vx2 = agentVx,
+                                   .vy2 = agentVy,
+                                   .collisionChangeMask = eicc.changes[i].mask,
+                                   .callback = scene->physicsCallbacks[mask]};
+      } else
+        INFO("No callback, skip");
+    }
+  }
+
+
+  // No callbacks - done
+  if (numberOfCallbacks == 0) return;
+
+  WARNF("Number of callbacks: %u", numberOfCallbacks);
+
+  // Sort callbacks by priority
+  sort((void **)callbackStats, 0, numberOfCallbacks - 1,
+       comparePhysicsCallbacks);
+
+  // Priority to fire
+  unsigned int firstPriority = callbackStats[0]->callback->priority;
+
+  unsigned int i = 0;
+  for (; i < numberOfCallbacks; i++) {
+    if (callbackStats[i]->callback->priority != firstPriority) break;
+      // Fire callback
+      INFOF("Firing callback %s (priority %u)",
+            intToBinary(callbackStats[i]->collisionChangeMask, 8), callbackStats[i]->callback->priority );
+      callbackStats[i]->callback->func(*callbackStats[i]);
+      free(callbackStats[i]);
+    }
+
+  if (i < numberOfCallbacks)
+  WARN("NOT DONE!");
+
+}
+
 double stepScene(Scene *scene, double timeToProcess) {
   double timeProcessed = (double)timeToProcess;
 
   // At collision change - adjust velocities, refresh collisions
   if (compare(scene->timeToNextCollisionChange, 0)) {
     INFO("At collision change time");
-    resetSceneCollisionTracker(scene);
+    // resetSceneCollisionTracker(scene);
+    resolveFoo(scene);
+
+    // Set next collision change time
+    setSceneNextCollisionTime(scene);
   }
 
   // Next collision is within step time range

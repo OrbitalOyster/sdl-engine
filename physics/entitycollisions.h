@@ -12,7 +12,7 @@
 EntityCollisionState *getEntityCollisionState(Entity *entity, Scene *scene);
 EntityImmediateCollisionChange
 getEntityImmediateCollisionChange(Entity *entity, double vx, double vy);
-void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc);
+void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange* cc);
 double getEntityNextCollisionTime(Entity *entity, Scene *scene);
 void freeEntityCollisionState(Entity* entity);
 

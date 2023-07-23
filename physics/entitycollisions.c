@@ -105,8 +105,8 @@ getEntityImmediateCollisionChange(Entity *entity, double vx, double vy) {
   return result;
 }
 
-void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange cc) {
-  free(cc.changes);
+void freeEntityImmediateCollisionChange(EntityImmediateCollisionChange *cc) {
+  free(cc->changes);
 }
 
 double getEntityNextCollisionTime(Entity *entity, Scene *scene) {
