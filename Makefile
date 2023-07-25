@@ -1,21 +1,19 @@
 # Generic Makefile
 
 OUTPUT := game
-WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion -Wfloat-equal -Werror
+WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion \
+						-Wfloat-equal -Werror
 STANDART := -std=c11
 OPTIMIZATION := -O2
 DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT -DGEOMETRY_DEBUG
 DEBUG := -ggdb3
 
-# Implicit variables
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
 LDLIBS := -lm -lSDL2 -lSDL2_ttf
 
 # All .c files
 C_FILES := $(wildcard *.c) $(wildcard **/*.c)
-
-# TODO: Header dependencies
 
 # All .o files
 OBJS := $(C_FILES:.c=.o)
@@ -27,16 +25,23 @@ $(OUTPUT): $(OBJS)
 
 # Compile all .c files
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
+
+# Header dependencies
+-include $(C_FILES:.c=.d)
 
 # Clear working directory
 clean:
 	-rm *.o
 	-rm **/*.o
+	-rm *.d
+	-rm **/*.d
 	-rm $(OUTPUT)
 
 valgrind:
-	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all --track-origins=yes  --gen-suppressions=all --suppressions=sdl.supp ./$(OUTPUT)
+	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all \
+		--track-origins=yes  --gen-suppressions=all --suppressions=sdl.supp \
+		./$(OUTPUT)
 
 .PHONY: all clean valgrind
 
