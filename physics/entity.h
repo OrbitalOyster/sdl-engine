@@ -55,7 +55,7 @@ typedef struct {
   uint16_t tag;
   EntityCollisionState *collisionState;
   // Immediate collision changes
-  EntityImmediateCollisionChange *immediateCollisionChange;
+  EntityImmediateCollisionChange immediateCollisionChange;
 } Entity;
 
 Entity *createEntity(double x, double y, double w, double h);

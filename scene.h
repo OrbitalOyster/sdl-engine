@@ -17,8 +17,6 @@ typedef struct {
   uint32_t numberOfEntities;
   Entity **entities;
 
-  Entity *collisionTracker[MAX_NUMBER_OF_ENTITIES];
-  uint32_t collisionTrackerSize;
   double timeToNextCollisionChange;
 
   PhysicsCallback** physicsCallbacks;

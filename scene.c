@@ -13,7 +13,6 @@ Scene *initScene() {
   Scene *scene = calloc(1, sizeof(Scene));
   scene->props = calloc(MAX_NUMBER_OF_PROPS, sizeof(Prop *));
   scene->entities = calloc(MAX_NUMBER_OF_ENTITIES, sizeof(Entity *));
-  scene->collisionTrackerSize = 0;
   scene->timeToNextCollisionChange = INFINITY;
   scene->physicsCallbacks =
       calloc(NUMBER_OF_COLLISION_CALLBACKS, sizeof(PhysicsCallback *));
@@ -51,15 +50,92 @@ void setSceneNextCollisionTime(Scene *scene) {
       scene->timeToNextCollisionChange = t;
   }
   INFOF("Scene next collision change in %lfms",
-        scene->timeToNextCollisionChange, scene->collisionTrackerSize);
+        scene->timeToNextCollisionChange);
+}
+
+void resolveEntityVelocity(Entity *entity, physicsCallbackStats **callbackStats, uint8_t *numberOfCallbacks, Scene *scene) {
+  entity->_avx = entity->_vx;
+  entity->_avy = entity->_vy;
+  // Update collisionState
+  freeEntityCollisionState(entity);
+  entity->collisionState = getEntityCollisionState(entity, scene);
+  // Get immediate collision change
+  EntityImmediateCollisionChange eicc =
+      getEntityImmediateCollisionChange(entity, entity->_avx, entity->_avy);
+
+  INFOF("Adjusting entity #%u (cid: %s cmask: %s) velocity, collision changes: "
+        "%u", entity->tag, intToBinary(entity->collisionId, 8), intToBinary(entity->collisionMask, 8), eicc.size);
+  for (uint8_t i = 0; i < eicc.size; i++) {
+    void *agent = eicc.changes[i].agent;
+    uint8_t agentCollisionId = 0;
+    OrthoRect *agentRect = NULL;
+    double agentVx = 0, agentVy = 0;
+    uint16_t agentTag = 0;
+    switch (eicc.changes[i].agentType) {
+    case CAT_PROP:
+      agentRect = ((Prop *)agent)->rect;
+      agentCollisionId = ((Prop *)agent)->collisionId;
+      agentTag = ((Prop *)agent)->tag;
+      break;
+    case CAT_ENTITY:
+      agentRect = ((Entity *)agent)->rect;
+      agentCollisionId = ((Entity *)agent)->collisionId;
+      agentVx = ((Entity *)agent)->_avx;
+      agentVy = ((Entity *)agent)->_avy;
+      agentTag = ((Entity *)agent)->tag;
+      break;
+    }
+    uint8_t mask = entity->collisionMask & agentCollisionId;
+    INFOF("Found %s collision with agent #%u", intToBinary(mask, 8), agentTag);
+    if (scene->physicsCallbacks[mask]) {
+      callbackStats[*numberOfCallbacks] =
+          calloc(1, sizeof(physicsCallbackStats));
+      *callbackStats[(*numberOfCallbacks)++] =
+          (physicsCallbackStats){.r1 = entity->rect,
+                                 .r2 = agentRect,
+                                 .vx1 = &entity->_avx,
+                                 .vy1 = &entity->_avy,
+                                 .vx2 = agentVx,
+                                 .vy2 = agentVy,
+                                 .collisionChangeMask = eicc.changes[i].mask,
+                                 .callback = scene->physicsCallbacks[mask]};
+    } else
+      INFO("No callback, skip");
+  }
+}
+
+void resolveSceneImmediateCollisions(Scene *scene) {
+  // TODO: No magic numbers
+  physicsCallbackStats **callbackStats =
+      calloc(10, sizeof(physicsCallbackStats *));
+  uint8_t numberOfCallbacks = 0;
+  for (unsigned int i = 0; i < scene->numberOfEntities; i++)
+    resolveEntityVelocity(scene->entities[i], callbackStats, &numberOfCallbacks, scene);
+
+  WARNF("%u", numberOfCallbacks);
+  // Sort callbacks by priority
+  sort((void **)callbackStats, 0, numberOfCallbacks - 1,
+       comparePhysicsCallbacks);
+
+  for (unsigned int i = 0; i < numberOfCallbacks; i++) {
+    INFOF("Firing callback %s (priority %u)",
+          intToBinary(callbackStats[i]->collisionChangeMask, 8), callbackStats[i]->callback->priority );
+    callbackStats[i]->callback->func(*callbackStats[i]);
+    free(callbackStats[i]);
+  }
+
+  free(callbackStats);
+}
+
+void resetSceneCollisions(Scene *scene) {
+  resolveSceneImmediateCollisions(scene);
+  setSceneNextCollisionTime(scene);
 }
 
 void initSceneCollisions(Scene *scene) {
   for (unsigned int i = 0; i < scene->numberOfEntities; i++)
     scene->entities[i]->collisionState =
         calloc(1, sizeof(EntityCollisionState));
-  if (scene){};
-  //resetSceneCollisionTracker(scene);
 }
 
 void addEntityToScene(Scene *scene, Entity *entity) {
@@ -75,15 +151,13 @@ void jumpEntity(Entity *entity, double x, double y, Scene *scene) {
   entity->y = y;
   jumpOrthoRect(entity->rect, x, y);
   if (scene){};
-  //resetSceneCollisionTracker(scene);
   INFOF("Jumped entity #%u to (%.8f %.8f)", entity->tag, entity->x, entity->y);
 }
 
 void setEntityVelocity(Entity *entity, double vx, double vy, Scene *scene) {
   entity->_vx = vx;
   entity->_vy = vy;
-  if (scene){};
-  // resetSceneCollisionTracker(scene);
+  resetSceneCollisions(scene);
   INFOF("Set entity #%u velocity to (%.8f %.8f)", entity->tag, entity->_vx,
         entity->_vy);
 }
@@ -92,8 +166,7 @@ void increaseEntityVelocity(Entity *entity, double dvx, double dvy,
                             Scene *scene) {
   entity->_vx += dvx;
   entity->_vy += dvy;
-  if (scene){};
-  //resetSceneCollisionTracker(scene);
+  resetSceneCollisions(scene);
   INFOF("Set entity #%u velocity to (%.8f %.8f)", entity->tag, entity->_vx,
         entity->_vy);
 }
@@ -112,6 +185,7 @@ double stepScene(Scene *scene, double timeToProcess) {
   // At collision change - adjust velocities, refresh collisions
   if (compare(scene->timeToNextCollisionChange, 0)) {
     INFO("At collision change time");
+    resolveSceneImmediateCollisions(scene);
     // Set next collision change time
     setSceneNextCollisionTime(scene);
   }
@@ -137,7 +211,7 @@ void processScene(Scene *scene, uint64_t ticksPassed) {
   INFOF("Processing scene, ticksPassed: %u", ticksPassed);
   double timeToProcess = (double)ticksPassed;
 
-  uint16_t steps = 1000;
+  uint16_t steps = 100;
   while (moreThan(timeToProcess, 0)) {
     if (!--steps)
       ERR(1, "TOO MANY STEPS");
@@ -145,7 +219,7 @@ void processScene(Scene *scene, uint64_t ticksPassed) {
     INFOF("Time left to process: %5.10lf", timeToProcess);
   }
 
-  INFOF("Scene processed, steps: %u", 1000 - steps);
+  INFOF("Scene processed, steps: %u", 100 - steps);
 }
 
 void destroyScene(Scene *scene) { free(scene); }
