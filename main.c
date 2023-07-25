@@ -156,9 +156,6 @@ void getPushedCallback(physicsCallbackStats s) {
 
 int main() {
 
-//  test();
-//  exit(0);
-
   GameParameters gameParameters = {.screenWidth = 640, .screenHeight = 480, .title = "Untitled" };
   if (!initGame(&gameParameters)) return 1;
   registerOnKeyDownFunc(onKeyDown);
