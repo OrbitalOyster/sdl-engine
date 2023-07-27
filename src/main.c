@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-int main() {
-  printf("Hello, World!\n");
-}
+#include "utils/tcolors.h"
 
+int main() {
+  printf(MSG_GREEN("Hello, World!\n"));
+}

@@ -15,7 +15,7 @@ OPTIMIZATION := -O2
 # Debugging info
 DEBUG := -ggdb3
 # Preprocessor flags (example -DDEBUG -DLOG)
-DFLAGS := 
+DFLAGS := -DCOLOR_OUTPUT
 
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
