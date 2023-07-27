@@ -1,27 +1,40 @@
 # Generic Makefile
 
-OUTPUT := game
+# Working directories
+SRC_DIR := src
+BIN_DIR := bin
+
+# Executable name
+EXE := engine
+
+OUTPUT := $(BIN_DIR)/$(EXE)
 WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion \
 						-Wfloat-equal -Werror
 STANDART := -std=c11
 OPTIMIZATION := -O2
-DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT -DGEOMETRY_DEBUG
+# Debugging info
 DEBUG := -ggdb3
+# Preprocessor flags (example -DDEBUG -DLOG)
+DFLAGS := 
 
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
-LDLIBS := -lm -lSDL2 -lSDL2_ttf
+LDLIBS := -lm
 
 # All .c files
-C_FILES := $(wildcard *.c) $(wildcard **/*.c)
+C_FILES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c)
 
 # All .o files
 OBJS := $(C_FILES:.c=.o)
 
 # Final result
-all: $(OUTPUT)
+all: $(BIN_DIR) $(OUTPUT)
 $(OUTPUT): $(OBJS)
 	$(CC) $(OBJS) $(LDLIBS) -o $(OUTPUT)
+
+# Executable directory 
+$(BIN_DIR):
+	mkdir $(BIN_DIR)
 
 # Compile all .c files
 %.o: %.c
@@ -30,18 +43,16 @@ $(OUTPUT): $(OBJS)
 # Header dependencies
 -include $(C_FILES:.c=.d)
 
+# Run executable
+run:
+	./$(OUTPUT)
+
 # Clear working directory
 clean:
-	-rm *.o
-	-rm **/*.o
-	-rm *.d
-	-rm **/*.d
+	-rm $(SRC_DIR)/*.o
+	-rm $(SRC_DIR)/**/*.o
+	-rm $(SRC_DIR)/*.d
+	-rm $(SRC_DIR)/**/*.d
 	-rm $(OUTPUT)
 
-valgrind:
-	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all \
-		--track-origins=yes  --gen-suppressions=all --suppressions=sdl.supp \
-		./$(OUTPUT)
-
-.PHONY: all clean valgrind
-
+.PHONY: all run clean
