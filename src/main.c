@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "utils/tcolors.h"
+#include "utils/tmodes.h"
 
 int main() {
-  printf(MSG_GREEN("Hello, World!\n"));
+  printf(_S_ MODE_BLINK COLOR_GREEN "m" "Hello, World!\n" _R_);
 }

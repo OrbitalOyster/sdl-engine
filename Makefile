@@ -9,8 +9,8 @@ EXE := engine
 
 OUTPUT := $(BIN_DIR)/$(EXE)
 WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion \
-						-Wfloat-equal -Werror
-STANDART := -std=c11
+						-Wfloat-equal -pedantic -Werror
+STANDART := -std=c2x
 OPTIMIZATION := -O2
 # Debugging info
 DEBUG := -ggdb3
