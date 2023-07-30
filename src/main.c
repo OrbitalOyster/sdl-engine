@@ -1,7 +1,9 @@
-#include <stdio.h>
+#include <stdarg.h>
 
-#include "utils/tmodes.h"
+#include "utils/debug.h"
 
 int main() {
-  printf(_S_ MODE_BLINK COLOR_GREEN "m" "Hello, World!\n" _R_);
+  INFOF("Info: %s", "foo");
+  WARNF("Warning: %s", "bar");
+  ERRF(1, "Error: %s", "baz");
 }
