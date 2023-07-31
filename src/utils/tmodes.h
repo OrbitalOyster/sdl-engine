@@ -3,6 +3,9 @@
 
 /* List of terminal modes for formatting */
 
+// Disabled by default, use -DCOLOR_OUTPUT to switch on
+#ifdef COLOR_OUTPUT
+
 #define _S_ "\x1b["
 #define _R_ "\x1b[0m"
 
@@ -33,5 +36,45 @@
 #define COLOR_BRIGHT_PURPLE ";95"
 #define COLOR_BRIGHT_CYAN ";96"
 #define COLOR_WHITE ";97"
+
+// Simple macro for two-mode formatting
+#define TMSG(mode, color, s) _S_ mode color "m" s _R_
+
+#else
+
+#define _S_
+#define _R_
+
+#define MODE_NORMAL
+#define MODE_BOLD
+#define MODE_DIM
+#define MODE_ITALIC
+#define MODE_UNDERSCORE
+#define MODE_BLINK
+#define MODE_REVERSE
+
+#define COLOR_BLACK
+#define COLOR_RED
+#define COLOR_GREEN
+#define COLOR_YELLOW
+#define COLOR_BLUE
+#define COLOR_PURPLE
+#define COLOR_CYAN
+#define COLOR_GRAY
+
+#define COLOR_DEFAULT
+
+#define COLOR_BRIGHT_BLACK
+#define COLOR_BRIGHT_RED
+#define COLOR_BRIGHT_GREEN
+#define COLOR_BRIGHT_YELLOW
+#define COLOR_BRIGHT_BLUE
+#define COLOR_BRIGHT_PURPLE
+#define COLOR_BRIGHT_CYAN
+#define COLOR_WHITE
+
+#define TMSG(mode, color, s) s
+
+#endif
 
 #endif
