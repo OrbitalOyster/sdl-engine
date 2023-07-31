@@ -1,0 +1,5 @@
+./bin/engine
+[;1;39m[src/main.c:6] [0m[;0;34mInfo[0m
+[;1;39m[src/main.c:7] [0m[;0;34mInfo: foo[0m
+[;1;39m[src/main.c:8] [0m[;0;32mInfo[0m
+[;1;39m[src/main.c:9] [0m[;0;32mInfo: foo[0m
