@@ -27,6 +27,9 @@ C_FILES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/**/*.c)
 # All .o files
 OBJS := $(C_FILES:.c=.o)
 
+# All .d files
+DEPS := $(C_FILES:.c=.d)
+
 # Final result
 all: $(BIN_DIR) $(OUTPUT)
 $(OUTPUT): $(OBJS)
@@ -41,7 +44,7 @@ $(BIN_DIR):
 	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 # Header dependencies
--include $(C_FILES:.c=.d)
+-include $(DEPS) 
 
 # Run executable
 run:
@@ -49,10 +52,8 @@ run:
 
 # Clear working directory
 clean:
-	-rm $(SRC_DIR)/*.o
-	-rm $(SRC_DIR)/**/*.o
-	-rm $(SRC_DIR)/*.d
-	-rm $(SRC_DIR)/**/*.d
+	-rm $(OBJS)
+	-rm $(DEPS)
 	-rm $(OUTPUT)
 
 .PHONY: all run clean
