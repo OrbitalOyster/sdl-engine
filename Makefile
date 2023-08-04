@@ -40,7 +40,7 @@ DEPS := $(OBJS:.o=.d)
 all: $(OUTPUT)
 
 # Object subdirectories and files
-$(OUTPUT): $(OBJ_SDIRS) $(OBJS)
+$(OUTPUT): $(OBJ_SDIRS) $(OBJS) $(BIN_DIR)
 	$(CC) $(OBJS) $(LDLIBS) -o $(OUTPUT)
 
 $(OBJ_SDIRS):
@@ -58,7 +58,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 -include $(DEPS)
 
 # Run executable
-run:
+run: all
 	./$(OUTPUT)
 
 # Clear working directory
