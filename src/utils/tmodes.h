@@ -1,7 +1,9 @@
+/*
+ * List of terminal modes for formatting 
+ */
+
 #ifndef TMODES_H
 #define TMODES_H
-
-/* List of terminal modes for formatting */
 
 // Disabled by default, use -DCOLOR_OUTPUT to switch on
 #ifdef COLOR_OUTPUT
