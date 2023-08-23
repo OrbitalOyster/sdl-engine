@@ -1,5 +1,5 @@
 /*
- * "d" stands for "dummy"
+ * "d" stands for "dullard"
  */
 
 #ifndef DMATH_H

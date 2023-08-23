@@ -1,9 +1,9 @@
-#include "dmath.h"
+#include "utils/dmath.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-#include "debug.h"
+#include "utils/debug.h"
 
 // TODO: Handle NAN
 

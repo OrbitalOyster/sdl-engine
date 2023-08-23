@@ -20,12 +20,5 @@ int main() {
   INFO2F("compare(-INF, -INF) == %i", compare(-inf, -inf));
   INFO2F("compare(INF, -INF) == %i", compare(inf, -inf));
   INFO2F("compare(1000000000, 0.000001) == %i", compare(1000000000, 0.000001));
-
-  INFO("Info");
-  INFOF("Info: %s", "foo");
-  INFO2("Info");
-  INFO2F("Info: %s", "foo");
-  WARN("Warning");
-  WARNF("Warning: %s", "bar");
-  ERRF(1, "Error: %s", "baz");
 }
+

@@ -2,8 +2,9 @@
 
 # Working directories
 SRC_DIR := src
-BIN_DIR := bin
+INCLUDE_DIR := include
 OBJ_DIR := obj
+BIN_DIR := bin
 
 # Executable name
 EXE := engine
@@ -20,18 +21,19 @@ DEBUG := -ggdb3
 DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
 
 CC := gcc
-CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG)
+CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
+					-I $(INCLUDE_DIR)
 LDLIBS := -lm
 
 # All source subdirectories
 SRC_SDIRS := $(SRC_DIR)/ $(wildcard $(SRC_DIR)/*/) $(wildcard $(SRC_DIR)/**/*/)
 
 # All .c files
-C_FILES := $(foreach d,$(SRC_SDIRS),$(wildcard $(d)*.c))
+C_FILES := $(foreach d, $(SRC_SDIRS), $(wildcard $(d)*.c))
 
 # All .o files
-OBJS := $(patsubst $(SRC_DIR)%,$(OBJ_DIR)%,$(C_FILES:.c=.o))
-OBJ_SDIRS := $(patsubst $(SRC_DIR)%,$(OBJ_DIR)%, $(SRC_SDIRS))
+OBJS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(C_FILES:.c=.o))
+OBJ_SDIRS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(SRC_SDIRS))
 
 # All .d files
 DEPS := $(OBJS:.o=.d)
@@ -39,16 +41,19 @@ DEPS := $(OBJS:.o=.d)
 # Final result
 all: $(OUTPUT)
 
+# Testing
+include dtest/Makefile
+
 # Object subdirectories and files
 $(OUTPUT): $(OBJ_SDIRS) $(OBJS) $(BIN_DIR)
 	$(CC) $(OBJS) $(LDLIBS) -o $(OUTPUT)
 
 $(OBJ_SDIRS):
-	mkdir $(OBJ_SDIRS)
+	mkdir -p $(OBJ_SDIRS)
 
 # Executable directory
 $(BIN_DIR):
-	mkdir $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 
 # Compile all .c files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
@@ -58,12 +63,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 -include $(DEPS)
 
 # Run executable
-run: all
+run: $(OUTPUT)
 	./$(OUTPUT)
 
 # Clear working directory
 clean:
-	-rm $(OBJ_DIR) -r
+	-rm $(OBJ_DIR)/* -r
 	-rm $(OUTPUT)
 
-.PHONY: all run clean
+.PHONY: all run test clean
