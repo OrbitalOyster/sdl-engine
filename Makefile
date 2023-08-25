@@ -23,7 +23,8 @@ DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
 					-I $(INCLUDE_DIR)
-LDLIBS := -lm
+# Linker libraries (example -lm)
+LDLIBS := -lm -lSDL2 -lSDL2_ttf
 
 # All source subdirectories
 SRC_SDIRS := $(SRC_DIR)/ $(wildcard $(SRC_DIR)/*/) $(wildcard $(SRC_DIR)/**/*/)
