@@ -15,8 +15,8 @@
 #define MAX_MSG_SIZE 1024
 
 /**
- * Macro doesn't check for format discrepancies, so INFOF("%lf", 1) will 
- * output 0.000000; SNPRINTF_CHECK will force an extra sprintf to raise an 
+ * Macro doesn't check for format discrepancies, so INFOF("%lf", 1) will
+ * output 0.000000; SNPRINTF_CHECK will force an extra sprintf to raise an
  * error on wrong formatting
  */
 
@@ -31,8 +31,10 @@
 
 #define ERR(_debug_c, _debug_s)                                                \
   {                                                                            \
-    fprintf(stderr, TMSG(MODE_BOLD, COLOR_DEFAULT, "[%s:%i] ")                 \
-        TMSG(MODE_BLINK, COLOR_RED, "%s\n", __FILE__, __LINE__, _debug_s);     \
+    fprintf(stderr,                                                            \
+            TMSG(MODE_BOLD, COLOR_DEFAULT, "[%s:%i] ")                         \
+                TMSG(MODE_BLINK, COLOR_RED, "%s") "\n",                        \
+            __FILE__, __LINE__, _debug_s);                                     \
     exit(_debug_c);                                                            \
   }
 
