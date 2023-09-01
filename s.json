@@ -2,7 +2,8 @@
 {
   "foo"    :"Hello" ,
   "bar": 1234509,
-  "arr": [1,2,3 , "str"]
+  "arr": [1,true,3 , "str", 42],
+  "b": false
 }
 
 
