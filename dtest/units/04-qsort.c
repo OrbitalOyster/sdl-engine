@@ -1,11 +1,12 @@
 // obj/utils/qsort.o
 // 0
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "utils/qsort.h"
 
-#define ARR_SIZE 10 
+#define MAX_ARR_SIZE 10
 
 struct Entity {
   int a;
@@ -20,31 +21,45 @@ struct Entity *createEntity(int a, int b, char *c, double d) {
   return result;
 }
 
-void fillEntities(struct Entity **arr) {
+void fill10(struct Entity **arr) {
   arr[0] = createEntity(00, 7, "0", .123);
   arr[1] = createEntity(10, 2, "0", .123);
   arr[2] = createEntity(20, 7, "0", .123);
   arr[3] = createEntity(30, 3, "0", .123);
-  arr[4] = createEntity(40, 2, "0", .123);
+  arr[4] = createEntity(40, 4, "0", .123);
   arr[5] = createEntity(50, 6, "0", .123);
   arr[6] = createEntity(60, 8, "0", .123);
   arr[7] = createEntity(70, 9, "0", .123);
   arr[8] = createEntity(80, 5, "0", .123);
-  arr[9] = createEntity(90, 4, "0", .123);
+  arr[9] = createEntity(90, 1, "0", .123);
 }
 
-int checkEntitiesSorted(struct Entity **arr) {
-  int prev = arr[0] -> b;
+void fill2(struct Entity **arr) {
+  arr[0] = createEntity(00, 7, "0", .123);
+  arr[1] = createEntity(10, 2, "0", .123);
+}
+
+void fill1(struct Entity **arr) { arr[0] = createEntity(00, 7, "0", .123); }
+
+void debugEntities(struct Entity **arr, int size) {
+  for (int i = 0; i < size; i++)
+    printf("%i ", arr[i]->b);
+  printf("\n");
+}
+
+int checkEntitiesSorted(struct Entity **arr, int size) {
+  int prev = arr[0]->b;
   int ok = 1;
-  for (int i = 1; i < ARR_SIZE; i++) {
-    if (prev > arr[i] -> b) ok = 0;
-    prev = arr[i] -> b;
+  for (int i = 1; i < size; i++) {
+    if (prev > arr[i]->b)
+      ok = 0;
+    prev = arr[i]->b;
   }
   return ok;
 }
 
-void destroyEntities(struct Entity **arr) {
-  for (int i = 0; i < ARR_SIZE; i++)
+void destroyEntities(struct Entity **arr, int size) {
+  for (int i = 0; i < size; i++)
     free(arr[i]);
   free(arr);
 }
@@ -55,12 +70,37 @@ int entitySortFunc(void **arr, int i1, int i2) {
 
 int main() {
   DTEST_UNIT_START("Qsort test");
-  struct Entity **entities = calloc(ARR_SIZE, sizeof(struct Entity *));
-  fillEntities(entities);
-  DTEST_EXPECT_FALSE(checkEntitiesSorted(entities));
-  sort((void **)entities, 0, ARR_SIZE - 1, entitySortFunc);
-  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities));
+  struct Entity **entities = calloc(MAX_ARR_SIZE, sizeof(struct Entity *));
+
+  int size = 10;
+  fill10(entities);
+  debugEntities(entities, size);
+  DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
+  sort((void **)entities, 0, size - 1, entitySortFunc);
+  debugEntities(entities, size);
+  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
+  sort((void **)entities, 0, size - 1, entitySortFunc);
+  debugEntities(entities, size);
+  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
+
+  size = 2;
+  fill2(entities);
+  debugEntities(entities, size);
+  DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
+  sort((void **)entities, 0, size - 1, entitySortFunc);
+  debugEntities(entities, size);
+  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
+  sort((void **)entities, 0, size - 1, entitySortFunc);
+  debugEntities(entities, size);
+  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
+
+  size = 1;
+  fill1(entities);
+  debugEntities(entities, size);
+  sort((void **)entities, 0, size - 1, entitySortFunc);
+  DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
+
+  destroyEntities(entities, MAX_ARR_SIZE);
   DTEST_UNIT_END
-  destroyEntities(entities);
   return 0;
 }

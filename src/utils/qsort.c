@@ -7,8 +7,7 @@ void swap(void **arr, int i1, int i2) {
 }
 
 int getPivot(void **arr, int i1, int i2) {
-  if (arr && i1) {
-  };
+  (void)(arr && i1 && i2);
   return i2;
 }
 
@@ -36,8 +35,11 @@ int getRightInd(void **arr, int pivotInd, int i1, int i2,
 
 void step(void **arr, int i1, int i2,
           int (*sortFunc)(void **arr, int i1, int i2)) {
+  // Nothing to sort
   if (i1 >= i2)
     return;
+
+  // Just two elements left
   if (i1 + 1 == i2) {
     if (!sortFunc(arr, i1, i2))
       swap(arr, i1, i2);
@@ -48,12 +50,12 @@ void step(void **arr, int i1, int i2,
   swap(arr, i2, pivotInd);
 
   int leftInd = i1;
-  int rightInd = i2 - 1;
+  int rightInd = i2;
 
   int done = 0;
   while (!done) {
-    leftInd = getLeftInd(arr, pivotInd, i1, i2 - 1, sortFunc);
-    rightInd = getRightInd(arr, pivotInd, i1, i2 - 1, sortFunc);
+    leftInd = getLeftInd(arr, pivotInd, i1, i2, sortFunc);
+    rightInd = getRightInd(arr, pivotInd, i1, i2, sortFunc);
     if (leftInd > rightInd) {
       swap(arr, leftInd, pivotInd);
       done = 1;
