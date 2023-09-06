@@ -4,6 +4,9 @@
 
 #include "utils/debug.h"
 
+#define MAX_KEY_LENGTH 255
+#define MAX_STRING_LENGTH 255
+
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
 
 union TokenValue {
@@ -19,11 +22,26 @@ struct Token {
 
 struct TokenMap {
   int length;
+  char **keys;
   struct Token *content;
 };
 
-#define MAX_KEY_LENGTH 255
-#define MAX_STRING_LENGTH 255
+struct TokenMap createTokenMap() {
+  struct TokenMap result = {.length = 0, .keys = NULL, .content = NULL};
+
+  return result;
+}
+
+/*
+void setTokenMap(struct TokenMap *map, struct Token *content, char* key) {
+
+}
+
+struct Token getTokenMap(struct TOkenMap *map, char *key) {
+
+}
+
+*/
 
 void processToken(enum TokenType type, FILE *f);
 
