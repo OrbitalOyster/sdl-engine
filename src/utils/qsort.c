@@ -46,16 +46,18 @@ void step(void **arr, int i1, int i2,
     return;
   }
 
+  // Get pivot, move it out of the way
   int pivotInd = getPivot(arr, i1, i2);
   swap(arr, i2, pivotInd);
+  pivotInd = i2;
 
   int leftInd = i1;
-  int rightInd = i2;
+  int rightInd = i2 - 1;
 
   int done = 0;
   while (!done) {
-    leftInd = getLeftInd(arr, pivotInd, i1, i2, sortFunc);
-    rightInd = getRightInd(arr, pivotInd, i1, i2, sortFunc);
+    leftInd = getLeftInd(arr, pivotInd, i1, i2 - 1, sortFunc);
+    rightInd = getRightInd(arr, pivotInd, i1, i2 - 1, sortFunc);
     if (leftInd > rightInd) {
       swap(arr, leftInd, pivotInd);
       done = 1;
