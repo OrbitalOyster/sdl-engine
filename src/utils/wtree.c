@@ -14,15 +14,13 @@ struct WTree *createWTree() {
   result->root = calloc(1, sizeof(struct WTreeNode));
   *(result->root) =
       (struct WTreeNode){.parent = NULL, .c = -1, .size = 0, .children = NULL};
-  result->size = 0;
-  result->endpoints = NULL;
   return result;
 }
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   struct WTreeNode *result = calloc(1, sizeof(struct WTreeNode));
-  *result =
-      (struct WTreeNode){.parent = parent, .c = c, .size = 0, .children = NULL};
+  *result = (struct WTreeNode){
+      .parent = parent, .c = c, .size = 0, .children = NULL, .endpoint = NULL};
   return result;
 }
 
@@ -39,34 +37,53 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
   return NULL;
 }
 
-int expandWTree(struct WTree *tree, char *word) {
-  int done = 0;
+int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   int n = 0;
-
   struct WTreeNode *currentNode = tree->root;
-
-  while (!done) {
-    char c = word[n];
-    INFOF("c: %c", c);
-    if (c == '\0')
-      done = 1;
-    else {
-      struct WTreeNode *nextNode = getChild(currentNode, c);
-      if (nextNode == NULL) {
-        nextNode = createNode(currentNode, c);
-        currentNode->size++;
-        currentNode->children =
-            realloc(currentNode->children,
-                    currentNode->size * sizeof(struct WTreeNode *));
-        if (currentNode->children == NULL) {
-          WARN("Unable to allocate memory");
-          return 1;
-        }
-        currentNode->children[currentNode->size - 1] = nextNode;
-      }
-      currentNode = nextNode;
-      n++;
+  while (1) {
+    char c = word[n++];
+    if (c == '\0') {
+      currentNode->endpoint = endpoint;
+      return 0;
     }
+    struct WTreeNode *nextNode = getChild(currentNode, c);
+    if (nextNode == NULL) {
+      nextNode = createNode(currentNode, c);
+      currentNode->size++;
+      currentNode->children =
+          realloc(currentNode->children,
+                  currentNode->size * sizeof(struct WTreeNode *));
+      if (currentNode->children == NULL) {
+        WARN("Unable to allocate memory");
+        return 1;
+      }
+      currentNode->children[currentNode->size - 1] = nextNode;
+    }
+    currentNode = nextNode;
   }
-  return 0;
+}
+
+void *getEndpoint(struct WTree *tree, char *word) {
+  int n = 0;
+  struct WTreeNode *currentNode = tree->root;
+  while (1) {
+    char c = word[n++];
+    if (c == '\0')
+      return currentNode->endpoint;
+    struct WTreeNode *nextNode = getChild(currentNode, c);
+    if (nextNode == NULL)
+      return NULL;
+    currentNode = nextNode;
+  }
+}
+
+void destroyNode(struct WTreeNode *node) {
+  for (unsigned int i = 0; i < node->size; i++)
+    destroyNode(node->children[i]);
+  free(node);
+}
+
+void destroyTree(struct WTree *tree) {
+  destroyNode(tree->root);
+  free(tree);
 }
