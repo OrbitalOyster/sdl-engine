@@ -18,7 +18,7 @@ int main() {
   expandWTree(tree, "bar", &ep1);
   expandWTree(tree, "baz", &ep2);
 
-  struct Endpoint* ep = getEndpoint(tree, "baz");
+  struct Endpoint* ep = getWTreeEndpoint(tree, "baz");
   INFOF("ep->b == %i", ep->b);
 
   destroyTree(tree);

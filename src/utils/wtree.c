@@ -63,7 +63,7 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   }
 }
 
-void *getEndpoint(struct WTree *tree, char *word) {
+void *getWTreeEndpoint(struct WTree *tree, char *word) {
   int n = 0;
   struct WTreeNode *currentNode = tree->root;
   while (1) {

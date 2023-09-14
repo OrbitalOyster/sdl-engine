@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "utils/wtree.h"
 #include "utils/debug.h"
 
 #define MAX_KEY_LENGTH 255
@@ -10,9 +11,10 @@
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
 
 union TokenValue {
-  int Number;
-  char *String;
-  int Boolean;
+  int number;
+  char *string;
+  int boolean;
+  struct TokenMap *map;
 };
 
 struct Token {
@@ -21,27 +23,59 @@ struct Token {
 };
 
 struct TokenMap {
-  int length;
-  char **keys;
-  struct Token *content;
+  unsigned int size;
+  struct Token **content;
+  struct WTree *tree;
 };
 
-struct TokenMap createTokenMap() {
-  struct TokenMap result = {.length = 0, .keys = NULL, .content = NULL};
+struct Token createToken(enum TokenType type, union TokenValue value) {
+  return (struct Token) {.type = type, .value = value};
+}
 
+struct TokenMap createTokenMap() {
+  struct TokenMap result = {.size = 0, .content = NULL, .tree = createWTree()};
   return result;
 }
 
-/*
-void setTokenMap(struct TokenMap *map, struct Token *content, char* key) {
-
+void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
+  map->size++;
+  map->content = realloc(map->content, map->size * sizeof(struct Token*));
+  map->content[map->size - 1] = token;
+  expandWTree(map->tree, key, map->content[map->size - 1]);
 }
 
-struct Token getTokenMap(struct TOkenMap *map, char *key) {
-
+struct Token *readTokenMap(struct TokenMap *map, char *key) {
+  struct Token *result = getWTreeEndpoint(map->tree, key);
+  return result;
 }
 
-*/
+void debugToken(struct Token *token) {
+  switch (token->type) {
+  case Undefined:
+    break;
+  case Object:
+    INFO("{}");
+    break;
+  case Array:
+    INFO("[]");
+    break;
+  case Number:
+    INFOF("Number: %i", token->value.number);
+    break;
+  case String:
+    INFOF("String: %s", token->value.string);
+    break;
+  case Boolean:
+    INFOF("Boolean: %i", token->value.boolean);
+    break;
+  case Eof:
+    break;
+  }
+}
+
+struct JSON {
+  struct Token root;
+};
 
 void processToken(enum TokenType type, FILE *f);
 
@@ -265,12 +299,12 @@ int processNextArrayElement(FILE *f, int expectingComma) {
 
 void processArray(FILE *f) {
   int done = 0;
-  int comma = 0;
+  int expectingComma = 0;
   do {
-    if (!processNextArrayElement(f, comma))
+    if (!processNextArrayElement(f, expectingComma))
       done = 1;
     else
-      comma = 1;
+      expectingComma = 1;
   } while (!done);
 }
 
@@ -309,4 +343,17 @@ void readFile(char *filename) {
   f = fopen(filename, "r");
   enum TokenType nextToken = findNextToken(f, 0);
   processToken(nextToken, f);
+}
+
+void tokenTest() {
+  struct TokenMap map = createTokenMap();
+  struct Token intToken = createToken(Number, (union TokenValue) {.number = 14});
+  struct Token strToken = createToken(String, (union TokenValue) {.string = "Hello"});
+  expandTokenMap(&map, "n", &intToken);
+  expandTokenMap(&map, "s", &strToken);
+
+  struct Token *n = readTokenMap(&map, "n");
+  struct Token *s = readTokenMap(&map, "s");
+  debugToken(n);
+  debugToken(s);
 }
