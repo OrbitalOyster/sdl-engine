@@ -11,10 +11,10 @@
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
 
 union TokenValue {
-  int number;
+  int number, boolean;
   char *string;
-  int boolean;
   struct TokenMap *map;
+  void *empty;
 };
 
 struct Token {
@@ -28,8 +28,10 @@ struct TokenMap {
   struct WTree *tree;
 };
 
-struct Token createToken(enum TokenType type, union TokenValue value) {
-  return (struct Token) {.type = type, .value = value};
+struct Token *createToken(enum TokenType type, union TokenValue value) {
+  struct Token *result = calloc(1, sizeof(struct Token));
+  *result = (struct Token) {.type = type, .value = value};
+  return result;
 }
 
 struct TokenMap createTokenMap() {
@@ -46,12 +48,15 @@ void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
 
 struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
+  if (result == NULL)
+    result = createToken(Undefined, (union TokenValue) {.empty = NULL});
   return result;
 }
 
 void debugToken(struct Token *token) {
   switch (token->type) {
   case Undefined:
+    INFO("Undefined");
     break;
   case Object:
     INFO("{}");
@@ -347,13 +352,16 @@ void readFile(char *filename) {
 
 void tokenTest() {
   struct TokenMap map = createTokenMap();
-  struct Token intToken = createToken(Number, (union TokenValue) {.number = 14});
-  struct Token strToken = createToken(String, (union TokenValue) {.string = "Hello"});
-  expandTokenMap(&map, "n", &intToken);
-  expandTokenMap(&map, "s", &strToken);
+  struct Token *intToken = createToken(Number, (union TokenValue) {.number = 14});
+  struct Token *strToken = createToken(String, (union TokenValue) {.string = "Hello"});
+  expandTokenMap(&map, "n", intToken);
+  expandTokenMap(&map, "s", strToken);
 
   struct Token *n = readTokenMap(&map, "n");
   struct Token *s = readTokenMap(&map, "s");
   debugToken(n);
   debugToken(s);
+
+  struct Token *u = readTokenMap(&map, "bogus");
+  debugToken(u);
 }
