@@ -17,7 +17,11 @@ test:
 		if [ $$EXPECTED -eq $$RESULT ]; then \
 			echo "OK"; \
 		else \
-			echo "FAIL"; \
+			if [ $$RESULT -eq 139 ]; then \
+				echo "SEGMENTATION FAULT"; \
+			else \
+				echo "FAIL"; \
+			fi; \
 		fi; \
 		echo "******************************************"; \
 	done
