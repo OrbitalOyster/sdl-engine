@@ -13,6 +13,7 @@
   printf(TMSG(MODE_BOLD, COLOR_DEFAULT, "\tTesting unit: ")                    \
              TMSG(MODE_ITALIC, COLOR_GRAY, "%s\n"),                            \
          s);                                                                   \
+  fflush(stdout);                                                              \
   unsigned int _testsRun = 0;                                                  \
   unsigned int _ok = 0;                                                        \
   unsigned int _failed = 0;

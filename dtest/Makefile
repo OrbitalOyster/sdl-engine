@@ -4,7 +4,7 @@ TEST_DIR := dtest
 TESTS := $(patsubst $(TEST_DIR)/%, %, $(wildcard $(TEST_DIR)/units/*.c))
 
 test:
-	@echo "******************************************" 
+	@echo "******************************************"
 	@for t in $(TESTS); do \
 		echo "Compiling" $$t; \
 		EXTRA_UNITS=$$(cut $(TEST_DIR)/$$t -c 3- | head -1); \
