@@ -5,7 +5,7 @@
 
 int main() {
   DTEST_UNIT_START("JSON parser");
-  readFile("s.json");
+  // readFile("s.json");
   tokenTest();
   DTEST_UNIT_END
   return 0;

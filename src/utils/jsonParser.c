@@ -1,11 +1,13 @@
 #include "utils/jsonParser.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "utils/wtree.h"
 #include "utils/debug.h"
 
 #define MAX_KEY_LENGTH 255
+#define MAX_NUMBER_LENGTH 64
 #define MAX_STRING_LENGTH 255
 
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
@@ -34,8 +36,14 @@ struct Token *createToken(enum TokenType type, union TokenValue value) {
   return result;
 }
 
-struct TokenMap createTokenMap() {
-  struct TokenMap result = {.size = 0, .content = NULL, .tree = createWTree()};
+struct Token *createNumberToken(int n) {
+  struct Token *result = createToken(Number, (union TokenValue) {.number = n});
+  return result;
+}
+
+struct TokenMap *createTokenMap() {
+  struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
+  *result = (struct TokenMap) {.size = 0, .content = NULL, .tree = createWTree()};
   return result;
 }
 
@@ -50,6 +58,73 @@ struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
   if (result == NULL)
     result = createToken(Undefined, (union TokenValue) {.empty = NULL});
+  return result;
+}
+
+char *tokenToString(struct Token *token);
+
+char* tokenMapToString(struct TokenMap *map) {
+  size_t size = 0;
+  char *result = calloc(size, sizeof(char));
+  for (unsigned int i = 0; i < map->size; i++) {
+    char *s = tokenToString(map->content[i]);
+    if (i) { // ", "
+      size += 2;
+      size += strlen(s);
+      result = realloc(result, size);
+      strcat(result, ", ");
+    }
+    size += strlen(s);
+    result = realloc(result, size);
+    strcat(result, s);
+  }
+  return result;
+}
+
+char *arrayTokenToString(struct TokenMap *map) {
+  char *s = tokenMapToString(map);
+  char *result = calloc(2 + strlen(s), sizeof(char));
+  strcat(result, "[" );
+  strcat(result, s);
+  strcat(result, "]");
+  return result;
+}
+
+char *objectTokenToString(struct TokenMap *map) {
+  char *s = tokenMapToString(map);
+  char *result = calloc(2 + strlen(s), sizeof(char));
+  strcat(result, "{" );
+  strcat(result, s);
+  strcat(result, "}");
+  return result;
+}
+
+char *tokenToString(struct Token *token) {
+  char *result = "";
+  switch (token->type) {
+  case Undefined:
+    INFO("Undefined");
+    break;
+  case Object:
+    INFO("{}");
+    break;
+  case Array:
+    result = arrayTokenToString(token->value.map);
+    break;
+  case Number:
+    result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
+    snprintf(result, MAX_NUMBER_LENGTH, "%i", token->value.number);
+    break;
+  case String:
+    result = calloc(MAX_STRING_LENGTH, sizeof(char));
+    snprintf(result, MAX_STRING_LENGTH, "\"%s\"", token->value.string);
+    break;
+  case Boolean:
+    INFOF("Boolean: %i", token->value.boolean);
+    break;
+  case Eof:
+    break;
+  }
   return result;
 }
 
@@ -77,10 +152,6 @@ void debugToken(struct Token *token) {
     break;
   }
 }
-
-struct JSON {
-  struct Token root;
-};
 
 void processToken(enum TokenType type, FILE *f);
 
@@ -351,17 +422,22 @@ void readFile(char *filename) {
 }
 
 void tokenTest() {
-  struct TokenMap map = createTokenMap();
+  struct TokenMap *map = createTokenMap();
   struct Token *intToken = createToken(Number, (union TokenValue) {.number = 14});
   struct Token *strToken = createToken(String, (union TokenValue) {.string = "Hello"});
-  expandTokenMap(&map, "n", intToken);
-  expandTokenMap(&map, "s", strToken);
+  expandTokenMap(map, "n", intToken);
+  expandTokenMap(map, "s", strToken);
 
-  struct Token *n = readTokenMap(&map, "n");
-  struct Token *s = readTokenMap(&map, "s");
+  printf("Token to string: %s\n", tokenToString(intToken));
+  printf("Token to string: %s\n", tokenToString(strToken));
+  printf("Map to string: %s\n", tokenMapToString(map));
+  printf("Array token to string: %s\n", arrayTokenToString(map));
+
+  struct Token *n = readTokenMap(map, "n");
+  struct Token *s = readTokenMap(map, "s");
   debugToken(n);
   debugToken(s);
 
-  struct Token *u = readTokenMap(&map, "bogus");
+  struct Token *u = readTokenMap(map, "bogus");
   debugToken(u);
 }
