@@ -1,6 +1,9 @@
 #ifndef WTREE_H
 #define WTREE_H
 
+#define MAX_WORD_LENGTH 64
+#define MAX_TREE_SIZE 255
+
 struct WTreeNode {
   char c;
   struct WTreeNode *parent;
@@ -11,6 +14,8 @@ struct WTreeNode {
 
 struct WTree {
   struct WTreeNode *root;
+  unsigned int size;
+  char **words;
 };
 
 struct WTree *createWTree();

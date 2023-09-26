@@ -63,26 +63,49 @@ struct Token *readTokenMap(struct TokenMap *map, char *key) {
 
 char *tokenToString(struct Token *token);
 
-char* tokenMapToString(struct TokenMap *map) {
+char* tokenMapToString(struct TokenMap *map, int keys) {
   size_t size = 0;
   char *result = calloc(size, sizeof(char));
-  for (unsigned int i = 0; i < map->size; i++) {
-    char *s = tokenToString(map->content[i]);
+  for (unsigned int i = 0; i < map->tree->root->size; i++) {
+//  for (unsigned int i = 0; i < map->size; i++) {
+    if (keys) {};
+    char *value = tokenToString(map->content[i]);
     if (i) { // ", "
       size += 2;
-      size += strlen(s);
+      size += strlen(value);
       result = realloc(result, size);
       strcat(result, ", ");
     }
-    size += strlen(s);
+    size += strlen(value);
     result = realloc(result, size);
-    strcat(result, s);
+    strcat(result, value);
   }
   return result;
 }
 
+/*
+char* tokenMapToString(struct TokenMap *map, int keys) {
+  size_t size = 0;
+  char *result = calloc(size, sizeof(char));
+  for (unsigned int i = 0; i < map->size; i++) {
+    if (keys) {};
+    char *value = tokenToString(map->content[i]);
+    if (i) { // ", "
+      size += 2;
+      size += strlen(value);
+      result = realloc(result, size);
+      strcat(result, ", ");
+    }
+    size += strlen(value);
+    result = realloc(result, size);
+    strcat(result, value);
+  }
+  return result;
+}
+*/
+
 char *arrayTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map);
+  char *s = tokenMapToString(map, 0);
   char *result = calloc(2 + strlen(s), sizeof(char));
   strcat(result, "[" );
   strcat(result, s);
@@ -91,7 +114,7 @@ char *arrayTokenToString(struct TokenMap *map) {
 }
 
 char *objectTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map);
+  char *s = tokenMapToString(map, 1);
   char *result = calloc(2 + strlen(s), sizeof(char));
   strcat(result, "{" );
   strcat(result, s);
@@ -430,8 +453,7 @@ void tokenTest() {
 
   printf("Token to string: %s\n", tokenToString(intToken));
   printf("Token to string: %s\n", tokenToString(strToken));
-  printf("Map to string: %s\n", tokenMapToString(map));
-  printf("Array token to string: %s\n", arrayTokenToString(map));
+  printf("Token map to string: %s\n", tokenMapToString(map, 1));
 
   struct Token *n = readTokenMap(map, "n");
   struct Token *s = readTokenMap(map, "s");

@@ -1,6 +1,7 @@
 #include "utils/wtree.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils/debug.h"
 
@@ -14,6 +15,8 @@ struct WTree *createWTree() {
   result->root = calloc(1, sizeof(struct WTreeNode));
   *(result->root) =
       (struct WTreeNode){.parent = NULL, .c = -1, .size = 0, .children = NULL};
+  result->size = 0;
+  result->words = calloc(MAX_TREE_SIZE, sizeof(char *));
   return result;
 }
 
@@ -39,11 +42,15 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
 
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   int n = 0;
+  char *nextWord = calloc(MAX_WORD_LENGTH, sizeof(char));
   struct WTreeNode *currentNode = tree->root;
   while (1) {
-    char c = word[n++];
+    char c = word[n];
+    nextWord[n] = c;
+    n++;
     if (c == '\0') {
       currentNode->endpoint = endpoint;
+      tree->words[tree->size++] = nextWord;
       return 0;
     }
     struct WTreeNode *nextNode = getChild(currentNode, c);
