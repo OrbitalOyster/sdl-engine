@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "utils/wtree.h"
 #include "utils/debug.h"
+#include "utils/wtree.h"
 
 #define MAX_KEY_LENGTH 255
 #define MAX_NUMBER_LENGTH 64
@@ -32,24 +32,25 @@ struct TokenMap {
 
 struct Token *createToken(enum TokenType type, union TokenValue value) {
   struct Token *result = calloc(1, sizeof(struct Token));
-  *result = (struct Token) {.type = type, .value = value};
+  *result = (struct Token){.type = type, .value = value};
   return result;
 }
 
 struct Token *createNumberToken(int n) {
-  struct Token *result = createToken(Number, (union TokenValue) {.number = n});
+  struct Token *result = createToken(Number, (union TokenValue){.number = n});
   return result;
 }
 
 struct TokenMap *createTokenMap() {
   struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
-  *result = (struct TokenMap) {.size = 0, .content = NULL, .tree = createWTree()};
+  *result =
+      (struct TokenMap){.size = 0, .content = NULL, .tree = createWTree()};
   return result;
 }
 
 void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
   map->size++;
-  map->content = realloc(map->content, map->size * sizeof(struct Token*));
+  map->content = realloc(map->content, map->size * sizeof(struct Token *));
   map->content[map->size - 1] = token;
   expandWTree(map->tree, key, map->content[map->size - 1]);
 }
@@ -57,18 +58,17 @@ void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
 struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
   if (result == NULL)
-    result = createToken(Undefined, (union TokenValue) {.empty = NULL});
+    result = createToken(Undefined, (union TokenValue){.empty = NULL});
   return result;
 }
 
 char *tokenToString(struct Token *token);
 
-char* tokenMapToString(struct TokenMap *map, int keys) {
+char *tokenMapToString(struct TokenMap *map, int keys) {
   size_t size = 0;
   char *result = calloc(size, sizeof(char));
-  for (unsigned int i = 0; i < map->tree->root->size; i++) {
-//  for (unsigned int i = 0; i < map->size; i++) {
-    if (keys) {};
+  for (unsigned int i = 0; i < map->tree->size; i++) {
+    char *key = map->tree->words[i];
     char *value = tokenToString(map->content[i]);
     if (i) { // ", "
       size += 2;
@@ -76,25 +76,10 @@ char* tokenMapToString(struct TokenMap *map, int keys) {
       result = realloc(result, size);
       strcat(result, ", ");
     }
-    size += strlen(value);
-    result = realloc(result, size);
-    strcat(result, value);
-  }
-  return result;
-}
-
-/*
-char* tokenMapToString(struct TokenMap *map, int keys) {
-  size_t size = 0;
-  char *result = calloc(size, sizeof(char));
-  for (unsigned int i = 0; i < map->size; i++) {
-    if (keys) {};
-    char *value = tokenToString(map->content[i]);
-    if (i) { // ", "
-      size += 2;
-      size += strlen(value);
-      result = realloc(result, size);
-      strcat(result, ", ");
+    if (keys) {
+      result = realloc(result, strlen(key) + 2);
+      strcat(result, key);
+      strcat(result, ": ");
     }
     size += strlen(value);
     result = realloc(result, size);
@@ -102,12 +87,11 @@ char* tokenMapToString(struct TokenMap *map, int keys) {
   }
   return result;
 }
-*/
 
 char *arrayTokenToString(struct TokenMap *map) {
   char *s = tokenMapToString(map, 0);
   char *result = calloc(2 + strlen(s), sizeof(char));
-  strcat(result, "[" );
+  strcat(result, "[");
   strcat(result, s);
   strcat(result, "]");
   return result;
@@ -116,7 +100,7 @@ char *arrayTokenToString(struct TokenMap *map) {
 char *objectTokenToString(struct TokenMap *map) {
   char *s = tokenMapToString(map, 1);
   char *result = calloc(2 + strlen(s), sizeof(char));
-  strcat(result, "{" );
+  strcat(result, "{");
   strcat(result, s);
   strcat(result, "}");
   return result;
@@ -446,20 +430,16 @@ void readFile(char *filename) {
 
 void tokenTest() {
   struct TokenMap *map = createTokenMap();
-  struct Token *intToken = createToken(Number, (union TokenValue) {.number = 14});
-  struct Token *strToken = createToken(String, (union TokenValue) {.string = "Hello"});
-  expandTokenMap(map, "n", intToken);
-  expandTokenMap(map, "s", strToken);
+  struct Token *intToken =
+      createToken(Number, (union TokenValue){.number = 14});
+  struct Token *strToken =
+      createToken(String, (union TokenValue){.string = "Hello"});
+  expandTokenMap(map, "num", intToken);
+  expandTokenMap(map, "str", strToken);
 
   printf("Token to string: %s\n", tokenToString(intToken));
   printf("Token to string: %s\n", tokenToString(strToken));
   printf("Token map to string: %s\n", tokenMapToString(map, 1));
-
-  struct Token *n = readTokenMap(map, "n");
-  struct Token *s = readTokenMap(map, "s");
-  debugToken(n);
-  debugToken(s);
-
-  struct Token *u = readTokenMap(map, "bogus");
-  debugToken(u);
+  printf("Array token to string: %s\n", arrayTokenToString(map));
+  printf("Object token to string: %s\n", objectTokenToString(map));
 }
