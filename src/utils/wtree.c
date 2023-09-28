@@ -87,10 +87,14 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
 void destroyNode(struct WTreeNode *node) {
   for (unsigned int i = 0; i < node->size; i++)
     destroyNode(node->children[i]);
+  free(node->children);
   free(node);
 }
 
 void destroyTree(struct WTree *tree) {
   destroyNode(tree->root);
+  for (unsigned int i = 0; i < tree->size; i++)
+    free(tree->words[i]);
+  free(tree->words);
   free(tree);
 }

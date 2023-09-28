@@ -30,9 +30,44 @@ struct TokenMap {
   struct WTree *tree;
 };
 
+struct TokenMap *createTokenMap() {
+  struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
+  *result =
+      (struct TokenMap){.size = 0, .content = NULL, .tree = createWTree()};
+  return result;
+}
+
+void destroyToken(struct Token *token);
+
+void destroyTokenMap(struct TokenMap *map) {
+  destroyTree(map->tree);
+  for (unsigned int i = 0; i < map->size; i++)
+    destroyToken(map->content[i]);
+  free(map->content);
+  free(map);
+}
+
 struct Token *createToken(enum TokenType type, union TokenValue value) {
   struct Token *result = calloc(1, sizeof(struct Token));
   *result = (struct Token){.type = type, .value = value};
+  return result;
+}
+
+void destroyToken(struct Token *token) {
+  if (token->type == Object || token->type == Array)
+    destroyTokenMap(token->value.map);
+  free(token);
+}
+
+struct Token *createObjectToken() {
+  struct TokenMap *map = createTokenMap();
+  struct Token *result = createToken(Object, (union TokenValue){.map = map});
+  return result;
+}
+
+struct Token *createArrayToken() {
+  struct TokenMap *map = createTokenMap();
+  struct Token *result = createToken(Array, (union TokenValue){.map = map});
   return result;
 }
 
@@ -41,10 +76,8 @@ struct Token *createNumberToken(int n) {
   return result;
 }
 
-struct TokenMap *createTokenMap() {
-  struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
-  *result =
-      (struct TokenMap){.size = 0, .content = NULL, .tree = createWTree()};
+struct Token *createStringToken(char *s) {
+  struct Token *result = createToken(String, (union TokenValue){.string = s});
   return result;
 }
 
@@ -71,13 +104,13 @@ char *tokenMapToString(struct TokenMap *map, int keys) {
     char *key = map->tree->words[i];
     char *value = tokenToString(map->content[i]);
     if (i) { // ", "
-      size += 2;
-      size += strlen(value);
+      size += 2 * sizeof(char);
+      size += strlen(value) * sizeof(char);
       result = realloc(result, size);
       strcat(result, ", ");
     }
     if (keys) {
-      result = realloc(result, strlen(key) + 2);
+      result = realloc(result, strlen(key) + 2 * sizeof(char));
       strcat(result, key);
       strcat(result, ": ");
     }
@@ -432,14 +465,19 @@ void tokenTest() {
   struct TokenMap *map = createTokenMap();
   struct Token *intToken =
       createToken(Number, (union TokenValue){.number = 14});
-  struct Token *strToken =
-      createToken(String, (union TokenValue){.string = "Hello"});
+//  struct Token *strToken =
+//      createToken(String, (union TokenValue){.string = "Hello"});
   expandTokenMap(map, "num", intToken);
-  expandTokenMap(map, "str", strToken);
+//  expandTokenMap(map, "str", strToken);
+  destroyTokenMap(map);
+  /*
+  struct Token *arrToken = createArrayToken();
+  expandTokenMap(map, "arr", arrToken);
 
   printf("Token to string: %s\n", tokenToString(intToken));
   printf("Token to string: %s\n", tokenToString(strToken));
   printf("Token map to string: %s\n", tokenMapToString(map, 1));
   printf("Array token to string: %s\n", arrayTokenToString(map));
   printf("Object token to string: %s\n", objectTokenToString(map));
+  */
 }

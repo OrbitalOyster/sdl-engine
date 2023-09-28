@@ -67,6 +67,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 run: $(OUTPUT)
 	./$(OUTPUT)
 
+valgrind:
+	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all \
+		--track-origins=yes  --gen-suppressions=all \
+		./$(OUTPUT)
+
 # Clear working directory
 clean:
 	-rm $(OBJ_DIR)/* -r
