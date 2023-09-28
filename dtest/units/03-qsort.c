@@ -41,12 +41,6 @@ void fill2(struct Entity **arr) {
 
 void fill1(struct Entity **arr) { arr[0] = createEntity(00, 7, "0", .123); }
 
-void debugEntities(struct Entity **arr, int size) {
-  for (int i = 0; i < size; i++)
-    printf("%i ", arr[i]->b);
-  printf("\n");
-}
-
 int checkEntitiesSorted(struct Entity **arr, int size) {
   int prev = arr[0]->b;
   int ok = 1;
@@ -74,29 +68,22 @@ int main() {
 
   int size = 10;
   fill10(entities);
-  debugEntities(entities, size);
   DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
   sort((void **)entities, 0, size - 1, entitySortFunc);
-  debugEntities(entities, size);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
   sort((void **)entities, 0, size - 1, entitySortFunc);
-  debugEntities(entities, size);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   size = 2;
   fill2(entities);
-  debugEntities(entities, size);
   DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
   sort((void **)entities, 0, size - 1, entitySortFunc);
-  debugEntities(entities, size);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
   sort((void **)entities, 0, size - 1, entitySortFunc);
-  debugEntities(entities, size);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   size = 1;
   fill1(entities);
-  debugEntities(entities, size);
   sort((void **)entities, 0, size - 1, entitySortFunc);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
