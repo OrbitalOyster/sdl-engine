@@ -25,4 +25,4 @@ test:
 		fi; \
 		echo "******************************************"; \
 	done
-	#-rm $(TEST_DIR)/unit
+	-rm $(TEST_DIR)/unit

@@ -1,8 +1,0 @@
-[;1;39m	Testing unit: [0m[;3;37mJSON parser
-[0mToken to string: 14
-Token to string: "Hello"
-Token map to string: nu, s[]
-Array token to string: [14, "Hello", []]
-Object token to string: {nu, s[]}
-[;1;39m	Done. Tests: 0; Passed: 0; Failed: 0
-[0m
