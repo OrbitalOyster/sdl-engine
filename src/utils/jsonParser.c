@@ -81,12 +81,39 @@ struct Token *createStringToken(char *s) {
   return result;
 }
 
+struct Token *createBooleanToken(int b) {
+  struct Token *result =
+      createToken(Boolean, (union TokenValue){.boolean = !!b});
+  return result;
+}
+
 void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
   map->size++;
   map->content = realloc(map->content, map->size * sizeof(struct Token *));
   map->content[map->size - 1] = token;
   expandWTree(map->tree, key, map->content[map->size - 1]);
 }
+
+void expandObjectToken(struct Token *obj, char *key, struct Token *token) {
+  if (obj->type != Object)
+    ERR(1, "Unable to expand token");
+  expandTokenMap(obj->value.map, key, token);
+}
+
+unsigned int getArrayTokenSize(struct Token *arr) {
+  if (arr->type != Array)
+    ERR(1, "Unable to get size of token");
+  return arr->value.map->size;
+}
+
+/*
+void expandArrayToken(struct Token *arr, struct Token *token) {
+  if (arr->type != Array)
+    ERR(1, "Unable to expand token");
+  unsigned int nextIndex = getArrayTokenSize(arr) - 1;
+  expandTokenMap(arr->value.map, nextIndex, token);
+}
+*/
 
 struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
@@ -143,13 +170,13 @@ char *objectTokenToString(struct TokenMap *map) {
 }
 
 char *tokenToString(struct Token *token) {
-  char *result = "";
+  char *result = NULL;
   switch (token->type) {
   case Undefined:
     INFO("Undefined");
     break;
   case Object:
-    INFO("{}");
+    result = objectTokenToString(token->value.map);
     break;
   case Array:
     result = arrayTokenToString(token->value.map);
@@ -163,37 +190,16 @@ char *tokenToString(struct Token *token) {
     snprintf(result, MAX_STRING_LENGTH, "\"%s\"", token->value.string);
     break;
   case Boolean:
-    INFOF("Boolean: %i", token->value.boolean);
+    result = calloc(6, sizeof(char));
+    if (token->value.boolean)
+      snprintf(result, MAX_STRING_LENGTH, "%s", "true");
+    else
+      snprintf(result, MAX_STRING_LENGTH, "%s", "false");
     break;
   case Eof:
     break;
   }
   return result;
-}
-
-void debugToken(struct Token *token) {
-  switch (token->type) {
-  case Undefined:
-    INFO("Undefined");
-    break;
-  case Object:
-    INFO("{}");
-    break;
-  case Array:
-    INFO("[]");
-    break;
-  case Number:
-    INFOF("Number: %i", token->value.number);
-    break;
-  case String:
-    INFOF("String: %s", token->value.string);
-    break;
-  case Boolean:
-    INFOF("Boolean: %i", token->value.boolean);
-    break;
-  case Eof:
-    break;
-  }
 }
 
 void processToken(enum TokenType type, FILE *f);
@@ -469,20 +475,34 @@ void tokenTest() {
   struct Token *intToken = createNumberToken(14);
   struct Token *strToken = createStringToken("Hello");
   struct Token *arrToken = createArrayToken();
+
+  struct Token *objToken = createObjectToken();
+  struct Token *boolToken = createBooleanToken(1);
+  expandObjectToken(objToken, "bool", boolToken);
+
   expandTokenMap(map, "num", intToken);
   expandTokenMap(map, "str", strToken);
   expandTokenMap(map, "arr", arrToken);
+  expandTokenMap(map, "obj", objToken);
 
   char *s = tokenToString(intToken);
-  printf("Token to string: %s\n", s); free(s);
+  printf("Token to string: %s\n", s);
+  free(s);
   s = tokenToString(strToken);
-  printf("Token to string: %s\n", s); free(s);
+  printf("Token to string: %s\n", s);
+  free(s);
+
+  printf("Array token size: %u\n", getArrayTokenSize(arrToken));
+
   s = tokenMapToString(map, 0);
-  printf("Token map to string: %s\n", s); free(s);
+  printf("Token map to string: %s\n", s);
+  free(s);
   s = arrayTokenToString(map);
-  printf("Array token to string: %s\n", s); free(s);
+  printf("Array token to string: %s\n", s);
+  free(s);
   s = objectTokenToString(map);
-  printf("Object token to string: %s\n", s); free(s);
+  printf("Object token to string: %s\n", s);
+  free(s);
 
   destroyTokenMap(map);
 }
