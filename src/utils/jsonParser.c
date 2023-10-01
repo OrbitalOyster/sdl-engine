@@ -102,18 +102,25 @@ void expandObjectToken(struct Token *obj, char *key, struct Token *token) {
 
 unsigned int getArrayTokenSize(struct Token *arr) {
   if (arr->type != Array)
-    ERR(1, "Unable to get size of token");
+    ERR(1, "Token is not array");
   return arr->value.map->size;
 }
 
-/*
+struct Token *getArrayTokenElement(struct Token *arr, unsigned int n) {
+  if (arr->type != Array)
+    ERR(1, "Token is not array");
+  return arr->value.map->content[n];
+}
+
 void expandArrayToken(struct Token *arr, struct Token *token) {
   if (arr->type != Array)
     ERR(1, "Unable to expand token");
   unsigned int nextIndex = getArrayTokenSize(arr) - 1;
-  expandTokenMap(arr->value.map, nextIndex, token);
+  char *key = calloc(MAX_STRING_LENGTH, sizeof(char));
+  snprintf(key, MAX_STRING_LENGTH, "%i", nextIndex);
+  expandTokenMap(arr->value.map, key, token);
+  free(key);
 }
-*/
 
 struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
@@ -474,7 +481,12 @@ void tokenTest() {
   struct TokenMap *map = createTokenMap();
   struct Token *intToken = createNumberToken(14);
   struct Token *strToken = createStringToken("Hello");
+
   struct Token *arrToken = createArrayToken();
+  struct Token *int1 = createNumberToken(10);
+  struct Token *int2 = createNumberToken(20);
+  expandArrayToken(arrToken, int1);
+  expandArrayToken(arrToken, int2);
 
   struct Token *objToken = createObjectToken();
   struct Token *boolToken = createBooleanToken(1);
@@ -493,11 +505,14 @@ void tokenTest() {
   free(s);
 
   printf("Array token size: %u\n", getArrayTokenSize(arrToken));
+  struct Token *arrElem = getArrayTokenElement(arrToken, 1);
+  s = tokenToString(arrElem);
+  printf("Array token to string: %s\n", s); free(s);
 
   s = tokenMapToString(map, 0);
   printf("Token map to string: %s\n", s);
   free(s);
-  s = arrayTokenToString(map);
+  s = tokenToString(arrToken);
   printf("Array token to string: %s\n", s);
   free(s);
   s = objectTokenToString(map);
