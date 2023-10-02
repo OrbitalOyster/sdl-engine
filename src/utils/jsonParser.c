@@ -1,213 +1,11 @@
 #include "utils/jsonParser.h"
 
+#include "utils/JSON/token.h"
+#include "utils/JSON/tokenMap.h"
+
 #include <stdio.h>
-#include <string.h>
 
 #include "utils/debug.h"
-#include "utils/wtree.h"
-
-#define MAX_KEY_LENGTH 255
-#define MAX_NUMBER_LENGTH 64
-#define MAX_STRING_LENGTH 255
-
-enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
-
-union TokenValue {
-  int number, boolean;
-  char *string;
-  struct TokenMap *map;
-  void *empty;
-};
-
-struct Token {
-  enum TokenType type;
-  union TokenValue value;
-};
-
-struct TokenMap {
-  unsigned int size;
-  struct Token **content;
-  struct WTree *tree;
-};
-
-struct TokenMap *createTokenMap() {
-  struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
-  *result =
-      (struct TokenMap){.size = 0, .content = NULL, .tree = createWTree()};
-  return result;
-}
-
-void destroyToken(struct Token *token);
-
-void destroyTokenMap(struct TokenMap *map) {
-  destroyTree(map->tree);
-  for (unsigned int i = 0; i < map->size; i++)
-    destroyToken(map->content[i]);
-  free(map->content);
-  free(map);
-}
-
-struct Token *createToken(enum TokenType type, union TokenValue value) {
-  struct Token *result = calloc(1, sizeof(struct Token));
-  *result = (struct Token){.type = type, .value = value};
-  return result;
-}
-
-void destroyToken(struct Token *token) {
-  if (token->type == Object || token->type == Array)
-    destroyTokenMap(token->value.map);
-  free(token);
-}
-
-struct Token *createObjectToken() {
-  struct TokenMap *map = createTokenMap();
-  struct Token *result = createToken(Object, (union TokenValue){.map = map});
-  return result;
-}
-
-struct Token *createArrayToken() {
-  struct TokenMap *map = createTokenMap();
-  struct Token *result = createToken(Array, (union TokenValue){.map = map});
-  return result;
-}
-
-struct Token *createNumberToken(int n) {
-  struct Token *result = createToken(Number, (union TokenValue){.number = n});
-  return result;
-}
-
-struct Token *createStringToken(char *s) {
-  struct Token *result = createToken(String, (union TokenValue){.string = s});
-  return result;
-}
-
-struct Token *createBooleanToken(int b) {
-  struct Token *result =
-      createToken(Boolean, (union TokenValue){.boolean = !!b});
-  return result;
-}
-
-void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
-  map->size++;
-  map->content = realloc(map->content, map->size * sizeof(struct Token *));
-  map->content[map->size - 1] = token;
-  expandWTree(map->tree, key, map->content[map->size - 1]);
-}
-
-void expandObjectToken(struct Token *obj, char *key, struct Token *token) {
-  if (obj->type != Object)
-    ERR(1, "Unable to expand token");
-  expandTokenMap(obj->value.map, key, token);
-}
-
-unsigned int getArrayTokenSize(struct Token *arr) {
-  if (arr->type != Array)
-    ERR(1, "Token is not array");
-  return arr->value.map->size;
-}
-
-struct Token *getArrayTokenElement(struct Token *arr, unsigned int n) {
-  if (arr->type != Array)
-    ERR(1, "Token is not array");
-  return arr->value.map->content[n];
-}
-
-void expandArrayToken(struct Token *arr, struct Token *token) {
-  if (arr->type != Array)
-    ERR(1, "Unable to expand token");
-  unsigned int nextIndex = getArrayTokenSize(arr) - 1;
-  char *key = calloc(MAX_STRING_LENGTH, sizeof(char));
-  snprintf(key, MAX_STRING_LENGTH, "%i", nextIndex);
-  expandTokenMap(arr->value.map, key, token);
-  free(key);
-}
-
-struct Token *readTokenMap(struct TokenMap *map, char *key) {
-  struct Token *result = getWTreeEndpoint(map->tree, key);
-  if (result == NULL)
-    result = createToken(Undefined, (union TokenValue){.empty = NULL});
-  return result;
-}
-
-char *tokenToString(struct Token *token);
-
-char *tokenMapToString(struct TokenMap *map, int keys) {
-  size_t size = 1;
-  char *result = calloc(size, sizeof(char));
-  for (unsigned int i = 0; i < map->tree->size; i++) {
-    char *key = map->tree->words[i];
-    char *value = tokenToString(map->content[i]);
-    if (i) { // ", "
-      size += (2 + strlen(value)) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, ", ");
-    }
-    if (keys) {
-      size += (strlen(key) + 2) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, key);
-      strcat(result, ": ");
-    }
-    size += strlen(value) * sizeof(char);
-    result = realloc(result, size);
-    strcat(result, value);
-    free(value);
-  }
-  return result;
-}
-
-char *arrayTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map, 0);
-  char *result = calloc(2 + strlen(s) + 1, sizeof(char));
-  strcat(result, "[");
-  strcat(result, s);
-  strcat(result, "]");
-  free(s);
-  return result;
-}
-
-char *objectTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map, 1);
-  char *result = calloc(2 + strlen(s) + 1, sizeof(char));
-  strcat(result, "{");
-  strcat(result, s);
-  strcat(result, "}");
-  free(s);
-  return result;
-}
-
-char *tokenToString(struct Token *token) {
-  char *result = NULL;
-  switch (token->type) {
-  case Undefined:
-    INFO("Undefined");
-    break;
-  case Object:
-    result = objectTokenToString(token->value.map);
-    break;
-  case Array:
-    result = arrayTokenToString(token->value.map);
-    break;
-  case Number:
-    result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
-    snprintf(result, MAX_NUMBER_LENGTH, "%i", token->value.number);
-    break;
-  case String:
-    result = calloc(MAX_STRING_LENGTH, sizeof(char));
-    snprintf(result, MAX_STRING_LENGTH, "\"%s\"", token->value.string);
-    break;
-  case Boolean:
-    result = calloc(6, sizeof(char));
-    if (token->value.boolean)
-      snprintf(result, MAX_STRING_LENGTH, "%s", "true");
-    else
-      snprintf(result, MAX_STRING_LENGTH, "%s", "false");
-    break;
-  case Eof:
-    break;
-  }
-  return result;
-}
 
 void processToken(enum TokenType type, FILE *f);
 
@@ -477,6 +275,13 @@ void readFile(char *filename) {
   processToken(nextToken, f);
 }
 
+/*
+void tokenTest() {
+  struct Token *json = createObjectToken();
+  printf("Empty object: %s\n", tokenToString(json));
+}
+*/
+
 void tokenTest() {
   struct TokenMap *map = createTokenMap();
   struct Token *intToken = createNumberToken(14);
@@ -512,6 +317,7 @@ void tokenTest() {
   s = tokenMapToString(map, 0);
   printf("Token map to string: %s\n", s);
   free(s);
+
   s = tokenToString(arrToken);
   printf("Array token to string: %s\n", s);
   free(s);

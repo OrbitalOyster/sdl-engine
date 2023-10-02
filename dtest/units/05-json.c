@@ -1,4 +1,4 @@
-// obj/utils/wtree.o obj/utils/jsonParser.o
+// obj/utils/wtree.o obj/utils/jsonParser.o obj/utils/JSON/*.o
 // 0
 
 #include "utils/jsonParser.h"
