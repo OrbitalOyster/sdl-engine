@@ -29,39 +29,18 @@ void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
   expandWTree(map->tree, key, map->content[map->size - 1]);
 }
 
-struct Token *readTokenMap(struct TokenMap *map, char *key) {
-  struct Token *result = getWTreeEndpoint(map->tree, key);
-  if (result == NULL)
-    result = createToken(Undefined, (union TokenValue){.empty = NULL});
-  return result;
+char *getTokenMapKey(struct TokenMap *map, unsigned int n) {
+  return map->tree->words[n];
 }
 
 struct Token *getTokenMapElement(struct TokenMap *map, unsigned int n) {
   return map->content[n];
 }
 
-char *tokenMapToString(struct TokenMap *map, int keys) {
-  size_t size = 1;
-  char *result = calloc(size, sizeof(char));
-  for (unsigned int i = 0; i < map->tree->size; i++) {
-    char *key = map->tree->words[i];
-    char *value = tokenToString(map->content[i]);
-    if (i) { // ", "
-      size += (2 + strlen(value)) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, ", ");
-    }
-    if (keys) {
-      size += (strlen(key) + 2) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, key);
-      strcat(result, ": ");
-    }
-    size += strlen(value) * sizeof(char);
-    result = realloc(result, size);
-    strcat(result, value);
-    free(value);
-  }
+struct Token *readTokenMap(struct TokenMap *map, char *key) {
+  struct Token *result = getWTreeEndpoint(map->tree, key);
+  if (result == NULL)
+    result = createToken(Undefined, (union TokenValue){.empty = NULL});
   return result;
 }
 

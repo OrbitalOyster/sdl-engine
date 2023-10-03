@@ -2,6 +2,7 @@
 
 #include "utils/JSON/token.h"
 #include "utils/JSON/tokenMap.h"
+#include "utils/JSON/stringify.h"
 
 #include <stdio.h>
 

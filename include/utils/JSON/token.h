@@ -17,6 +17,8 @@ union TokenValue {
 };
 
 struct Token *createToken(enum TokenType type, union TokenValue value);
+enum TokenType getTokenType(struct Token *token);
+union TokenValue getTokenValue(struct Token *token);
 struct Token *createObjectToken();
 struct Token *createArrayToken();
 struct Token *createNumberToken(int n);
