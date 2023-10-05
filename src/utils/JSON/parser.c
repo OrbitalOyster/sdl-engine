@@ -5,7 +5,7 @@
 
 #include "utils/debug.h"
 
-void parseTokenF(enum TokenType type, FILE *f);
+struct Token *parseTokenF(FILE *f, int c);
 
 int isWhiteSpace(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
 
@@ -14,9 +14,6 @@ int isDigit(int c) { return (c >= '0' && c <= '9'); }
 enum TokenType identifyToken(int c) {
   enum TokenType result = Undefined;
   switch (c) {
-  case EOF:
-    result = Eof;
-    break;
   case '{':
     result = Object;
     INFO("Token: Object");
@@ -45,26 +42,9 @@ enum TokenType identifyToken(int c) {
   return result;
 }
 
-void readKey(FILE *f) {
-  char *key = calloc(MAX_KEY_LENGTH, sizeof(int));
-  int c, n = 0;
-  int done = 0;
-  do {
-    c = fgetc(f);
-    if (c == EOF)
-      ERR(1, "Unexpected EOF");
-    if (c == '"')
-      done = 1;
-    else
-      key[n++] = (char)c;
-  } while (!done);
-  INFOF("Read key: %s", key);
-}
-
-void readString(FILE *f) {
-  char *string = calloc(MAX_STRING_LENGTH, sizeof(int));
-  int c, n = 0;
-  int done = 0;
+char *readStringF(FILE *f) {
+  char *string = calloc(MAX_STRING_LENGTH, sizeof(char));
+  int c, n = 0, done = 0;
   do {
     c = fgetc(f);
     if (c == EOF)
@@ -75,9 +55,10 @@ void readString(FILE *f) {
       string[n++] = (char)c;
   } while (!done);
   INFOF("Read String: %s", string);
+  return string;
 }
 
-void readNumber(FILE *f) {
+int readNumberF(FILE *f) {
   char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
   int c, n = 0;
   int done = 0;
@@ -90,14 +71,14 @@ void readNumber(FILE *f) {
       number[n++] = (char)c;
   } while (!done);
   INFOF("Read Number: %s", number);
+  int result = atoi(number);
+  INFOF("Actual number: %s", number);
   fseek(f, -1, SEEK_CUR);
+  return result;
 }
 
-void readBoolean(FILE *f) {
-  char *boolean = calloc(5, sizeof(int));
-  int c, n = 0;
-  int done = 0;
-  int readingTrue = 0;
+int readBooleanF(FILE *f) {
+  int c, n = 0, done = 0, readingTrue = 0;
   const char *trueString = "true";
   const char *falseString = "false";
   fseek(f, -1, SEEK_CUR);
@@ -106,7 +87,6 @@ void readBoolean(FILE *f) {
     INFOF("Read char: %i [%c]", c, c);
     if (!n && c == 't')
       readingTrue = 1;
-    boolean[n] = (char)c;
     if (readingTrue) {
       if (c != trueString[n])
         ERRF(1, "Expected 'true', got '%c'", c);
@@ -120,155 +100,109 @@ void readBoolean(FILE *f) {
     }
     n++;
   } while (!done);
-  INFOF("Read Boolean: %s", boolean);
+  INFOF("Read Boolean: %i", readingTrue);
+  return readingTrue;
 }
 
-int findNextKey(FILE *f, int expectingComma) {
-  int c;
-  int done = 0;
-  do {
-    c = fgetc(f);
-    if (isWhiteSpace(c))
-      continue;
-    if (c == ',') {
-      if (!expectingComma)
-        ERR(1, "Unexpected ','");
-      expectingComma = 0;
-      continue;
-    }
-    if (c == '}')
-      return 0;
-    if (c != '"')
-      ERRF(1, "Expected key, got [%c]", c);
-    done = 1;
-  } while (!done);
-  return 1;
-}
-
-void findNextColon(FILE *f) {
-  int c;
-  int done = 0;
-  do {
-    c = fgetc(f);
-    if (isWhiteSpace(c))
-      continue;
-    if (c == EOF)
-      ERR(1, "Unexpected EOF");
-    if (c != ':')
-      ERRF(1, "Expected ':', got [%c]", c);
-    done = 1;
-  } while (!done);
-  INFO("Found colon");
-}
-
-enum TokenType findNextToken(FILE *f, int expectingComma) {
-  enum TokenType nextToken = Undefined;
+int skipWhiteSpacesF(FILE *f, int skipComma) {
   int c;
   do {
     c = fgetc(f);
     if (isWhiteSpace(c))
       continue;
     if (c == ',') {
-      if (!expectingComma)
+      if (!skipComma)
         ERR(1, "Unexpected ','");
-      expectingComma = 0;
+      skipComma = 0;
       continue;
     }
-    INFOF("Read char: %i [%c]", c, c);
-    nextToken = identifyToken(c);
-    if (nextToken == Undefined)
-      ERR(1, "Unexpected character");
-  } while (nextToken == Undefined);
-
-  return nextToken;
+    if (c == EOF) ERR(1, "Unexpected EOF");
+    return c;
+  } while (1);
 }
 
-void processObject(FILE *f) {
+void parseObjectF(FILE *f) {
   int done = 0;
   int expectingComma = 0;
+  int c;
   do {
-    if (!findNextKey(f, expectingComma))
+    c = skipWhiteSpacesF(f, expectingComma);
+    if (c == '}')
       done = 1;
-    else {
-      readKey(f);
-      findNextColon(f);
-      enum TokenType nextToken = findNextToken(f, 0);
-      parseTokenF(nextToken, f);
+    else
+    {
+      // Key
+      if (c != '"')
+        ERRF(1, "Expected key, got [%c]", c);
+      readStringF(f);
+      c = skipWhiteSpacesF(f, 0); 
+      // Colon
+      if (c != ':')
+        ERRF(1, "Expected ':', got [%c]", c);
+      c = skipWhiteSpacesF(f, 0); 
+      // Value
+      parseTokenF(f, c);
       expectingComma = 1;
     }
   } while (!done);
 }
 
-int processNextArrayElement(FILE *f, int expectingComma) {
-  int c;
-  int done = 0;
-  enum TokenType nextElement = Undefined;
-  do {
-    c = fgetc(f);
-    if (isWhiteSpace(c))
-      continue;
-    if (c == EOF)
-      ERR(1, "Unexpected EOF");
-    if (c == ',') {
-      if (!expectingComma)
-        ERR(1, "Unexpected ','");
-      expectingComma = 0;
-      continue;
-    }
-    if (c == ']')
-      return 0;
-    INFOF("Read char: %i [%c]", c, c);
-    nextElement = identifyToken(c);
-    parseToken(nextElement, f);
-    done = 1;
-  } while (!done);
+int parseNextArrayElementF(FILE *f, int expectingComma) {
+  int c = skipWhiteSpacesF(f, expectingComma);
+  if (c == ']')
+    return 0;
+  INFOF("Read char: %i [%c]", c, c);
+  parseTokenF(f, c);
   return 1;
 }
 
-void processArray(FILE *f) {
+void parseArrayF(FILE *f) {
   int done = 0;
   int expectingComma = 0;
   do {
-    if (!processNextArrayElement(f, expectingComma))
+    if (!parseNextArrayElementF(f, expectingComma))
       done = 1;
     else
       expectingComma = 1;
   } while (!done);
 }
 
-void parseTokenF(enum TokenType type, FILE *f) {
+struct Token *parseTokenF(FILE *f, int c) {
+  union TokenValue value;
+  enum TokenType type = identifyToken(c);
   switch (type) {
   case Undefined:
+    ERRF(1, "Unexpected character: %i [%c]", c, c);
     break;
   case Object:
     INFO("Processing Object...");
-    processObject(f);
+    parseObjectF(f);
     break;
   case Array:
     INFO("Processing Array...");
-    processArray(f);
+    parseArrayF(f);
     break;
   case Number:
     INFO("Processing Number...");
-    readNumber(f);
+    value.number = readNumberF(f);
     break;
   case String:
     INFO("Processing String...");
-    readString(f);
+    value.string = readStringF(f);
     break;
   case Boolean:
     INFO("Processing Boolean...");
-    readBoolean(f);
-    break;
-  case Eof:
-    fclose(f);
+    value.boolean = readBooleanF(f);
     break;
   }
+  struct Token *result = createToken(type, value);
+  return result;
 }
 
 void readFile(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
-  enum TokenType nextToken = findNextToken(f, 0);
-  parseToken(nextToken, f);
+  int c = skipWhiteSpacesF(f, 0);
+  parseTokenF(f, c);
+  fclose(f);
 }

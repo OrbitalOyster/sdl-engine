@@ -56,8 +56,6 @@ char *tokenToString(struct Token *token) {
     else
       snprintf(result, 6, "%s", "false");
     break;
-  case Eof:
-    break;
   }
   return result;
 }

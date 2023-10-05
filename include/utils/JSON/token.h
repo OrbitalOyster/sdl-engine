@@ -7,7 +7,7 @@
 
 struct Token;
 
-enum TokenType { Undefined, Object, Array, Number, String, Boolean, Eof };
+enum TokenType { Undefined, Object, Array, Number, String, Boolean };
 
 union TokenValue {
   int number, boolean;
