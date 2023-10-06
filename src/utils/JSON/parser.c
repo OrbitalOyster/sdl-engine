@@ -73,6 +73,7 @@ int readNumberF(FILE *f) {
   INFOF("Read Number: %s", number);
   int result = atoi(number);
   INFOF("Actual number: %s", number);
+  free(number);
   fseek(f, -1, SEEK_CUR);
   return result;
 }
@@ -116,12 +117,14 @@ int skipWhiteSpacesF(FILE *f, int skipComma) {
       skipComma = 0;
       continue;
     }
-    if (c == EOF) ERR(1, "Unexpected EOF");
+    if (c == EOF)
+      ERR(1, "Unexpected EOF");
     return c;
   } while (1);
 }
 
-void parseObjectF(FILE *f) {
+struct TokenMap *parseObjectF(FILE *f) {
+  struct TokenMap *result = createTokenMap();
   int done = 0;
   int expectingComma = 0;
   int c;
@@ -129,42 +132,50 @@ void parseObjectF(FILE *f) {
     c = skipWhiteSpacesF(f, expectingComma);
     if (c == '}')
       done = 1;
-    else
-    {
+    else {
       // Key
       if (c != '"')
         ERRF(1, "Expected key, got [%c]", c);
-      readStringF(f);
-      c = skipWhiteSpacesF(f, 0); 
+      char *key = readStringF(f);
+      c = skipWhiteSpacesF(f, 0);
       // Colon
       if (c != ':')
         ERRF(1, "Expected ':', got [%c]", c);
-      c = skipWhiteSpacesF(f, 0); 
+      c = skipWhiteSpacesF(f, 0);
       // Value
-      parseTokenF(f, c);
+      struct Token *newToken = parseTokenF(f, c);
+      // Add to object
+      expandTokenMap(result, key, newToken);
+      free(key);
       expectingComma = 1;
     }
   } while (!done);
+  return result;
 }
 
-int parseNextArrayElementF(FILE *f, int expectingComma) {
+struct Token *parseNextArrayElementF(FILE *f, int expectingComma) {
   int c = skipWhiteSpacesF(f, expectingComma);
   if (c == ']')
-    return 0;
+    return NULL;
   INFOF("Read char: %i [%c]", c, c);
-  parseTokenF(f, c);
-  return 1;
+  struct Token *token = parseTokenF(f, c);
+  return token;
 }
 
-void parseArrayF(FILE *f) {
+struct TokenMap *parseArrayF(FILE *f) {
+  struct TokenMap *result = createTokenMap();
   int done = 0;
   int expectingComma = 0;
   do {
-    if (!parseNextArrayElementF(f, expectingComma))
+    struct Token *nextToken = parseNextArrayElementF(f, expectingComma);
+    if (nextToken == NULL)
       done = 1;
-    else
+    else {
+      expandTokenMapN(result, nextToken);
       expectingComma = 1;
+    }
   } while (!done);
+  return result;
 }
 
 struct Token *parseTokenF(FILE *f, int c) {
@@ -176,11 +187,11 @@ struct Token *parseTokenF(FILE *f, int c) {
     break;
   case Object:
     INFO("Processing Object...");
-    parseObjectF(f);
+    value.map = parseObjectF(f);
     break;
   case Array:
     INFO("Processing Array...");
-    parseArrayF(f);
+    value.map = parseArrayF(f);
     break;
   case Number:
     INFO("Processing Number...");
@@ -199,10 +210,11 @@ struct Token *parseTokenF(FILE *f, int c) {
   return result;
 }
 
-void readFile(char *filename) {
+struct Token *readFile(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
   int c = skipWhiteSpacesF(f, 0);
-  parseTokenF(f, c);
+  struct Token *result = parseTokenF(f, c);
   fclose(f);
+  return result;
 }

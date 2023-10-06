@@ -2,8 +2,8 @@
 #define PARSER_H
 
 #include "utils/JSON/token.h"
+#include "utils/JSON/tokenMap.h"
 
-void readFile(char *filename);
-struct Token *stringToToken(char *s);
+struct Token *readFile(char *filename);
 
 #endif

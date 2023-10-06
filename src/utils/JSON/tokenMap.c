@@ -1,5 +1,6 @@
 #include "utils/JSON/tokenMap.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,15 +19,20 @@ struct TokenMap *createTokenMap() {
   return result;
 }
 
-unsigned int getTokenMapSize(struct TokenMap *map) {
-  return map->size;
-}
+unsigned int getTokenMapSize(struct TokenMap *map) { return map->size; }
 
 void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
   map->size++;
   map->content = realloc(map->content, map->size * sizeof(struct Token *));
   map->content[map->size - 1] = token;
   expandWTree(map->tree, key, map->content[map->size - 1]);
+}
+
+void expandTokenMapN(struct TokenMap *map, struct Token *token) {
+  char *key = calloc(MAX_KEY_LENGTH, sizeof(char));
+  snprintf(key, MAX_KEY_LENGTH, "%i", map->size);
+  expandTokenMap(map, key, token);
+  free(key);
 }
 
 char *getTokenMapKey(struct TokenMap *map, unsigned int n) {
@@ -51,4 +57,3 @@ void destroyTokenMap(struct TokenMap *map) {
   free(map->content);
   free(map);
 }
-

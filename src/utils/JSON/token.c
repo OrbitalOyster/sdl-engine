@@ -2,8 +2,8 @@
 
 #include <stdlib.h>
 
-#include "utils/debug.h"
 #include "utils/JSON/tokenMap.h"
+#include "utils/debug.h"
 
 struct Token {
   enum TokenType type;
@@ -16,9 +16,7 @@ struct Token *createToken(enum TokenType type, union TokenValue value) {
   return result;
 }
 
-enum TokenType getTokenType(struct Token *token) {
-  return token->type;
-}
+enum TokenType getTokenType(struct Token *token) { return token->type; }
 
 union TokenValue getTokenValue(struct Token *token) {
   return token->value;
@@ -83,6 +81,7 @@ void expandArrayToken(struct Token *arr, struct Token *token) {
 void destroyToken(struct Token *token) {
   if (token->type == Object || token->type == Array)
     destroyTokenMap(token->value.map);
+  if (token->type == String)
+    free(token->value.string);
   free(token);
 }
-
