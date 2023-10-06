@@ -8,7 +8,7 @@
 
 int main() {
   DTEST_UNIT_START("JSON parser");
-  struct Token *token = readFile("s.json");
+  struct Token *token = readFile("sample.json");
   char *s = tokenToString(token);
   INFOF("Token to string: %s", s);
   DTEST_UNIT_END

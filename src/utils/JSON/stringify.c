@@ -33,7 +33,6 @@ char *tokenToString(struct Token *token) {
   union TokenValue value = getTokenValue(token);
   switch (getTokenType(token)) {
   case Undefined:
-    // INFO("Undefined");
     break;
   case Object:
     result = objectTokenToString(value.map);
@@ -55,6 +54,8 @@ char *tokenToString(struct Token *token) {
       snprintf(result, 5, "%s", "true");
     else
       snprintf(result, 6, "%s", "false");
+    break;
+  case Null:
     break;
   }
   return result;

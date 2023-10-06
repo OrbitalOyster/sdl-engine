@@ -105,6 +105,10 @@ int readBooleanF(FILE *f) {
   return readingTrue;
 }
 
+void readNullF(FILE *f) {
+  if (f){};
+}
+
 int skipWhiteSpacesF(FILE *f, int skipComma) {
   int c;
   do {
@@ -204,6 +208,10 @@ struct Token *parseTokenF(FILE *f, int c) {
   case Boolean:
     INFO("Processing Boolean...");
     value.boolean = readBooleanF(f);
+    break;
+   case Null:
+    INFO("Processing Null...");
+    readNullF(f);
     break;
   }
   struct Token *result = createToken(type, value);
