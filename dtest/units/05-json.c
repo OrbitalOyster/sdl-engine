@@ -11,6 +11,8 @@ int main() {
   struct Token *token = readFile("sample.json");
   char *s = tokenToString(token);
   INFOF("Token to string: %s", s);
+  destroyToken(token);
+  free(s);
   DTEST_UNIT_END
   return 0;
 }

@@ -13,17 +13,18 @@ union TokenValue {
   int number, boolean;
   char *string;
   struct TokenMap *map;
-  void *empty;
 };
 
 struct Token *createToken(enum TokenType type, union TokenValue value);
 enum TokenType getTokenType(struct Token *token);
 union TokenValue getTokenValue(struct Token *token);
+struct Token *createUndefinedToken();
 struct Token *createObjectToken();
 struct Token *createArrayToken();
 struct Token *createNumberToken(int n);
 struct Token *createStringToken(char *s);
 struct Token *createBooleanToken(int b);
+struct Token *createNullToken();
 unsigned int getArrayTokenSize(struct Token *arr);
 struct Token *getArrayTokenElement(struct Token *arr, unsigned int n);
 void expandObjectToken(struct Token *obj, char *key, struct Token *token);

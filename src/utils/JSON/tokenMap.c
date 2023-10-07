@@ -46,7 +46,7 @@ struct Token *getTokenMapElement(struct TokenMap *map, unsigned int n) {
 struct Token *readTokenMap(struct TokenMap *map, char *key) {
   struct Token *result = getWTreeEndpoint(map->tree, key);
   if (result == NULL)
-    result = createToken(Undefined, (union TokenValue){.empty = NULL});
+    result = createUndefinedToken();
   return result;
 }
 

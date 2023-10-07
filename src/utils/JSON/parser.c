@@ -5,6 +5,10 @@
 
 #include "utils/debug.h"
 
+const char *trueString = "true";
+const char *falseString = "false";
+const char *nullString = "null";
+
 struct Token *parseTokenF(FILE *f, int c);
 
 int isWhiteSpace(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
@@ -29,6 +33,10 @@ enum TokenType identifyToken(int c) {
   case 'f':
     result = Boolean;
     INFO("Token: Boolean");
+    break;
+  case 'n':
+    result = Null;
+    INFO("Token: Null");
     break;
   default:
     if (isDigit(c)) {
@@ -80,8 +88,6 @@ int readNumberF(FILE *f) {
 
 int readBooleanF(FILE *f) {
   int c, n = 0, done = 0, readingTrue = 0;
-  const char *trueString = "true";
-  const char *falseString = "false";
   fseek(f, -1, SEEK_CUR);
   do {
     c = fgetc(f);
@@ -106,7 +112,13 @@ int readBooleanF(FILE *f) {
 }
 
 void readNullF(FILE *f) {
-  if (f){};
+  int c;
+  fseek(f, -1, SEEK_CUR);
+  for (int i = 0; i < 4; i++) {
+    c = fgetc(f);
+    INFOF("Read char: %i [%c]", c, c);
+    if (c != nullString[i]) ERRF(1, "Expected 'null', got '%c'", c);
+  }
 }
 
 int skipWhiteSpacesF(FILE *f, int skipComma) {

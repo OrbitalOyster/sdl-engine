@@ -22,6 +22,12 @@ union TokenValue getTokenValue(struct Token *token) {
   return token->value;
 }
 
+struct Token *createUndefinedToken() {
+  struct Token *result = calloc(1, sizeof(struct Token));
+  *result = (struct Token){.type = Undefined};
+  return result;
+}
+
 struct Token *createObjectToken() {
   struct TokenMap *map = createTokenMap();
   struct Token *result = createToken(Object, (union TokenValue){.map = map});
@@ -50,6 +56,11 @@ struct Token *createBooleanToken(int b) {
   return result;
 }
 
+struct Token *createNullToken() {
+  struct Token *result = calloc(1, sizeof(struct Token));
+  *result = (struct Token){.type = Null};
+  return result;
+}
 unsigned int getArrayTokenSize(struct Token *arr) {
   if (arr->type != Array)
     ERR(1, "Token is not array");

@@ -56,6 +56,8 @@ char *tokenToString(struct Token *token) {
       snprintf(result, 6, "%s", "false");
     break;
   case Null:
+    result = calloc(5, sizeof(char));
+    snprintf(result, 5, "%s", "null");
     break;
   }
   return result;
