@@ -3,9 +3,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils/debug.h"
 #include "utils/wtree.h"
+
+struct Endpoint {
+  char *msg;
+};
+
+struct Endpoint *oyster;
 
 void populateTree(FILE *f, struct WTree *tree) {
   unsigned int n = 0;
@@ -13,7 +20,10 @@ void populateTree(FILE *f, struct WTree *tree) {
   int read = 0;
   do {
     read = fscanf(f, "%s\n", s);
-    expandWTree(tree, s, NULL);
+    if (strcmp(s, "oyster") == 0)
+      expandWTree(tree, s, oyster);
+    else
+      expandWTree(tree, s, NULL);
     n++;
   } while (read != EOF);
   free(s);
@@ -21,11 +31,18 @@ void populateTree(FILE *f, struct WTree *tree) {
 
 int main() {
   DTEST_UNIT_START("WTree benchmark");
+  oyster = calloc(1, sizeof(struct Endpoint));
+  *oyster = (struct Endpoint){.msg = "oyster"};
   FILE *f = fopen("/usr/share/dict/words", "r");
   struct WTree *tree = createWTree();
   DTEST_EVAL_TIME(populateTree(f, tree));
+  struct Endpoint *lookup;
+  DTEST_EVAL_TIME(lookup = getWTreeEndpoint(tree, "oyster"));
+  DTEST_EXPECT_TRUE(lookup != NULL);
+  INFOF("Lookup: %s", lookup->msg);
   fclose(f);
   destroyTree(tree);
+  free(oyster);
   DTEST_UNIT_END
   return 0;
 }

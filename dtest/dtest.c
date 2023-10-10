@@ -27,10 +27,11 @@
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \
     printf("\t\tEval time: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT, #s) " |");   \
+    fflush(stdout);                                                            \
     clock_t _startTime = clock();                                              \
     s;                                                                         \
     double _result = (double)(clock() - _startTime) / CLOCKS_PER_SEC;          \
-    printf("%.4lf sec.\n", _result);                                           \
+    printf("%.6lf sec.\n", _result);                                           \
   }
 
 #define DTEST_EVAL_DOUBLE(s)                                                   \
@@ -54,6 +55,7 @@
       _failed++;                                                               \
       printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
     }                                                                          \
+    fflush(stdout);                                                            \
     _testsRun++;                                                               \
   }
 
@@ -70,6 +72,7 @@
       _failed++;                                                               \
       printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
     }                                                                          \
+    fflush(stdout);                                                            \
     _testsRun++;                                                               \
   }
 
