@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <time.h>
 
 #include "utils/tmodes.h"
 
@@ -22,6 +23,15 @@
   printf(TMSG(MODE_BOLD, COLOR_DEFAULT,                                        \
               "\tDone. Tests: %u; Passed: %u; Failed: %u\n"),                  \
          _testsRun, _ok, _failed);
+
+#define DTEST_EVAL_TIME(s)                                                     \
+  {                                                                            \
+    printf("\t\tEval time: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT, #s) " |");   \
+    clock_t _startTime = clock();                                              \
+    s;                                                                         \
+    double _result = (double)(clock() - _startTime) / CLOCKS_PER_SEC;          \
+    printf("%.4lf sec.\n", _result);                                           \
+  }
 
 #define DTEST_EVAL_DOUBLE(s)                                                   \
   {                                                                            \
