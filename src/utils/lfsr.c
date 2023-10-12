@@ -1,13 +1,16 @@
 #include "utils/lfsr.h"
 
-#include <math.h>
-
 const uint8_t SIZE = sizeof(LFSR_TYPE) * 8;
 const LFSR_TYPE LEFT_BIT = (LFSR_TYPE)1 << (SIZE - 1);
 
-uint8_t getBitAtPosition(LFSR_TYPE n, uint8_t p) {
-  return !!(n & (LFSR_TYPE)pow(2, p));
-}
+const unsigned int p2[32] = {
+    1,         2,         4,          8,         16,       32,       64,
+    128,       256,       512,        1024,      2048,     4096,     8192,
+    16384,     32768,     65536,      131072,    262144,   524288,   1048576,
+    2097152,   4194304,   8388608,    16777216,  33554432, 67108864, 134217728,
+    268435456, 536870912, 1073741824, 2147483648};
+
+uint8_t getBitAtPosition(LFSR_TYPE n, uint8_t p) { return !!(n & p2[p]); }
 
 uint8_t getFeedback(LFSR_TYPE state, LFSR_TYPE taps) {
   uint8_t result = 0;
