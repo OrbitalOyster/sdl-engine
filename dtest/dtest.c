@@ -26,7 +26,7 @@
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \
-    printf("\t\tEval time: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT, #s) " |");   \
+    printf("\t\tEval time: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT, #s) " | ");  \
     fflush(stdout);                                                            \
     clock_t _startTime = clock();                                              \
     s;                                                                         \

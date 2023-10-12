@@ -22,6 +22,7 @@ struct WTree *createWTree() {
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   struct WTreeNode *result = calloc(1, sizeof(struct WTreeNode));
+  if (result == NULL) ERR(1, "Out of memory");
   *result = (struct WTreeNode){
       .parent = parent, .c = c, .size = 0, .children = NULL, .endpoint = NULL};
   return result;
@@ -43,6 +44,7 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   int n = 0;
   char *nextWord = calloc(MAX_WORD_LENGTH, sizeof(char));
+  if (nextWord == NULL) ERR(1, "Out of memory");
   struct WTreeNode *currentNode = tree->root;
   while (1) {
     char c = word[n];
