@@ -2,7 +2,7 @@
 #define WTREE_H
 
 #define MAX_WORD_LENGTH 64
-#define MAX_TREE_SIZE 200000
+#define MAX_TREE_SIZE 10000000
 
 struct WTreeNode {
   char c;
