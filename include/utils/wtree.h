@@ -4,6 +4,10 @@
 #define MAX_WORD_LENGTH 64
 #define MAX_TREE_SIZE 10000000
 
+#define WTREE_CHARS_NUMBER 64
+#define WTREE_CHARS                                                            \
+  "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+
 struct WTreeNode {
   char c;
   struct WTreeNode *parent;
