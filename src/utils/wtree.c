@@ -5,18 +5,13 @@
 
 #include "utils/debug.h"
 
-int checkIfValidChar(char c) {
-  return (c > '0' && c < '9') || (c > 'a' && c < 'z') || (c > 'A' && c < 'Z') ||
-         c == '_';
-}
-
 struct WTree *createWTree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
   result->root = calloc(1, sizeof(struct WTreeNode));
   *(result->root) =
       (struct WTreeNode){.parent = NULL, .c = -1, .size = 0, .children = NULL};
   result->size = 0;
-  result->words = calloc(MAX_TREE_SIZE, sizeof(char *));
+  result->words = NULL;
   return result;
 }
 
@@ -43,7 +38,7 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
 
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   int n = 0;
-  char *nextWord = calloc(MAX_WORD_LENGTH, sizeof(char));
+  char *nextWord = calloc(strlen(word), sizeof(char));
   if (nextWord == NULL) ERR(1, "Out of memory");
   struct WTreeNode *currentNode = tree->root;
   while (1) {
@@ -52,7 +47,9 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
     n++;
     if (c == '\0') {
       currentNode->endpoint = endpoint;
-      tree->words[tree->size++] = nextWord;
+      tree->size++;
+      tree->words = realloc(tree->words, tree->size * sizeof(char*));
+      tree->words[tree->size - 1] = nextWord;
       return 0;
     }
     struct WTreeNode *nextNode = getChild(currentNode, c);

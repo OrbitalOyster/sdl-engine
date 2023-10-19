@@ -1,9 +1,6 @@
 #ifndef WTREE_H
 #define WTREE_H
 
-#define MAX_WORD_LENGTH 64
-#define MAX_TREE_SIZE 10000000
-
 #define WTREE_CHARS_NUMBER 64
 #define WTREE_CHARS                                                            \
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
@@ -13,6 +10,7 @@ struct WTreeNode {
   struct WTreeNode *parent;
   unsigned int size;
   struct WTreeNode **children;
+  unsigned int memoryAllocated;
   void *endpoint;
 };
 
