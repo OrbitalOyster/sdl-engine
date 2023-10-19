@@ -17,7 +17,8 @@ struct WTree *createWTree() {
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   struct WTreeNode *result = calloc(1, sizeof(struct WTreeNode));
-  if (result == NULL) ERR(1, "Out of memory");
+  if (result == NULL)
+    ERR(1, "Out of memory");
   *result = (struct WTreeNode){
       .parent = parent, .c = c, .size = 0, .children = NULL, .endpoint = NULL};
   return result;
@@ -37,9 +38,12 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
 }
 
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
-  int n = 0;
   char *nextWord = calloc(strlen(word), sizeof(char));
-  if (nextWord == NULL) ERR(1, "Out of memory");
+  if (nextWord == NULL) {
+    WARN("Unable to allocate memory");
+    return 1;
+  }
+  unsigned int n = 0;
   struct WTreeNode *currentNode = tree->root;
   while (1) {
     char c = word[n];
@@ -48,7 +52,7 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
     if (c == '\0') {
       currentNode->endpoint = endpoint;
       tree->size++;
-      tree->words = realloc(tree->words, tree->size * sizeof(char*));
+      tree->words = realloc(tree->words, tree->size * sizeof(char *));
       tree->words[tree->size - 1] = nextWord;
       return 0;
     }
@@ -90,7 +94,7 @@ void destroyNode(struct WTreeNode *node) {
   free(node);
 }
 
-void destroyTree(struct WTree *tree) {
+void destroyWTree(struct WTree *tree) {
   destroyNode(tree->root);
   for (unsigned int i = 0; i < tree->size; i++)
     free(tree->words[i]);

@@ -51,7 +51,7 @@ struct Token *readTokenMap(struct TokenMap *map, char *key) {
 }
 
 void destroyTokenMap(struct TokenMap *map) {
-  destroyTree(map->tree);
+  destroyWTree(map->tree);
   for (unsigned int i = 0; i < map->size; i++)
     destroyToken(map->content[i]);
   free(map->content);

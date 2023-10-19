@@ -70,7 +70,7 @@ int main() {
   char *msg;
   DTEST_EVAL_TIME(msg = lookup(tree));
   INFOF("Msg: %s", msg);
-  destroyTree(tree);
+  destroyWTree(tree);
   destroyKeys();
   DTEST_UNIT_END
   return 0;

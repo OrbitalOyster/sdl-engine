@@ -21,9 +21,8 @@ struct WTree {
 };
 
 struct WTree *createWTree();
-struct WTreeNode *createNode(struct WTreeNode *parent, char c);
 int expandWTree(struct WTree *tree, char *word, void *endpoint);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
-void destroyTree(struct WTree *tree);
+void destroyWTree(struct WTree *tree);
 
 #endif
