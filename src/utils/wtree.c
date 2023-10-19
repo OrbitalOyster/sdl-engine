@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "utils/debug.h"
+#include "utils/qsort.h"
 
 struct WTree *createWTree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
@@ -22,6 +23,15 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   *result = (struct WTreeNode){
       .parent = parent, .c = c, .size = 0, .children = NULL, .endpoint = NULL};
   return result;
+}
+
+
+int nodeSortFunc(void **arr, int i1, int i2) {
+  return ((struct WTreeNode *)arr[i1])->c < ((struct WTreeNode *)arr[i2])->c;
+}
+
+void sortNode(struct WTreeNode *node) {
+  sort((void **)node->children, 0, (int)node->size-1, nodeSortFunc);
 }
 
 // TODO Less brutal approach

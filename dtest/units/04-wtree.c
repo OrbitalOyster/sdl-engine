@@ -1,4 +1,4 @@
-// obj/utils/wtree.o
+// obj/utils/wtree.o obj/utils/qsort.o
 // 0
 
 #include "utils/wtree.h"
@@ -28,7 +28,7 @@ int main() {
   INFOF("Word #1: %s", tree->words[1]);
   INFOF("Word #2: %s", tree->words[2]);
 
-  destroyTree(tree);
+  destroyWTree(tree);
   DTEST_UNIT_END
   return 0;
 }

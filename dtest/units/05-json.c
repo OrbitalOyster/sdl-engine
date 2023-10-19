@@ -1,4 +1,4 @@
-// obj/utils/wtree.o obj/utils/JSON/*.o
+// obj/utils/wtree.o obj/utils/JSON/*.o obj/utils/qsort.o
 // 0
 
 #include <utils/debug.h>

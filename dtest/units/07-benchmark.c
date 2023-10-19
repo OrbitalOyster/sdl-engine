@@ -1,4 +1,4 @@
-// obj/utils/wtree.o obj/utils/lfsr.o
+// obj/utils/wtree.o obj/utils/lfsr.o obj/utils/qsort.o
 // 0
 
 #include <stdio.h>
