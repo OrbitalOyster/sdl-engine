@@ -22,6 +22,7 @@ struct WTree {
 
 struct WTree *createWTree();
 int expandWTree(struct WTree *tree, char *word, void *endpoint);
+void sortWTree(struct WTree *tree);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
 void destroyWTree(struct WTree *tree);
 

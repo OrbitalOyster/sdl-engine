@@ -6,6 +6,8 @@
 #include "utils/debug.h"
 #include "utils/qsort.h"
 
+#include <stdio.h>
+
 struct WTree *createWTree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
   result->root = calloc(1, sizeof(struct WTreeNode));
@@ -25,13 +27,14 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   return result;
 }
 
-
 int nodeSortFunc(void **arr, int i1, int i2) {
   return ((struct WTreeNode *)arr[i1])->c < ((struct WTreeNode *)arr[i2])->c;
 }
 
 void sortNode(struct WTreeNode *node) {
   sort((void **)node->children, 0, (int)node->size-1, nodeSortFunc);
+  for (unsigned int i = 0; i < node->size; i++)
+    sortNode(node->children[i]);
 }
 
 // TODO Less brutal approach
@@ -81,6 +84,26 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
     }
     currentNode = nextNode;
   }
+}
+
+void getWTreeWords(struct WTree *tree) {
+  // char **result = calloc(tree->size, sizeof(char*));
+
+  char *word = calloc(64, sizeof(char));
+
+  for (unsigned int i = 0; i < tree->size; i++) {
+    
+  }
+}
+
+void resetWTreeWords(struct WTree *tree) {
+  for (unsigned int i = 0; i < tree->size; i++)
+    free(tree->words[i]);
+  free(tree->words);
+}
+
+void sortWTree(struct WTree *tree) {
+  sortNode(tree->root); 
 }
 
 void *getWTreeEndpoint(struct WTree *tree, char *word) {
