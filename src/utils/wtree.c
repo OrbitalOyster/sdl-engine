@@ -51,7 +51,7 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
 }
 
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
-  char *nextWord = calloc(strlen(word), sizeof(char));
+  char *nextWord = calloc(strlen(word) + 1, sizeof(char));
   if (nextWord == NULL) {
     WARN("Unable to allocate memory");
     return 1;
@@ -86,14 +86,25 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   }
 }
 
-void getWTreeWords(struct WTree *tree) {
-  // char **result = calloc(tree->size, sizeof(char*));
-
-  char *word = calloc(64, sizeof(char));
-
-  for (unsigned int i = 0; i < tree->size; i++) {
-    
+void getNodeWord(struct WTreeNode *node, char *word, int level) {
+//  INFOF("%i %c %i", level, node->c, node->c);
+  word[level] = node->c;
+  if (node->size == 0) {
+    word[level+1] = '\0';
+//    INFO2F("%s", word);
   }
+  else {
+    level++;
+    for (unsigned int i = 0; i < node -> size; i++)
+      getNodeWord(node->children[i], word, level);
+  }
+}
+
+void getWTreeWords(struct WTree *tree) {
+  char *word = calloc(64, sizeof(char));
+  int level = 0;
+  for (unsigned int i = 0; i < tree->root->size; i++)
+    getNodeWord(tree->root->children[i], word, level);
 }
 
 void resetWTreeWords(struct WTree *tree) {
