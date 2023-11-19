@@ -1,7 +1,7 @@
 #ifndef TOKEN_MAP_H
 #define TOKEN_MAP_H
 
-#include "utils/JSON/token.h"
+#include "token.h"
 
 struct TokenMap;
 
@@ -15,4 +15,4 @@ struct Token *readTokenMap(struct TokenMap *map, char *key);
 char *tokenMapToString(struct TokenMap *map, int keys);
 void destroyTokenMap(struct TokenMap *map);
 
-#endif
+#endif /* TOKEN_MAP_H */

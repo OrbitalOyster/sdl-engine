@@ -33,4 +33,4 @@ char *objectTokenToString(struct TokenMap *map);
 char *tokenToString(struct Token *token);
 void destroyToken(struct Token *token);
 
-#endif
+#endif /* TOKEN_H */

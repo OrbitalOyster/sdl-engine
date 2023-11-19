@@ -10,4 +10,4 @@ void registerOnKeyUpFunc(void (*func)());
 void resetKeyInput();
 int processInput(int *quit);
 
-#endif
+#endif /* INPUT_H */

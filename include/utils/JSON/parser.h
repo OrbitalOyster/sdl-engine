@@ -1,9 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "utils/JSON/token.h"
-#include "utils/JSON/tokenMap.h"
+#include "token.h"
+#include "tokenMap.h"
 
 struct Token *readFile(char *filename);
 
-#endif
+#endif /* PARSER_H */

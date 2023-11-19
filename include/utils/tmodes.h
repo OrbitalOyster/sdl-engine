@@ -1,5 +1,5 @@
 /*
- * List of terminal modes for formatting 
+ * List of terminal modes for formatting
  */
 
 #ifndef TMODES_H
@@ -42,10 +42,7 @@
 // Simple macro for two-mode formatting
 #define TMSG(mode, color, s) _S_ mode color "m" s _R_
 
-#else
-
-#define _S_
-#define _R_
+#else /* COLOR_OUTPUT */
 
 #define MODE_NORMAL
 #define MODE_BOLD
@@ -77,6 +74,6 @@
 
 #define TMSG(mode, color, s) s
 
-#endif
+#endif /* COLOR_OUTPUT */
 
-#endif
+#endif /* TMODES_H */

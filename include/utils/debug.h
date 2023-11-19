@@ -1,7 +1,9 @@
+/*
+ * Simple macros for debugging info
+ */
+
 #ifndef DEBUG_H
 #define DEBUG_H
-
-/* Simple macros for debugging info */
 
 // Disabled by default, use -DDEBUG_MSG to switch on
 #ifdef DEBUG_MSG
@@ -25,9 +27,9 @@
 #ifdef SNPRINTF_CHECK
 #define FORMAT_CHECK(_debug_b, MAX_MSG_SIZE, _debug_s, ...)                    \
   snprintf(_debug_b, MAX_MSG_SIZE, _debug_s, __VA_ARGS__)
-#else
+#else /* SNPRINTF_CHECK */
 #define FORMAT_CHECK(_debug_b, MAX_MSG_SIZE, _debug_s, ...)
-#endif
+#endif /* SNPRINTF_CHECK */
 
 #define ERR(_debug_c, _debug_s)                                                \
   {                                                                            \
@@ -100,7 +102,7 @@
     fprintf(stdout, _debug_b, __VA_ARGS__);                                    \
   }
 
-#else
+#else /* DEBUG_MSG */
 #define ERR(_debug_c, _debug_s)
 #define ERRF(_debug_c, _debug_s, ...)
 #define WARN(_debug_s)
@@ -109,6 +111,6 @@
 #define INFOF(_debug_s, ...)
 #define INFO2(_debug_s)
 #define INFO2F(_debug_s, ...)
-#endif
+#endif /* DEBUG_MSG */
 
-#endif
+#endif /* DEBUG_H */

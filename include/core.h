@@ -15,4 +15,4 @@ Core *initCore(int windowWidth, int windowHeight, char *title);
 SDL_Renderer *getRenderer(Core *core);
 void destroyCore(Core *core);
 
-#endif
+#endif /* CORE_H */

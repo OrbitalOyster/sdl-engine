@@ -5,4 +5,4 @@
 // Returns the number of __VA_ARGS__, up to 8, but not 0
 #define VA_NARGS(...) VA_NARGS_IMPL(__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1)
 
-#endif
+#endif /* HACKERY_H */

@@ -1,3 +1,7 @@
+/*
+ * Linear-feedback shift register implementation
+ */
+
 #ifndef LFSR_H
 #define LFSR_H
 
@@ -7,4 +11,4 @@
 
 LFSR_TYPE getNextLFSR(LFSR_TYPE *state, LFSR_TYPE taps);
 
-#endif
+#endif /* LFSR_H */

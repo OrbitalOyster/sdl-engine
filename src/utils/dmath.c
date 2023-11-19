@@ -1,16 +1,10 @@
 #include "utils/dmath.h"
 
 #include <math.h>
-#include <stdlib.h>
 
 #include "utils/debug.h"
 
-// TODO: Handle NAN
-
 static void checkValues(double a, double b) {
-  if (isnan(a) || isnan(b))
-    WARN("Unhandled NAN");
-
   if (a > DMATH_MAX || b > DMATH_MAX)
     WARNF("dmath out of bounds: %lf, %lf", a, b);
 
