@@ -8,16 +8,6 @@
 
 #include <stdio.h>
 
-struct WTree *createWTree() {
-  struct WTree *result = calloc(1, sizeof(struct WTree));
-  result->root = calloc(1, sizeof(struct WTreeNode));
-  *(result->root) =
-      (struct WTreeNode){.parent = NULL, .c = -1, .size = 0, .children = NULL};
-  result->size = 0;
-  result->words = NULL;
-  return result;
-}
-
 struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   struct WTreeNode *result = calloc(1, sizeof(struct WTreeNode));
   if (result == NULL)
@@ -27,13 +17,21 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char c) {
   return result;
 }
 
+struct WTree *createWTree() {
+  struct WTree *result = calloc(1, sizeof(struct WTree));
+  result->root = createNode(NULL, -1);
+  result->size = 0;
+  result->words = NULL;
+  return result;
+}
+
 int nodeSortFunc(void **arr, int i1, int i2) {
   return ((struct WTreeNode *)arr[i1])->c < ((struct WTreeNode *)arr[i2])->c;
 }
 
 void sortNode(struct WTreeNode *node) {
-  sort((void **)node->children, 0, (int)node->size-1, nodeSortFunc);
-  for (unsigned int i = 0; i < node->size; i++)
+  sort((void **)node->children, 0, (int)node->size - 1, nodeSortFunc);
+  for (unsigned short int i = 0; i < node->size; i++)
     sortNode(node->children[i]);
 }
 
@@ -44,7 +42,7 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
     WARN("Attempt to access NULL node");
     return NULL;
   }
-  for (unsigned int i = 0; i < node->size; i++)
+  for (unsigned short int i = 0; i < node->size; i++)
     if (node->children[i]->c == c)
       return node->children[i];
   return NULL;
@@ -86,36 +84,32 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   }
 }
 
-void getNodeWord(struct WTreeNode *node, char *word, int level) {
-//  INFOF("%i %c %i", level, node->c, node->c);
+// Recursive function, fills *word pointer with chars following tree until '\0'
+void getNodeWord(struct WTreeNode *node, char *word, unsigned int level) {
   word[level] = node->c;
-  if (node->size == 0) {
-    word[level+1] = '\0';
-//    INFO2F("%s", word);
-  }
+  word = realloc(word, (level + 2) * sizeof(char));
+  // End of branch, add '\0'
+  if (node->size == 0)
+    word[level + 1] = '\0';
   else {
     level++;
-    for (unsigned int i = 0; i < node -> size; i++)
+    for (unsigned short int i = 0; i < node->size; i++)
       getNodeWord(node->children[i], word, level);
   }
 }
 
-void getWTreeWords(struct WTree *tree) {
-  char *word = calloc(64, sizeof(char));
-  int level = 0;
-  for (unsigned int i = 0; i < tree->root->size; i++)
-    getNodeWord(tree->root->children[i], word, level);
-}
-
 void resetWTreeWords(struct WTree *tree) {
-  for (unsigned int i = 0; i < tree->size; i++)
+  // At least 1 char ('\0')
+  unsigned int level = 0;
+  for (unsigned short int i = 0; i < tree->root->size; i++) {
     free(tree->words[i]);
-  free(tree->words);
+    tree->words[i] = calloc(1, sizeof(char));
+    tree->words[i][0] = '\0';
+    getNodeWord(tree->root->children[i], tree->words[i], level);
+  }
 }
 
-void sortWTree(struct WTree *tree) {
-  sortNode(tree->root); 
-}
+void sortWTree(struct WTree *tree) { sortNode(tree->root); }
 
 void *getWTreeEndpoint(struct WTree *tree, char *word) {
   int n = 0;
@@ -132,7 +126,7 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
 }
 
 void destroyNode(struct WTreeNode *node) {
-  for (unsigned int i = 0; i < node->size; i++)
+  for (unsigned short int i = 0; i < node->size; i++)
     destroyNode(node->children[i]);
   free(node->children);
   free(node);

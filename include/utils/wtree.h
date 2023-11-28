@@ -8,9 +8,8 @@
 struct WTreeNode {
   char c;
   struct WTreeNode *parent;
-  unsigned int size;
+  unsigned short int size;
   struct WTreeNode **children;
-  unsigned int memoryAllocated;
   void *endpoint;
 };
 
@@ -24,6 +23,7 @@ struct WTree *createWTree();
 int expandWTree(struct WTree *tree, char *word, void *endpoint);
 void getWTreeWords(struct WTree *tree);
 void sortWTree(struct WTree *tree);
+void resetWTreeWords(struct WTree *tree);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
 void destroyWTree(struct WTree *tree);
 
