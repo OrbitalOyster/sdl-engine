@@ -2,3 +2,4 @@
 *.d
 tmp
 bin
+dtest/unit

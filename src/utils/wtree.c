@@ -59,7 +59,6 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   while (1) {
     char c = word[n];
     nextWord[n] = c;
-    n++;
     if (c == '\0') {
       currentNode->endpoint = endpoint;
       tree->size++;
@@ -80,6 +79,7 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
       }
       currentNode->children[currentNode->size - 1] = nextNode;
     }
+    n++;
     currentNode = nextNode;
   }
 }
