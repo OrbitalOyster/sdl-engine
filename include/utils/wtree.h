@@ -6,7 +6,7 @@
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
 
 struct WTreeNode {
-  char c;
+  char *s;
   struct WTreeNode *parent;
   unsigned short int size;
   struct WTreeNode **children;

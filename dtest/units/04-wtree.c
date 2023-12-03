@@ -14,11 +14,17 @@ int main() {
   DTEST_UNIT_START("Word tree");
   struct WTree *tree = createWTree();
   struct Endpoint ep1 = {.a = 1, .b = 2, .c = "ep1"};
-  struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
+//  struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
 
-  expandWTree(tree, "foo", &ep1);
-  expandWTree(tree, "bar", NULL);
-  expandWTree(tree, "baz", &ep2);
+  expandWTree(tree, "abcdef", &ep1);
+  expandWTree(tree, "abcxxx", &ep1);
+  expandWTree(tree, "abcxyz", &ep1);
+//  expandWTree(tree, "abcccc", NULL);
+//  expandWTree(tree, "abcd", &ep1);
+//  expandWTree(tree, "abcdefgh", &ep2);
+  INFOF("Tree size: %u", tree->size);
+
+/*
 
   struct Endpoint* ep = getWTreeEndpoint(tree, "baz");
   INFOF("ep->c == %s", ep->c);
@@ -29,6 +35,8 @@ int main() {
   INFOF("Word #2: %s", tree->words[2]);
 
   destroyWTree(tree);
+*/
+
   DTEST_UNIT_END
   return 0;
 }
