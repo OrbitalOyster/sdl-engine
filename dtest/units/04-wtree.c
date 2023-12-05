@@ -17,11 +17,9 @@ int main() {
 //  struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
 
   expandWTree(tree, "abcdef", &ep1);
-  expandWTree(tree, "abcxxx", &ep1);
   expandWTree(tree, "abcxyz", &ep1);
-//  expandWTree(tree, "abcccc", NULL);
-//  expandWTree(tree, "abcd", &ep1);
-//  expandWTree(tree, "abcdefgh", &ep2);
+  expandWTree(tree, "abc", &ep1);
+  expandWTree(tree, "abcxxx", &ep1);
   INFOF("Tree size: %u", tree->size);
 
 /*

@@ -46,6 +46,7 @@ struct WTreeNode *getChild(struct WTreeNode *node, char *s) {
     WARN("Attempt to access NULL node");
     return NULL;
   }
+  INFOF("Seaching node %s, size %u for %s", node->s, node->size, s);
   for (unsigned short int i = 0; i < node->size; i++)
     if (node->children[i]->s[0] == s[0])
       return node->children[i];
@@ -91,22 +92,36 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
 }
 */
 
-// Returns index of first mismatched char
-unsigned int compareWords(char *s1, char *s2, unsigned int c1,
-                          unsigned int c2) {
-  INFOF("Comparing %s to %s (%u-%u)", s1, s2, c1, c2);
-  for (unsigned int i = c1; i < c2; i++)
-    if (s1[i] != s2[i]) {
-      INFOF("%c (%i) != %c (%i)", s1[i], s1[i], s2[i], s2[i]);
-      return i;
+// Returns number of matched chars
+unsigned int compareWords(char *s1, char *s2) {
+  INFOF("Comparing %s to %s", s1, s2);
+  unsigned int n = 0;
+  int gotNull = 0;
+  while (!gotNull)
+    if (s1[n] != s2[n]) {
+      INFOF("%c (%i) != %c (%i)", s1[n], s1[n], s2[n], s2[n]);
+      return n;
+    } else {
+      gotNull = (s1[n] == '\0' || s2[n] == '\0');
+      n++;
     }
-  //  WARN("Should not happen?");
-  return c2;
+  return n;
 }
 
 void appendNode(struct WTreeNode *parent, char *word) {
-  INFOF("Appending node %s to %s", word, parent->s);
+  INFO2F("Appending node %s to %s", word, parent->s);
   struct WTreeNode *child = createNode(parent, word);
+  parent->size++;
+  parent->children =
+      realloc(parent->children, parent->size * sizeof(struct WTreeNode *));
+  parent->children[parent->size - 1] = child;
+}
+
+void appendNullNode(struct WTreeNode *parent) {
+  INFO2F("Appending null node to %s", parent->s);
+  char *nullWord = calloc(1, sizeof(char));
+  nullWord[0] = '\0';
+  struct WTreeNode *child = createNode(parent, nullWord);
   parent->size++;
   parent->children =
       realloc(parent->children, parent->size * sizeof(struct WTreeNode *));
@@ -117,10 +132,12 @@ struct WTreeNode *splitNode(struct WTreeNode *node, unsigned int n) {
   INFOF("Splitting node %s by char #%i", node->s, n);
   // Splitting word
   unsigned int l = (unsigned int)strlen(node->s);
-  char *shead = calloc(n, sizeof(char));
-  char *stail = calloc(strlen(node->s) - n, sizeof(char));
+  l++; // null character
+  char *shead = calloc(n + 1, sizeof(char));
+  char *stail = calloc(l - n, sizeof(char));
   for (unsigned int i = 0; i < n; i++)
     shead[i] = node->s[i];
+  shead[n] = '\0';
   for (unsigned int i = n; i < l; i++)
     stail[i - n] = node->s[i];
   INFOF("shead == %s, stail == %s", shead, stail);
@@ -140,6 +157,92 @@ struct WTreeNode *splitNode(struct WTreeNode *node, unsigned int n) {
   return tail;
 }
 
+int expandWTree(struct WTree *tree, char *word, void *endpoint) {
+  if (endpoint) {
+  };
+  INFOF("Expanding by %s", word);
+  char *tail = calloc(strlen(word) + 1, sizeof(char));
+  strcpy(tail, word);
+
+  struct WTreeNode *parentNode = tree->root;
+  struct WTreeNode *node = getChild(parentNode, word);
+
+  while (1) {
+    // Entirely new word, append to node
+    if (!node) {
+      INFO("Child not found, appending tail");
+      appendNode(parentNode, tail);
+      tree->size++;
+      INFO2("Expand complete");
+      return 0;
+    }
+
+    INFOF("Switched to node: %s", node->s);
+    unsigned int tl = (unsigned int)strlen(tail) + 1;
+    unsigned int matched = compareWords(node->s, tail);
+    INFOF("Matched %u chars", matched);
+    // Error
+    if (tail[matched] == '\0' && node->s[matched] == '\0') {
+      if (!node->size) ERR(1, "Duplicate");
+      appendNullNode(node);
+			tree->size++;
+      INFO2("Expand complete");
+      return 0;
+		}
+    // abcdef/abc
+    if (tail[matched] == '\0') {
+      INFO("New node is shorter than existing one");
+      splitNode(node, matched);
+      appendNullNode(node);
+      tree->size++;
+      INFO2("Expand complete");
+      return 0;
+    }
+    // abc/abcdef
+    if (node->s[matched] == '\0' && tail[matched] != '\0' && !node->size) {
+      INFO("New node is longer than existing one");
+			appendNullNode(node);
+      // Trim tail
+      for (unsigned int i = 0; i < matched + 1; i++)
+        tail[i] = tail[i + matched];
+      tail[tl - matched - 1] = '\0';
+      tail = realloc(tail, (tl - matched) * sizeof(char));
+      INFOF("New tail: %s", tail);
+      appendNode(node, tail);
+			tree->size++;
+      INFO2("Expand complete");
+      return 0;
+    }
+    // abcdef/abcxxx
+    if (node->s[matched] != '\0' && tail[matched] != '\0') {
+	    // Trim tail
+			for (unsigned int i = 0; i < matched + 1; i++)
+				tail[i] = tail[i + matched];
+			tail[tl - matched - 1] = '\0';
+			tail = realloc(tail, (tl - matched) * sizeof(char));
+			INFOF("New tail: %s", tail);
+
+			INFOF("New branch, %s", tail);
+      splitNode(node, matched);
+			appendNode(node, tail);
+			tree->size++;
+      INFO2("Expand complete");
+      return 0;
+		}
+    // Trim tail
+    for (unsigned int i = 0; i < matched + 1; i++)
+      tail[i] = tail[i + matched];
+    tail[tl - matched - 1] = '\0';
+    tail = realloc(tail, (tl - matched) * sizeof(char));
+    INFOF("New tail: %s", tail);
+
+    parentNode = node;
+    node = getChild(node, tail);
+    INFO("Next cycle...");
+  }
+}
+
+/*
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   if (endpoint) {
   };
@@ -192,6 +295,7 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   tree->size++;
   return 0;
 }
+*/
 
 // Recursive function, fills *word pointer with chars following tree until '\0'
 /*
