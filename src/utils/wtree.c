@@ -60,13 +60,13 @@ unsigned int compareWords(char *s1, char *s2) {
   while (!nullChar)
     if (s1[n] != s2[n]) {
       INFOF("%c (%i) != %c (%i)", s1[n], s1[n], s2[n], s2[n]);
-			INFOF("Matched %u chars", n);
+      INFOF("Matched %u chars", n);
       return n;
     } else {
       nullChar = (s1[n] == '\0' || s2[n] == '\0');
       n++;
     }
-	INFOF("Matched %u chars", n);
+  INFOF("Matched %u chars", n);
   return n;
 }
 
@@ -106,7 +106,7 @@ void splitNode(struct WTreeNode *node, unsigned int n) {
 
 // Removes first n char of string, size l (including null character)
 char *trimString(char *s, unsigned int n, unsigned int l) {
-	INFOF("Trimming %s, size %u, by %u chars", s, l, n);
+  INFOF("Trimming %s, size %u, by %u chars", s, l, n);
   for (unsigned int i = 0; i < n + 1; i++)
     s[i] = s[i + n];
   s[l - n - 1] = '\0';
@@ -208,12 +208,13 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   strcpy(tail, word);
   struct WTreeNode *node = getChild(tree->root, tail[0]);
-	if (!node) return NULL;
+  if (!node)
+    return NULL;
   while (1) {
-		unsigned int matched = compareWords(node->s, tail);
-		if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0')
-			return node->endpoint;
-		trimString(tail, matched, (unsigned int)strlen(tail) + 1);
+    unsigned int matched = compareWords(node->s, tail);
+    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0')
+      return node->endpoint;
+    trimString(tail, matched, (unsigned int)strlen(tail) + 1);
   }
 }
 
