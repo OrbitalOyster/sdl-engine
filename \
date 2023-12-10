@@ -93,24 +93,22 @@ void splitNode(struct WTreeNode *node, unsigned int n) {
   struct WTreeNode *tail = createNode(node, stail);
   tail->size = node->size;
   tail->children = node->children;
-  tail->endpoint = node->endpoint;
   // Replacing head
   node->size = 1;
   free(node->s);
-  node->endpoint = NULL;
   node->s = shead;
   node->children = calloc(1, sizeof(struct WTreeNode *));
   node->children[0] = tail;
 }
 
 // Removes first n char of string
-char *trimString(char *s, unsigned int n) {
-  INFOF("Trimming %s by %u chars", s, n);
+void trimString(char *s, unsigned int n) {
+  INFOF("Trimming %s, by %u chars", s, n);
   unsigned int i = 0;
   for (; i < n + 1; i++)
     s[i] = s[i + n];
   s[i] = '\0';
-  return realloc(s, (i + 1) * sizeof(char));
+  realloc(s, (i + 1) * sizeof(char));
 }
 
 int expandWTree(struct WTree *tree, char *word, void *endpoint) {
@@ -123,13 +121,14 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   struct WTreeNode *nextNode = getChild(node, tail[0]);
   while (nextNode) {
     INFOF("Switched to node: %s", nextNode->s);
-    unsigned int l = (unsigned int)strlen(nextNode->s);
+    unsigned int nl = (unsigned int)strlen(nextNode->s);
     unsigned int matched = compareWords(nextNode->s, tail);
-    INFOF("tl == %u, l == %u, matched == %u", tl, l, matched);
-    tail = trimString(tail, matched);
+    INFOF("tl == %u, nl == %u, matched == %u", tl, nl, matched);
+    trimString(tail, matched);
     tl -= matched;
-    if (matched < l || (matched == l && !nextNode->size))
+    if (matched < nl || (matched == nl && !nextNode->size))
       splitNode(nextNode, matched);
+
     node = nextNode;
     nextNode = getChild(node, tail[0]);
   }
@@ -177,16 +176,11 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
   if (!node)
     return NULL;
   while (1) {
-    INFOF("Searching node %s", node->s);
     unsigned int matched = compareWords(node->s, tail);
-    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0') {
-      INFO2("Found it");
+    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0')
       return node->endpoint;
-    }
-    tail = trimString(tail, matched);
-    node = getChild(node, tail[0]);
+    trimString(tail, matched);
   }
-  return NULL;
 }
 
 void destroyNode(struct WTreeNode *node) {
