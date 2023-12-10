@@ -8,6 +8,24 @@
 
 #include <stdio.h>
 
+union WTreeChildren {
+  struct WTreeNode **nodes;
+  void *endpoint;
+};
+
+struct WTreeNode {
+  char *s;
+  struct WTreeNode *parent;
+  unsigned short int size;
+  union WTreeChildren children;
+};
+
+struct WTree {
+  struct WTreeNode *root;
+  unsigned int size;
+  char **words;
+};
+
 void destroyNode(struct WTreeNode *node);
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
@@ -15,7 +33,7 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
   if (result == NULL)
     ERR(1, "Out of memory");
   *result = (struct WTreeNode){
-      .parent = parent, .s = s, .size = 0, .children = NULL, .endpoint = NULL};
+      .parent = parent, .s = s, .size = 0, .children.nodes = NULL};
   return result;
 }
 
@@ -33,9 +51,9 @@ int nodeSortFunc(void **arr, int i1, int i2) {
 }
 
 void sortNode(struct WTreeNode *node) {
-  sort((void **)node->children, 0, (int)node->size - 1, nodeSortFunc);
+  sort((void **)node->children.nodes, 0, (int)node->size - 1, nodeSortFunc);
   for (unsigned short int i = 0; i < node->size; i++)
-    sortNode(node->children[i]);
+    sortNode(node->children.nodes[i]);
 }
 
 // TODO Less brutal approach
@@ -47,8 +65,8 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
   }
   INFOF("Seaching node %s, size %u for %c(%i)", node->s, node->size, c, c);
   for (unsigned short int i = 0; i < node->size; i++)
-    if (node->children[i]->s[0] == c)
-      return node->children[i];
+    if (node->children.nodes[i]->s[0] == c)
+      return node->children.nodes[i];
   return NULL;
 }
 
@@ -70,9 +88,9 @@ struct WTreeNode *appendNode(struct WTreeNode *parent, char *word) {
   INFO2F("Appending node %s to %s", word, parent->s);
   struct WTreeNode *child = createNode(parent, word);
   parent->size++;
-  parent->children =
-      realloc(parent->children, parent->size * sizeof(struct WTreeNode *));
-  parent->children[parent->size - 1] = child;
+  parent->children.nodes = realloc(parent->children.nodes,
+                             parent->size * sizeof(struct WTreeNode *));
+  parent->children.nodes[parent->size - 1] = child;
   return child;
 }
 
@@ -93,14 +111,12 @@ void splitNode(struct WTreeNode *node, unsigned int n) {
   struct WTreeNode *tail = createNode(node, stail);
   tail->size = node->size;
   tail->children = node->children;
-  tail->endpoint = node->endpoint;
   // Replacing head
   node->size = 1;
   free(node->s);
-  node->endpoint = NULL;
   node->s = shead;
-  node->children = calloc(1, sizeof(struct WTreeNode *));
-  node->children[0] = tail;
+  node->children.nodes = calloc(1, sizeof(struct WTreeNode *));
+  node->children.nodes[0] = tail;
 }
 
 // Removes first n char of string
@@ -113,7 +129,7 @@ char *trimString(char *s, unsigned int n) {
   return realloc(s, (i + 1) * sizeof(char));
 }
 
-int expandWTree(struct WTree *tree, char *word, void *endpoint) {
+void expandWTree(struct WTree *tree, char *word, void *endpoint) {
   INFOF("Expanding by %s", word);
   // Tail length, + 1 for null char
   unsigned int tl = (unsigned int)strlen(word) + 1;
@@ -135,24 +151,10 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   }
   INFOF("Child not found, appending tail %s", tail);
   struct WTreeNode *appended = appendNode(node, tail);
-  appended->endpoint = endpoint;
+  appended->children.endpoint = endpoint;
   tree->size++;
   INFO2("Expand complete");
-  return 0;
 }
-
-/*
-void resetWTreeWords(struct WTree *tree) {
-  // At least 1 char ('\0')
-  unsigned int level = 0;
-  for (unsigned short int i = 0; i < tree->root->size; i++) {
-    free(tree->words[i]);
-    tree->words[i] = calloc(1, sizeof(char));
-    tree->words[i][0] = '\0';
-    getNodeWord(tree->root->children[i], tree->words[i], level);
-  }
-}
-*/
 
 void sortWTree(struct WTree *tree) { sortNode(tree->root); }
 
@@ -165,7 +167,7 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
     unsigned int matched = compareWords(node->s, tail);
     if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0') {
       INFO2("Found it");
-      return node->endpoint;
+      return node->children.endpoint;
     }
     tail = trimString(tail, matched);
     node = getChild(node, tail[0]);
@@ -184,7 +186,7 @@ void debugWord(struct WTreeNode *node, char *word, unsigned int *n) {
     INFO2F("%s", word)
   else
     for (unsigned int i = 0; i < node->size; i++)
-      debugWord(node->children[i], word, n);
+      debugWord(node->children.nodes[i], word, n);
   *n -= l;
   word[*n] = '\0';
 }
@@ -200,8 +202,7 @@ void debugWTree(struct WTree *tree) {
 void destroyNode(struct WTreeNode *node) {
   free(node->s);
   for (unsigned short int i = 0; i < node->size; i++)
-    destroyNode(node->children[i]);
-  free(node->children);
+    destroyNode(node->children.nodes[i]);
   free(node);
 }
 

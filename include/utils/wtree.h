@@ -4,28 +4,16 @@
 #define WTREE_CHARS_NUMBER 64
 #define WTREE_CHARS                                                            \
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
+#define WTREE_MAX_WORD_LENGTH 64
 
-struct WTreeNode {
-  char *s;
-  struct WTreeNode *parent;
-  unsigned short int size;
-  struct WTreeNode **children;
-  void *endpoint;
-};
-
-struct WTree {
-  struct WTreeNode *root;
-  unsigned int size;
-  char **words;
-};
+struct WTree;
 
 struct WTree *createWTree();
-int expandWTree(struct WTree *tree, char *word, void *endpoint);
-void getWTreeWords(struct WTree *tree);
+void expandWTree(struct WTree *tree, char *word, void *endpoint);
 void sortWTree(struct WTree *tree);
-void resetWTreeWords(struct WTree *tree);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
 void debugWTree(struct WTree *tree);
+char **getWTreeWords(struct WTree *tree);
 void destroyWTree(struct WTree *tree);
 
 #endif /* WTREE_H */

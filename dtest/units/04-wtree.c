@@ -28,13 +28,11 @@ int main() {
   INFO("Sorted");
   debugWTree(tree);
 
-  /*
-  struct Endpoint* ep = getWTreeEndpoint(tree, "abczzz");
+  struct Endpoint* ep = getWTreeEndpoint(tree, "abcxyz");
   if (ep)
     INFOF("ep->c == %s", ep->c)
   else
     INFO("It's NULL");
-  */
 
   destroyWTree(tree);
 
