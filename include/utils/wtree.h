@@ -25,6 +25,7 @@ void getWTreeWords(struct WTree *tree);
 void sortWTree(struct WTree *tree);
 void resetWTreeWords(struct WTree *tree);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
+void debugWTree(struct WTree *tree);
 void destroyWTree(struct WTree *tree);
 
 #endif /* WTREE_H */

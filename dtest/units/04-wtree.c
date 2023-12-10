@@ -16,17 +16,25 @@ int main() {
   struct Endpoint ep1 = {.a = 1, .b = 2, .c = "ep1"};
   struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
 
-  expandWTree(tree, "abc", &ep1);
+  expandWTree(tree, "ccc", NULL);
   expandWTree(tree, "abcdef", NULL);
+  expandWTree(tree, "abc", &ep1);
   expandWTree(tree, "abcxxx", NULL);
   expandWTree(tree, "abcxyz", &ep2);
   INFOF("Tree size: %u", tree->size);
 
-  struct Endpoint* ep = getWTreeEndpoint(tree, "abcxyz");
+  debugWTree(tree);
+  sortWTree(tree);
+  INFO("Sorted");
+  debugWTree(tree);
+
+  /*
+  struct Endpoint* ep = getWTreeEndpoint(tree, "abczzz");
   if (ep)
     INFOF("ep->c == %s", ep->c)
   else
     INFO("It's NULL");
+  */
 
   destroyWTree(tree);
 

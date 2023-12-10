@@ -141,21 +141,7 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   return 0;
 }
 
-// Recursive function, fills *word pointer with chars following tree until '\0'
 /*
-void getNodeWord(struct WTreeNode *node, char *word, unsigned int level) {
-  word[level] = node->c;
-  word = realloc(word, (level + 2) * sizeof(char));
-  // End of branch, add '\0'
-  if (node->size == 0)
-    word[level + 1] = '\0';
-  else {
-    level++;
-    for (unsigned short int i = 0; i < node->size; i++)
-      getNodeWord(node->children[i], word, level);
-  }
-}
-
 void resetWTreeWords(struct WTree *tree) {
   // At least 1 char ('\0')
   unsigned int level = 0;
@@ -174,9 +160,7 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   strcpy(tail, word);
   struct WTreeNode *node = getChild(tree->root, tail[0]);
-  if (!node)
-    return NULL;
-  while (1) {
+  while (node) {
     INFOF("Searching node %s", node->s);
     unsigned int matched = compareWords(node->s, tail);
     if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0') {
@@ -187,6 +171,30 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
     node = getChild(node, tail[0]);
   }
   return NULL;
+}
+
+void debugWord(struct WTreeNode *node, char *word, unsigned int *n) {
+  unsigned int l = 0;
+  if (node->s) {
+    l = (unsigned int)strlen(node->s);
+    strcat(word, node->s);
+  }
+  *n += l;
+  if (!node->size)
+    INFO2F("%s", word)
+  else
+    for (unsigned int i = 0; i < node->size; i++)
+      debugWord(node->children[i], word, n);
+  *n -= l;
+  word[*n] = '\0';
+}
+
+void debugWTree(struct WTree *tree) {
+  char *word = calloc(64, sizeof(char));
+  unsigned int n = 0;
+  memset(word, '\0', 64);
+  struct WTreeNode *node = tree->root;
+  debugWord(node, word, &n);
 }
 
 void destroyNode(struct WTreeNode *node) {
