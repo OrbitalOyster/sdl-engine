@@ -20,12 +20,6 @@ struct WTreeNode {
   union WTreeChildren children;
 };
 
-struct WTree {
-  struct WTreeNode *root;
-  unsigned int size;
-  char **words;
-};
-
 void destroyNode(struct WTreeNode *node);
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
@@ -89,7 +83,7 @@ struct WTreeNode *appendNode(struct WTreeNode *parent, char *word) {
   struct WTreeNode *child = createNode(parent, word);
   parent->size++;
   parent->children.nodes = realloc(parent->children.nodes,
-                             parent->size * sizeof(struct WTreeNode *));
+                                   parent->size * sizeof(struct WTreeNode *));
   parent->children.nodes[parent->size - 1] = child;
   return child;
 }
@@ -158,21 +152,26 @@ void expandWTree(struct WTree *tree, char *word, void *endpoint) {
 
 void sortWTree(struct WTree *tree) { sortNode(tree->root); }
 
-void *getWTreeEndpoint(struct WTree *tree, char *word) {
+struct WTreeNode *searchWTree(struct WTree *tree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   strcpy(tail, word);
   struct WTreeNode *node = getChild(tree->root, tail[0]);
   while (node) {
-    INFOF("Searching node %s", node->s);
     unsigned int matched = compareWords(node->s, tail);
-    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0') {
-      INFO2("Found it");
-      return node->children.endpoint;
-    }
+    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0')
+      return node;
     tail = trimString(tail, matched);
     node = getChild(node, tail[0]);
   }
   return NULL;
+}
+
+void *getWTreeEndpoint(struct WTree *tree, char *word) {
+  struct WTreeNode *node = searchWTree(tree, word);
+  if (!node)
+    return NULL;
+  else
+    return node->children.endpoint;
 }
 
 void debugWord(struct WTreeNode *node, char *word, unsigned int *n) {
