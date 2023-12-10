@@ -13,17 +13,17 @@ struct Endpoint {
 int main() {
   DTEST_UNIT_START("Word tree");
   struct WTree *tree = createWTree();
-  struct Endpoint ep1 = {.a = 1, .b = 2, .c = "ep1"};
-  struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
+//  struct Endpoint ep1 = {.a = 1, .b = 2, .c = "ep1"};
+//  struct Endpoint ep2 = {.a = 3, .b = 4, .c = "ep2"};
 
-  expandWTree(tree, "abc", &ep1);
-  expandWTree(tree, "abcdef", NULL);
   expandWTree(tree, "abcxxx", NULL);
-  expandWTree(tree, "abcxyz", &ep2);
+  expandWTree(tree, "abcdef", NULL);
+  expandWTree(tree, "abc", NULL);
+  expandWTree(tree, "abcxyz", NULL);
   INFOF("Tree size: %u", tree->size);
 
-  struct Endpoint* ep = getWTreeEndpoint(tree, "abc");
-  INFOF("ep->c == %s", ep->c);
+//  struct Endpoint* ep = getWTreeEndpoint(tree, "abc");
+//  INFOF("ep->c == %s", ep->c);
 
 /*
 

@@ -45,42 +45,39 @@ struct WTreeNode *getChild(struct WTreeNode *node, char c) {
     WARN("Attempt to access NULL node");
     return NULL;
   }
-  INFOF("Seaching node %s, size %u for %c", node->s, node->size, c);
+  INFOF("Seaching node %s, size %u for %c(%i)", node->s, node->size, c, c);
   for (unsigned short int i = 0; i < node->size; i++)
     if (node->children[i]->s[0] == c)
       return node->children[i];
   return NULL;
 }
 
-// Returns number of matching chars
+// Returns number of matching chars (excluding null chars)
 unsigned int compareWords(char *s1, char *s2) {
   INFOF("Comparing %s to %s", s1, s2);
   unsigned int n = 0;
-  int nullChar = 0;
-  while (!nullChar)
-    if (s1[n] != s2[n]) {
+  do {
+    if (s1[n] == '\0' || s2[n] == '\0' || s1[n] != s2[n]) {
       INFOF("%c (%i) != %c (%i)", s1[n], s1[n], s2[n], s2[n]);
       INFOF("Matched %u chars", n);
       return n;
-    } else {
-      nullChar = (s1[n] == '\0' || s2[n] == '\0');
-      n++;
     }
-  INFOF("Matched %u chars", n);
-  return n;
+  } while (++n);
+  return n; // Should not happen
 }
 
-void appendNode(struct WTreeNode *parent, char *word) {
+struct WTreeNode *appendNode(struct WTreeNode *parent, char *word) {
   INFO2F("Appending node %s to %s", word, parent->s);
   struct WTreeNode *child = createNode(parent, word);
   parent->size++;
   parent->children =
       realloc(parent->children, parent->size * sizeof(struct WTreeNode *));
   parent->children[parent->size - 1] = child;
+  return child;
 }
 
 void splitNode(struct WTreeNode *node, unsigned int n) {
-  INFOF("Splitting node %s by char #%i", node->s, n);
+  INFO2F("Splitting node %s by char #%i", node->s, n);
   // Splitting word
   unsigned int l = (unsigned int)strlen(node->s);
   l++; // null character
@@ -117,60 +114,25 @@ int expandWTree(struct WTree *tree, char *word, void *endpoint) {
   INFOF("Expanding by %s", word);
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   strcpy(tail, word);
-  struct WTreeNode *parentNode = tree->root;
-  struct WTreeNode *node = getChild(parentNode, word[0]);
+  struct WTreeNode *node = tree->root;
+  struct WTreeNode *nextNode = getChild(node, tail[0]);
+  while (nextNode) {
+    INFOF("Switched to node: %s", nextNode->s);
+    unsigned int tl = (unsigned int)strlen(tail);
+    unsigned int nl = (unsigned int)strlen(nextNode->s);
+    unsigned int matched = compareWords(nextNode->s, tail);
+    INFOF("tl == %u, nl == %u, matched == %u", tl, nl, matched);
+    tail = trimString(tail, matched, tl + 1);
+    if (matched < nl || (matched == nl && !nextNode->size))
+      splitNode(nextNode, matched);
 
-  while (1) {
-    // Entirely new tail, append to node
-    if (!node) {
-      INFO("Child not found, appending tail");
-      node = parentNode;
-      break;
-    }
-    INFOF("Switched to node: %s", node->s);
-    unsigned int tl = (unsigned int)strlen(tail) + 1;
-    unsigned int matched = compareWords(node->s, tail);
-    // abcdef/abc
-    if (tail[matched] == '\0') {
-      // abc/abc
-      if (node->s[matched] == '\0') {
-        INFO("New node is the same like existing one");
-        if (!node->size)
-          ERR(1, "Duplicate");
-      } else {
-        INFO("New node is shorter than existing one");
-        splitNode(node, matched);
-      }
-      tail = realloc(tail, sizeof(char));
-      tail[0] = '\0';
-      break;
-    }
-    // Trim tail
-    tail = trimString(tail, matched, tl);
-    INFOF("New tail: %s", tail);
-    // abcdef/abcxxx
-    if (node->s[matched] != '\0') {
-      INFOF("New branch, %s", tail);
-      splitNode(node, matched);
-      break;
-    }
-    // abc/abcdef
-    if (!node->size) {
-      INFO("New node is longer than existing one");
-      char *nullChar = calloc(1, sizeof(char));
-      nullChar[0] = '\0';
-      appendNode(node, nullChar);
-      break;
-    }
-    parentNode = node;
-    node = getChild(node, tail[0]);
-    INFO("Next cycle...");
+    node = nextNode;
+    nextNode = getChild(node, tail[0]);
   }
-
-  // Done
-  appendNode(node, tail);
+  INFOF("Child not found, appending tail %s", tail);
+  struct WTreeNode *appended = appendNode(node, tail);
+  appended->endpoint = endpoint;
   tree->size++;
-  node->endpoint = endpoint;
   INFO2("Expand complete");
   return 0;
 }
