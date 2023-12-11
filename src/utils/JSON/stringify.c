@@ -85,7 +85,9 @@ char *tokenMapToString(struct TokenMap *map, int nkeys) {
     result = realloc(result, size);
     strcat(result, value);
     free(value);
+    free(key);
   }
+  free(keys);
   return result;
 }
 
