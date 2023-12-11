@@ -1,6 +1,8 @@
 // obj/utils/wtree.o obj/utils/JSON/*.o obj/utils/qsort.o
 // 0
 
+#include <stdlib.h>
+
 #include <utils/debug.h>
 
 #include "utils/JSON/token.h"

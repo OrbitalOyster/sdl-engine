@@ -103,14 +103,14 @@
   }
 
 #else /* DEBUG_MSG */
-#define ERR(_debug_c, _debug_s)
-#define ERRF(_debug_c, _debug_s, ...)
-#define WARN(_debug_s)
-#define WARNF(_debug_s, ...)
-#define INFO(_debug_s)
-#define INFOF(_debug_s, ...)
-#define INFO2(_debug_s)
-#define INFO2F(_debug_s, ...)
+#define ERR(_debug_c, _debug_s) {}
+#define ERRF(_debug_c, _debug_s, ...) {}
+#define WARN(_debug_s) {}
+#define WARNF(_debug_s, ...) {}
+#define INFO(_debug_s) {}
+#define INFOF(_debug_s, ...) {}
+#define INFO2(_debug_s) {}
+#define INFO2F(_debug_s, ...) {}
 #endif /* DEBUG_MSG */
 
 #endif /* DEBUG_H */

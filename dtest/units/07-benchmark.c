@@ -13,8 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 1000000
-// #define NKEYS 5
+#define NKEYS 100
 #define KEYLENGTH 16
 
 char **keys;
@@ -50,14 +49,6 @@ void populateTree(struct WTree *tree) {
   }
 }
 
-/*
-void populateTree(struct WTree *tree) {
-  expandWTree(tree, "foo", NULL);
-  expandWTree(tree, "bar", NULL);
-  expandWTree(tree, "baz", NULL);
-}
-*/
-
 void destroyKeys() {
   for (int i = 0; i < NKEYS; i++)
     free(keys[i]);
@@ -74,40 +65,21 @@ char *lookup(struct WTree *tree) {
     return NULL;
 }
 
-/*
-int main() {
-  DTEST_UNIT_START("WTree benchmark");
-  oyster = calloc(1, sizeof(struct Endpoint));
-  *oyster = (struct Endpoint){.msg = "oyster"};
-  DTEST_EVAL_TIME(populateKeys());
-  struct WTree *tree = createWTree();
-  DTEST_EVAL_TIME(populateTree(tree));
-  //INFOF("%c\n", tree->root->children[0]->c);
-  sortWTree(tree);
-  getWTreeWords(tree);
-  for (unsigned int i = 0; i < tree->size; i++)
-    INFOF("%s", tree->words[i]);
-  char *msg;
-  DTEST_EVAL_TIME(msg = lookup(tree));
-  DTEST_EVAL_TIME(getWTreeEndpoint(tree, "oyster"));
-  INFOF("Msg: %s", msg);
-  free(oyster);
-  destroyWTree(tree);
-  destroyKeys();
-  DTEST_UNIT_END
-  return 0;
-}
-*/
-
 int main() {
   DTEST_UNIT_START("WTree benchmark");
   DTEST_EVAL_TIME(populateKeys());
   struct WTree *tree = createWTree();
   DTEST_EVAL_TIME(populateTree(tree));
+  unsigned int size = getWTreeSize(tree);
   DTEST_EVAL_TIME(sortWTree(tree));
-  DTEST_EVAL_TIME(resetWTreeWords(tree));
-//  for (unsigned int i = 0; i < tree->size; i++)
-//    INFOF("%s", tree->words[i]);
+  char **words;
+  DTEST_EVAL_TIME(words = getWTreeWords(tree));
+  for (unsigned int i = 0; i < size; i++) {
+    INFOF("%s", words[i]);
+    free(words[i]);
+  }
+  free(words);
+  DTEST_EVAL_TIME(lookup(tree));
   free(oyster);
   destroyWTree(tree);
   destroyKeys();

@@ -1,6 +1,8 @@
 // obj/utils/wtree.o obj/utils/qsort.o
 // 0
 
+#include <stdlib.h>
+
 #include "utils/wtree.h"
 #include "utils/debug.h"
 

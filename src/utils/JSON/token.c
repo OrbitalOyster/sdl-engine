@@ -1,5 +1,6 @@
 #include "utils/JSON/token.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "utils/JSON/tokenMap.h"
@@ -61,6 +62,7 @@ struct Token *createNullToken() {
   *result = (struct Token){.type = Null};
   return result;
 }
+
 unsigned int getArrayTokenSize(struct Token *arr) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
