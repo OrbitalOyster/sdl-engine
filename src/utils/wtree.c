@@ -116,8 +116,9 @@ void splitNode(struct WTreeNode *node, unsigned int n) {
 // Removes first n char of string
 char *trimString(char *s, unsigned int n) {
   INFOF("Trimming %s by %u chars", s, n);
+  unsigned int l = (unsigned int)strlen(s);
   unsigned int i = 0;
-  for (; i < n + 1; i++)
+  for (; i < l - n; i++)
     s[i] = s[i + n];
   s[i] = '\0';
   return realloc(s, (i + 1) * sizeof(char));
@@ -158,11 +159,14 @@ struct WTreeNode *searchWTree(struct WTree *tree, char *word) {
   struct WTreeNode *node = getChild(tree->root, tail[0]);
   while (node) {
     unsigned int matched = compareWords(node->s, tail);
-    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0')
+    if (!node->size && node->s[matched] == '\0' && tail[matched] == '\0') {
+      free(tail);
       return node;
+    }
     tail = trimString(tail, matched);
     node = getChild(node, tail[0]);
   }
+  free(tail);
   return NULL;
 }
 
@@ -174,34 +178,44 @@ void *getWTreeEndpoint(struct WTree *tree, char *word) {
     return node->children.endpoint;
 }
 
-void debugWord(struct WTreeNode *node, char *word, unsigned int *n) {
+void getWTreeWord(struct WTreeNode *node, char *word, unsigned int *n,
+                  unsigned int *size, char **result) {
   unsigned int l = 0;
   if (node->s) {
     l = (unsigned int)strlen(node->s);
     strcat(word, node->s);
   }
   *n += l;
-  if (!node->size)
-    INFO2F("%s", word)
-  else
+  if (!node->size) {
+    char *newWord = calloc(*n + 1, sizeof(char));
+    strcpy(newWord, word);
+    result[(*size)++] = newWord;
+  } else
     for (unsigned int i = 0; i < node->size; i++)
-      debugWord(node->children.nodes[i], word, n);
+      getWTreeWord(node->children.nodes[i], word, n, size, result);
   *n -= l;
   word[*n] = '\0';
 }
 
-void debugWTree(struct WTree *tree) {
-  char *word = calloc(64, sizeof(char));
+char **getWTreeWords(struct WTree *tree) {
+  char **result = calloc(tree->size, sizeof(char *));
+  unsigned int size = 0;
+  char *word = calloc(WTREE_CHARS_NUMBER, sizeof(char));
   unsigned int n = 0;
-  memset(word, '\0', 64);
+  memset(word, '\0', WTREE_CHARS_NUMBER);
   struct WTreeNode *node = tree->root;
-  debugWord(node, word, &n);
+  getWTreeWord(node, word, &n, &size, result);
+  free(word);
+  return result;
 }
 
 void destroyNode(struct WTreeNode *node) {
   free(node->s);
-  for (unsigned short int i = 0; i < node->size; i++)
-    destroyNode(node->children.nodes[i]);
+  if (node->size) {
+    for (unsigned short int i = 0; i < node->size; i++)
+      destroyNode(node->children.nodes[i]);
+    free(node->children.nodes);
+  }
   free(node);
 }
 

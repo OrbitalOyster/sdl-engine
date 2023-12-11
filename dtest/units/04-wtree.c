@@ -19,16 +19,21 @@ int main() {
   expandWTree(tree, "ccc", NULL);
   expandWTree(tree, "abcdef", NULL);
   expandWTree(tree, "abc", &ep1);
-  expandWTree(tree, "abcxxx", NULL);
   expandWTree(tree, "abcxyz", &ep2);
+  expandWTree(tree, "abcxxx", NULL);
   INFOF("Tree size: %u", tree->size);
 
-  debugWTree(tree);
   sortWTree(tree);
   INFO("Sorted");
-  debugWTree(tree);
 
-  struct Endpoint* ep = getWTreeEndpoint(tree, "abcxyz");
+  char **words = getWTreeWords(tree);
+  for (unsigned int i = 0; i < tree->size; i++)
+    INFO2F("%s", words[i]);
+  for (unsigned int i = 0; i < tree->size; i++)
+    free(words[i]);
+  free(words);
+
+  struct Endpoint* ep = getWTreeEndpoint(tree, "abc");
   if (ep)
     INFOF("ep->c == %s", ep->c)
   else

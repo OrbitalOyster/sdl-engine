@@ -16,7 +16,6 @@ struct WTree *createWTree();
 void expandWTree(struct WTree *tree, char *word, void *endpoint);
 void sortWTree(struct WTree *tree);
 void *getWTreeEndpoint(struct WTree *tree, char *word);
-void debugWTree(struct WTree *tree);
 char **getWTreeWords(struct WTree *tree);
 void destroyWTree(struct WTree *tree);
 
