@@ -21,15 +21,16 @@ int main() {
   expandWTree(tree, "abc", &ep1);
   expandWTree(tree, "abcxyz", &ep2);
   expandWTree(tree, "abcxxx", NULL);
-  INFOF("Tree size: %u", tree->size);
+  unsigned int size = getWTreeSize(tree);
+  INFOF("Tree size: %u", size);
 
   sortWTree(tree);
   INFO("Sorted");
 
   char **words = getWTreeWords(tree);
-  for (unsigned int i = 0; i < tree->size; i++)
+  for (unsigned int i = 0; i < size; i++)
     INFO2F("%s", words[i]);
-  for (unsigned int i = 0; i < tree->size; i++)
+  for (unsigned int i = 0; i < size; i++)
     free(words[i]);
   free(words);
 

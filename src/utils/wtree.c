@@ -20,6 +20,12 @@ struct WTreeNode {
   union WTreeChildren children;
 };
 
+struct WTree {
+  struct WTreeNode *root;
+  unsigned int size;
+  char **words;
+};
+
 void destroyNode(struct WTreeNode *node);
 
 struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
@@ -149,6 +155,10 @@ void expandWTree(struct WTree *tree, char *word, void *endpoint) {
   appended->children.endpoint = endpoint;
   tree->size++;
   INFO2("Expand complete");
+}
+
+unsigned int getWTreeSize(struct WTree* tree) {
+  return tree->size;
 }
 
 void sortWTree(struct WTree *tree) { sortNode(tree->root); }

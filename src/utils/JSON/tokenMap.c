@@ -35,8 +35,8 @@ void expandTokenMapN(struct TokenMap *map, struct Token *token) {
   free(key);
 }
 
-char *getTokenMapKey(struct TokenMap *map, unsigned int n) {
-  return map->tree->words[n];
+char **getTokenMapKeys(struct TokenMap *map) {
+  return getWTreeWords(map->tree);
 }
 
 struct Token *getTokenMapElement(struct TokenMap *map, unsigned int n) {

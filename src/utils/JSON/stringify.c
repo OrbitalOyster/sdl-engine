@@ -63,18 +63,19 @@ char *tokenToString(struct Token *token) {
   return result;
 }
 
-char *tokenMapToString(struct TokenMap *map, int keys) {
+char *tokenMapToString(struct TokenMap *map, int nkeys) {
   size_t size = 1;
   char *result = calloc(size, sizeof(char));
+  char **keys = getTokenMapKeys(map);
   for (unsigned int i = 0; i < getTokenMapSize(map); i++) {
-    char *key = getTokenMapKey(map, i);
+    char *key = keys[i];
     char *value = tokenToString(getTokenMapElement(map, i));
     if (i) { // ", "
       size += (2 + strlen(value)) * sizeof(char);
       result = realloc(result, size);
       strcat(result, ", ");
     }
-    if (keys) {
+    if (nkeys) {
       size += (strlen(key) + 2) * sizeof(char);
       result = realloc(result, size);
       strcat(result, key);
