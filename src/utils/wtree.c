@@ -6,8 +6,6 @@
 #include "utils/debug.h"
 #include "utils/qsort.h"
 
-#include <stdio.h>
-
 union WTreeChildren {
   struct WTreeNode **nodes;
   void *endpoint;
@@ -23,7 +21,6 @@ struct WTreeNode {
 struct WTree {
   struct WTreeNode *root;
   unsigned int size;
-  char **words;
 };
 
 void destroyNode(struct WTreeNode *node);
@@ -39,9 +36,8 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
 
 struct WTree *createWTree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
-  result->root = createNode(NULL, NULL);
-  result->size = 0;
-  result->words = NULL;
+  *result =
+      (struct WTree){.root = createNode(NULL, NULL), .size = 0, .words = NULL};
   return result;
 }
 
@@ -75,7 +71,7 @@ unsigned int compareWords(char *s1, char *s2) {
   INFOF("Comparing %s to %s", s1, s2);
   unsigned int n = 0;
   do {
-    if (s1[n] == '\0' || s2[n] == '\0' || s1[n] != s2[n]) {
+    if (s1[n] != s2[n] || s1[n] == '\0' || s2[n] == '\0') {
       INFOF("%c (%i) != %c (%i)", s1[n], s1[n], s2[n], s2[n]);
       INFOF("Matched %u chars", n);
       return n;
@@ -84,9 +80,9 @@ unsigned int compareWords(char *s1, char *s2) {
   return n; // Should not happen
 }
 
-struct WTreeNode *appendNode(struct WTreeNode *parent, char *word) {
-  INFO2F("Appending node %s to %s", word, parent->s);
-  struct WTreeNode *child = createNode(parent, word);
+struct WTreeNode *appendNode(struct WTreeNode *parent, char *s) {
+  INFO2F("Appending node %s to %s", s, parent->s);
+  struct WTreeNode *child = createNode(parent, s);
   parent->size++;
   parent->children.nodes = realloc(parent->children.nodes,
                                    parent->size * sizeof(struct WTreeNode *));
@@ -94,11 +90,11 @@ struct WTreeNode *appendNode(struct WTreeNode *parent, char *word) {
   return child;
 }
 
+// Creates new node by splitting node by n chars (first n goes to the head)
 void splitNode(struct WTreeNode *node, unsigned int n) {
   INFO2F("Splitting node %s by char #%i", node->s, n);
   // Splitting word
-  unsigned int l = (unsigned int)strlen(node->s);
-  l++; // null character
+  unsigned int l = (unsigned int)strlen(node->s) + 1; // + null char
   char *shead = calloc(n + 1, sizeof(char));
   char *stail = calloc(l - n, sizeof(char));
   for (unsigned int i = 0; i < n; i++)
@@ -157,9 +153,7 @@ void expandWTree(struct WTree *tree, char *word, void *endpoint) {
   INFO2("Expand complete");
 }
 
-unsigned int getWTreeSize(struct WTree* tree) {
-  return tree->size;
-}
+unsigned int getWTreeSize(struct WTree *tree) { return tree->size; }
 
 void sortWTree(struct WTree *tree) { sortNode(tree->root); }
 
@@ -231,8 +225,5 @@ void destroyNode(struct WTreeNode *node) {
 
 void destroyWTree(struct WTree *tree) {
   destroyNode(tree->root);
-  //  for (unsigned int i = 0; i < tree->size; i++)
-  //    free(tree->words[i]);
-  free(tree->words);
   free(tree);
 }
