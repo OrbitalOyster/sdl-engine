@@ -10,9 +10,9 @@
 #define DMATH_MIN -1000000000.0
 
 int compare(double a, double b);
-int moreThan(double a, double b);
-int lessThan(double a, double b);
-int moreEqThan(double a, double b);
-int lessEqThan(double a, double b);
+int more(double a, double b);
+int less(double a, double b);
+int more_eq(double a, double b);
+int less_eq(double a, double b);
 
 #endif /* DMATH_H */

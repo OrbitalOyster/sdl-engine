@@ -7,6 +7,7 @@
 
 #include "utils/tmodes.h"
 
+// Hackery for nested macro parameters
 #define _dinclude(f) #f
 #define dinclude(f) _dinclude(f)
 
@@ -15,22 +16,24 @@
              TMSG(MODE_ITALIC, COLOR_GRAY, "%s\n"),                            \
          s);                                                                   \
   fflush(stdout);                                                              \
-  unsigned int _testsRun = 0;                                                  \
+  unsigned int _tests_run = 0;                                                 \
   unsigned int _ok = 0;                                                        \
   unsigned int _failed = 0;
 
 #define DTEST_UNIT_END                                                         \
   printf(TMSG(MODE_BOLD, COLOR_DEFAULT,                                        \
               "\tDone. Tests: %u; Passed: %u; Failed: %u\n"),                  \
-         _testsRun, _ok, _failed);
+         _tests_run, _ok, _failed);
+
+#define DTEST_INFO(s) printf("\t\t%s\n", TMSG(MODE_BOLD, COLOR_BLUE, #s));
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \
     printf("\t\tEval time: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT, #s) " | ");  \
     fflush(stdout);                                                            \
-    clock_t _startTime = clock();                                              \
+    clock_t _start_time = clock();                                             \
     s;                                                                         \
-    double _result = (double)(clock() - _startTime) / CLOCKS_PER_SEC;          \
+    double _result = (double)(clock() - _start_time) / CLOCKS_PER_SEC;         \
     printf("%.6lf sec.\n", _result);                                           \
   }
 
@@ -56,7 +59,7 @@
       printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
     }                                                                          \
     fflush(stdout);                                                            \
-    _testsRun++;                                                               \
+    _tests_run++;                                                              \
   }
 
 #define DTEST_EXPECT_FALSE(s)                                                  \
@@ -73,7 +76,7 @@
       printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
     }                                                                          \
     fflush(stdout);                                                            \
-    _testsRun++;                                                               \
+    _tests_run++;                                                              \
   }
 
 #include dinclude(TEST_FILE)

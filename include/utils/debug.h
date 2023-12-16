@@ -103,8 +103,8 @@
   }
 
 #else /* DEBUG_MSG */
-#define ERR(_debug_c, _debug_s) {}
-#define ERRF(_debug_c, _debug_s, ...) {}
+#define ERR(_debug_c, _debug_s) exit(_debug_c);
+#define ERRF(_debug_c, _debug_s, ...) exit(_debug_c);
 #define WARN(_debug_s) {}
 #define WARNF(_debug_s, ...) {}
 #define INFO(_debug_s) {}

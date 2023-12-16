@@ -13,7 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 1000000
+#define NKEYS 5
 #define KEYLENGTH 16
 
 char **keys;

@@ -37,7 +37,7 @@ struct WTreeNode *createNode(struct WTreeNode *parent, char *s) {
 struct WTree *createWTree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
   *result =
-      (struct WTree){.root = createNode(NULL, NULL), .size = 0, .words = NULL};
+      (struct WTree){.root = createNode(NULL, NULL), .size = 0};
   return result;
 }
 

@@ -4,7 +4,7 @@
 
 #include "utils/debug.h"
 
-static void checkValues(double a, double b) {
+static void check_values(double a, double b) {
   if (a > DMATH_MAX || b > DMATH_MAX)
     WARNF("dmath out of bounds: %lf, %lf", a, b);
 
@@ -14,36 +14,36 @@ static void checkValues(double a, double b) {
 
 int compare(double a, double b) {
   if (isfinite(a) && isfinite(b)) {
-    checkValues(a, b);
+    check_values(a, b);
     return fabs(a - b) < DMATH_EPSILON;
   } else
     return isinf(a) && isinf(b) && !((a < 0) ^ (b < 0));
 }
 
-static int compareFinite(double a, double b) {
-  checkValues(a, b);
+static int compare_finite(double a, double b) {
+  check_values(a, b);
   return fabs(a - b) < DMATH_EPSILON;
 }
 
-int moreThan(double a, double b) {
-  if (isfinite(a) && isfinite(b) && compareFinite(a, b))
+int more(double a, double b) {
+  if (isfinite(a) && isfinite(b) && compare_finite(a, b))
     return 0;
   return a > b;
 }
 
-int lessThan(double a, double b) {
-  if (isfinite(a) && isfinite(b) && compareFinite(a, b))
+int less(double a, double b) {
+  if (isfinite(a) && isfinite(b) && compare_finite(a, b))
     return 0;
   return a < b;
 }
 
-int moreEqThan(double a, double b) {
+int more_eq(double a, double b) {
   if (compare(a, b))
     return 1;
   return a > b;
 }
 
-int lessEqThan(double a, double b) {
+int less_eq(double a, double b) {
   if (compare(a, b))
     return 1;
   return a < b;
