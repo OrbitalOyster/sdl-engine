@@ -26,7 +26,7 @@
          _tests_run, _ok, _failed);                                            \
   return (int)_failed;
 
-#define DTEST_INFO(s) printf("\t%s\n", TMSG(MODE_BOLD, COLOR_BLUE, #s));
+#define DTEST_INFO(s) printf("\t\t" TMSG(MODE_BOLD, COLOR_BLUE, s) "\n");
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \

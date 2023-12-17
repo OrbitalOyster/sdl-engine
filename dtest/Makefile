@@ -40,9 +40,8 @@ test-strict:
 		COMPILE_RES=$$?; \
 		if [ $$COMPILE_RES -ne 0 ]; then \
 			echo "FAILED TO COMPILE: " $$COMPILE_RES; \
-			exit 1; \
+			exit $$COMPILE_RES; \
 		fi; \
-		echo "Compile result: " $$COMPILE_RES; \
 		./$(TEST_DIR)/$(TEST_OUTPUT); \
 		RESULT=$$?; \
 		echo -n "Expected:$$EXPECTED; Result: $$RESULT | "; \
@@ -54,7 +53,7 @@ test-strict:
 			else \
 				echo "FAIL"; \
 			fi; \
-			exit 1; \
+			exit $$RESULT; \
 		fi; \
 		echo $(DELIMITER); \
 	done
