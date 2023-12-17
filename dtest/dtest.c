@@ -26,7 +26,7 @@
          _tests_run, _ok, _failed);                                            \
   return (int)_failed;
 
-#define DTEST_INFO(s) printf("\t\t" TMSG(MODE_BOLD, COLOR_BLUE, s) "\n");
+#define DTEST_INFO(s) printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n");
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \
@@ -49,7 +49,7 @@
 #define DTEST_EXPECT_TRUE(s)                                                   \
   {                                                                            \
     printf("\t\tTest: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT,                   \
-                             #s) " | Expected: true | ");                      \
+                             #s) " | Expected: true  | ");                     \
     int _result = s;                                                           \
     printf("Result: %i | ", _result);                                          \
     if (_result) {                                                             \
@@ -70,6 +70,24 @@
     int _result = s;                                                           \
     printf("Result: %i | ", _result);                                          \
     if (!_result) {                                                            \
+      _ok++;                                                                   \
+      printf(TMSG(MODE_BOLD, COLOR_GREEN, "OK\n"));                            \
+    } else {                                                                   \
+      _failed++;                                                               \
+      printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
+    }                                                                          \
+    fflush(stdout);                                                            \
+    _tests_run++;                                                              \
+  }
+
+#define DTEST_EXPECT_UINT(s, uint)                                             \
+  {                                                                            \
+    printf("\t\tTest: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT,                   \
+                             #s) " | Expected: %u | ",                         \
+           uint);                                                              \
+    unsigned int _result = s;                                                  \
+    printf("Result: %u | ", _result);                                          \
+    if (_result == uint) {                                                     \
       _ok++;                                                                   \
       printf(TMSG(MODE_BOLD, COLOR_GREEN, "OK\n"));                            \
     } else {                                                                   \

@@ -25,7 +25,7 @@ struct Endpoint {
 struct Endpoint *oyster;
 
 char getRandomChar() {
-  return WTREE_CHARS[getNextLFSR(&state, taps) & (WTREE_CHARS_NUMBER - 1)];
+  return WTREE_CHARS[lfsr(&state, taps) & (WTREE_CHARS_NUMBER - 1)];
 }
 
 void populateKeys() {

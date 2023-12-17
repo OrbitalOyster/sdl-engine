@@ -9,6 +9,6 @@
 
 #define LFSR_TYPE uint32_t
 
-LFSR_TYPE getNextLFSR(LFSR_TYPE *state, LFSR_TYPE taps);
+LFSR_TYPE lfsr(LFSR_TYPE *state, LFSR_TYPE taps);
 
 #endif /* LFSR_H */
