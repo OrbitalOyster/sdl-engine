@@ -23,9 +23,10 @@
 #define DTEST_UNIT_END                                                         \
   printf(TMSG(MODE_BOLD, COLOR_DEFAULT,                                        \
               "\tDone. Tests: %u; Passed: %u; Failed: %u\n"),                  \
-         _tests_run, _ok, _failed);
+         _tests_run, _ok, _failed);                                            \
+  return (int)_failed;
 
-#define DTEST_INFO(s) printf("\t\t%s\n", TMSG(MODE_BOLD, COLOR_BLUE, #s));
+#define DTEST_INFO(s) printf("\t%s\n", TMSG(MODE_BOLD, COLOR_BLUE, #s));
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \

@@ -2,4 +2,4 @@
 *.d
 tmp
 bin
-dtest/unit
+dtest/output

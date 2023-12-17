@@ -34,5 +34,4 @@ int main() {
   DTEST_EXPECT_FALSE(compare(NAN, NAN));
 
   DTEST_UNIT_END
-  return 0;
 }
