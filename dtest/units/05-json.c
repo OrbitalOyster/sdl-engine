@@ -15,6 +15,5 @@ int main() {
   INFOF("Token to string: %s", s);
   destroyToken(token);
   free(s);
-  DTEST_UNIT_END
-  return 0;
+  DTEST_UNIT_END;
 }

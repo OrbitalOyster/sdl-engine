@@ -7,5 +7,5 @@ int main() {
   DTEST_INFO("Supposed to fail");
   DTEST_EXPECT_TRUE(1 + 1 == 3);
   DTEST_EXPECT_FALSE(1 * 2 == 3);
-  DTEST_UNIT_END
+  DTEST_UNIT_END;
 }

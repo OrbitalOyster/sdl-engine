@@ -34,6 +34,5 @@ int main() {
   INFO2F("%u", getNextLFSR(&state, taps));
   INFO2F("%u", getNextLFSR(&state, taps));
   INFO2F("%u", getNextLFSR(&state, taps));
-  DTEST_UNIT_END
-  return 0;
+  DTEST_UNIT_END;
 }

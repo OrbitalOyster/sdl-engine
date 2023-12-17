@@ -44,6 +44,5 @@ int main() {
 
   destroyWTree(tree);
 
-  DTEST_UNIT_END
-  return 0;
+  DTEST_UNIT_END;
 }

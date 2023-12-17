@@ -33,5 +33,5 @@ int main() {
   DTEST_EXPECT_FALSE(compare(-INFINITY, NAN));
   DTEST_EXPECT_FALSE(compare(NAN, NAN));
 
-  DTEST_UNIT_END
+  DTEST_UNIT_END;
 }

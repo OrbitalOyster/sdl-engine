@@ -13,6 +13,5 @@ int main() {
   WARNF("Formatted warning message: %s", "hello");
   ERRF(99, "Error: %s", "99");
   // Should not get here
-  DTEST_UNIT_END
-  return 0;
+  DTEST_UNIT_END;
 }

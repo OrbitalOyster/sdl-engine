@@ -83,6 +83,5 @@ int main() {
   free(oyster);
   destroyWTree(tree);
   destroyKeys();
-  DTEST_UNIT_END
-  return 0;
+  DTEST_UNIT_END;
 }

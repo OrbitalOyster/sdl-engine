@@ -88,6 +88,6 @@ int main() {
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   destroyEntities(entities, MAX_ARR_SIZE);
-  DTEST_UNIT_END
+  DTEST_UNIT_END;
   return 0;
 }
