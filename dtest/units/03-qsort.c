@@ -1,7 +1,6 @@
 // obj/utils/qsort.o
 // 0
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "utils/qsort.h"
@@ -58,7 +57,7 @@ void destroyEntities(struct Entity **arr, int size) {
   free(arr);
 }
 
-int entitySortFunc(void **arr, int i1, int i2) {
+int cmpr(void **arr, int i1, int i2) {
   return ((struct Entity *)arr[i1])->b < ((struct Entity *)arr[i2])->b;
 }
 
@@ -69,25 +68,24 @@ int main() {
   int size = 10;
   fill10(entities);
   DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
-  sort((void **)entities, 0, size - 1, entitySortFunc);
+  sort((void **)entities, 0, size - 1, cmpr);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
-  sort((void **)entities, 0, size - 1, entitySortFunc);
+  sort((void **)entities, 0, size - 1, cmpr);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   size = 2;
   fill2(entities);
   DTEST_EXPECT_FALSE(checkEntitiesSorted(entities, size));
-  sort((void **)entities, 0, size - 1, entitySortFunc);
+  sort((void **)entities, 0, size - 1, cmpr);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
-  sort((void **)entities, 0, size - 1, entitySortFunc);
+  sort((void **)entities, 0, size - 1, cmpr);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   size = 1;
   fill1(entities);
-  sort((void **)entities, 0, size - 1, entitySortFunc);
+  sort((void **)entities, 0, size - 1, cmpr);
   DTEST_EXPECT_TRUE(checkEntitiesSorted(entities, size));
 
   destroyEntities(entities, MAX_ARR_SIZE);
   DTEST_UNIT_END;
-  return 0;
 }

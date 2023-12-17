@@ -1,74 +1,63 @@
 #include "utils/qsort.h"
 
-void swap(void **arr, int i1, int i2) {
+static void swap(void **arr, int i1, int i2) {
   void *tmp = arr[i1];
   arr[i1] = arr[i2];
   arr[i2] = tmp;
 }
 
-int getPivot(void **arr, int i1, int i2) {
+static int get_pivot(void **arr, int i1, int i2) {
+  // Insert any pivot-finding implementation
   (void)(arr && i1 && i2);
   return i2;
 }
 
-int getLeftInd(void **arr, int pivotInd, int i1, int i2,
-               int (*sortFunc)(void **arr, int i1, int i2)) {
+static int get_l_ind(void **arr, int pivot_ind, int i1, int i2,
+                     int (*cmpr)(void **arr, int i1, int i2)) {
   int i = i1;
   while (i <= i2)
-    if (!sortFunc(arr, i, pivotInd))
+    if (!cmpr(arr, i, pivot_ind))
       return i;
     else
       i++;
   return i;
 }
 
-int getRightInd(void **arr, int pivotInd, int i1, int i2,
-                int (*sortFunc)(void **arr, int i1, int i2)) {
+static int get_r_ind(void **arr, int pivot_ind, int i1, int i2,
+                     int (*cmpr)(void **arr, int i1, int i2)) {
   int i = i2;
   while (i >= i1)
-    if (sortFunc(arr, i, pivotInd))
+    if (cmpr(arr, i, pivot_ind))
       return i;
     else
       i--;
   return i;
 }
 
-void step(void **arr, int i1, int i2,
-          int (*sortFunc)(void **arr, int i1, int i2)) {
+static void step(void **arr, int i1, int i2,
+                 int (*cmpr)(void **arr, int i1, int i2)) {
   // Nothing to sort
   if (i1 >= i2)
     return;
-
-  // Just two elements left
-  if (i1 + 1 == i2) {
-    if (!sortFunc(arr, i1, i2))
-      swap(arr, i1, i2);
-    return;
-  }
-
   // Get pivot, move it out of the way
-  int pivotInd = getPivot(arr, i1, i2);
-  swap(arr, i2, pivotInd);
-  pivotInd = i2;
-
-  int leftInd = i1;
-  int rightInd = i2 - 1;
-
-  int done = 0;
-  while (!done) {
-    leftInd = getLeftInd(arr, pivotInd, i1, i2 - 1, sortFunc);
-    rightInd = getRightInd(arr, pivotInd, i1, i2 - 1, sortFunc);
-    if (leftInd > rightInd) {
-      swap(arr, leftInd, pivotInd);
-      done = 1;
-    } else
-      swap(arr, leftInd, rightInd);
+  int pivot_ind = get_pivot(arr, i1, i2);
+  swap(arr, i2, pivot_ind);
+  pivot_ind = i2;
+  // Set new bounds
+  int l_ind = i1;
+  int r_ind = i2 - 1;
+  while (l_ind <= r_ind) {
+    l_ind = get_l_ind(arr, pivot_ind, i1, i2 - 1, cmpr);
+    r_ind = get_r_ind(arr, pivot_ind, i1, i2 - 1, cmpr);
+    if (l_ind <= r_ind)
+      swap(arr, l_ind, r_ind);
   }
-  step(arr, i1, leftInd - 1, sortFunc);
-  step(arr, leftInd + 1, i2, sortFunc);
+  // Bring pivot back, repeat the process
+  swap(arr, l_ind, pivot_ind);
+  step(arr, i1, l_ind - 1, cmpr);
+  step(arr, l_ind + 1, i2, cmpr);
 }
 
-void sort(void **arr, int i1, int i2,
-          int (*sortFunc)(void **arr, int i1, int i2)) {
-  step(arr, i1, i2, sortFunc);
+void sort(void **arr, int i1, int i2, int (*cmpr)(void **arr, int i1, int i2)) {
+  step(arr, i1, i2, cmpr);
 }
