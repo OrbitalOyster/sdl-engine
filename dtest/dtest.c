@@ -7,7 +7,7 @@
 
 #include "utils/tmodes.h"
 
-// Hackery for nested macro parameters
+// Hackery for including macros within macros
 #define _dinclude(f) #f
 #define dinclude(f) _dinclude(f)
 
@@ -27,6 +27,8 @@
   return (int)_failed;
 
 #define DTEST_INFO(s) printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n");
+
+#define DTEST_INFOF(s, ...) printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n", __VA_ARGS__);
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \

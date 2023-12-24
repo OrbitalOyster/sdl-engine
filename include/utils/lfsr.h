@@ -1,5 +1,5 @@
 /*
- * Linear-feedback shift register implementation
+ * Linear-feedback shift register RNG implementation
  */
 
 #ifndef LFSR_H

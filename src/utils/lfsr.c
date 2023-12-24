@@ -25,12 +25,9 @@ LFSR_TYPE lfsr(LFSR_TYPE *state, LFSR_TYPE taps) {
   LFSR_TYPE result = 0;
   uint8_t feedback = 0;
   for (uint8_t i = 0; i < SIZE; i++) {
-    result = (LFSR_TYPE)(result << 1);
-    result |= (*state & 1);
+    result = (LFSR_TYPE)(result << 1) | (*state & 1);
     feedback = get_feedback(*state, taps);
-    *state >>= 1;
-    *state = (LFSR_TYPE)(*state | (LEFT_BIT * feedback));
+    *state = (LFSR_TYPE)(*state >> 1 | (LEFT_BIT * feedback));
   }
-
   return result;
 }
