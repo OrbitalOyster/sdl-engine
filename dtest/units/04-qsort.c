@@ -1,9 +1,10 @@
-// obj/utils/qsort.o obj/utils/lfsr.o
+// obj/utils/qsort.o obj/utils/dstrings.o obj/utils/lfsr.o
 // 0
 #include "utils/qsort.h"
 
 #include <stdlib.h>
 
+#include "utils/dstrings.h"
 #include "utils/lfsr.h"
 
 struct Entity {
@@ -44,19 +45,15 @@ int main() {
   DTEST_UNIT_START("Qsort test");
   struct Entity **arr;
   unsigned int size;
-  unsigned int state = 12345;
+  unsigned int state = 1234567890;
   unsigned int taps = 61680;
   
-
-  // size = 1000;
-  // DTEST_INFOF("%u", test);
-
-  for (unsigned int j = 0; j < 100; j++) {
+  for (unsigned int j = 0; j < 5; j++) {
     size = lfsr(&state, taps);
-    DTEST_INFOF("Testing array size %u", size);
+    DTEST_INFOF("LSFR: %u (%s)", size, uint_to_binary(size));
     size >>= 24;
     if (size < 5) continue;
-    DTEST_INFOF("Testing array size %u", size);
+//    DTEST_INFOF("Testing array size %u (%s)", size, uint_to_binary(size));
     arr = calloc(size, sizeof(struct Entity *));
     for (unsigned int i = 0; i < size; i++) {
       unsigned int r = lfsr(&state, taps);

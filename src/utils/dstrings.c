@@ -20,7 +20,7 @@ char *uint_to_binary(unsigned int n) {
     n >>= 1;
   } while (p2[pos] <= nb);
 
-  char *result = calloc(pos, sizeof(char));
+  char *result = calloc(pos + 1, sizeof(char));
   for (unsigned int i = 0; i < pos; i++)
     result[i] = tmp[pos - 1 - i];
 

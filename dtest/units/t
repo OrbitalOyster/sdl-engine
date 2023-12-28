@@ -9,4 +9,5 @@ int main() {
   unsigned int n = 255;
   char *s = uint_to_binary(n);
   INFOF("Result: %s", s);
+  free(s);
 }
