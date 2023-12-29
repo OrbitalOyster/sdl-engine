@@ -48,13 +48,14 @@ int main() {
   unsigned int state = 1234567890;
   unsigned int taps = 61680;
   
-  for (unsigned int j = 0; j < 5; j++) {
+  for (unsigned int j = 0; j < 50; j++) {
     size = lfsr(&state, taps);
-    DTEST_INFOF("LSFR: %u (%s)", size, uint_to_binary(size));
-    size >>= 24;
+    size &= 4095; // 1111 1111 1111
     if (size < 5) continue;
-//    DTEST_INFOF("Testing array size %u (%s)", size, uint_to_binary(size));
+    DTEST_INFOF("Testing array size %u", size);
     arr = calloc(size, sizeof(struct Entity *));
+    if (!arr)
+      DTEST_INFO("Calloc failed");
     for (unsigned int i = 0; i < size; i++) {
       unsigned int r = lfsr(&state, taps);
       arr[i] = create_entity(1, r, "hello", 0.1);
