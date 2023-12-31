@@ -6,12 +6,12 @@
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
 #define WTREE_MAX_WORD_LENGTH 64
 
-struct WTree *createWTree();
-void expandWTree(struct WTree *tree, char *word, void *endpoint);
-unsigned int getWTreeSize(struct WTree *tree);
-void sortWTree(struct WTree *tree);
-void *getWTreeEndpoint(struct WTree *tree, char *word);
-char **getWTreeWords(struct WTree *tree);
-void destroyWTree(struct WTree *tree);
+struct WTree *create_wtree();
+void expand_wtree(struct WTree *wtree, char *word, void *endpoint);
+unsigned int get_wtree_size(struct WTree *wtree);
+void sort_wtree(struct WTree *wtree);
+void *get_wtree_endpoint(struct WTree *wtree, char *word);
+char **get_wtree_words(struct WTree *wtree);
+void destroy_wtree(struct WTree *wtree);
 
 #endif /* WTREE_H */

@@ -1,10 +1,11 @@
 #include "utils/qsort.h"
 
-static void swap(void **arr, int i1, int i2) {
-  void *tmp = arr[i1];
-  arr[i1] = arr[i2];
-  arr[i2] = tmp;
-}
+#define SWAP(arr, i1, i2)                                                      \
+  {                                                                            \
+    void *tmp = arr[i1];                                                       \
+    arr[i1] = arr[i2];                                                         \
+    arr[i2] = tmp;                                                             \
+  }
 
 static int get_pivot(void **arr, int i1, int i2) {
   // Insert any pivot-finding implementation
@@ -41,7 +42,7 @@ static void step(void **arr, int i1, int i2,
     return;
   // Get pivot, move it out of the way
   int pivot_ind = get_pivot(arr, i1, i2);
-  swap(arr, i2, pivot_ind);
+  SWAP(arr, i2, pivot_ind);
   pivot_ind = i2;
   // Set new bounds
   int l_ind = i1;
@@ -50,10 +51,10 @@ static void step(void **arr, int i1, int i2,
     l_ind = get_l_ind(arr, pivot_ind, i1, i2 - 1, cmpr);
     r_ind = get_r_ind(arr, pivot_ind, i1, i2 - 1, cmpr);
     if (l_ind <= r_ind)
-      swap(arr, l_ind, r_ind);
+      SWAP(arr, l_ind, r_ind);
   }
   // Bring pivot back, repeat the process
-  swap(arr, l_ind, pivot_ind);
+  SWAP(arr, l_ind, pivot_ind);
   step(arr, i1, l_ind - 1, cmpr);
   step(arr, l_ind + 1, i2, cmpr);
 }

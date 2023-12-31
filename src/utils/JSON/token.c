@@ -19,9 +19,7 @@ struct Token *createToken(enum TokenType type, union TokenValue value) {
 
 enum TokenType getTokenType(struct Token *token) { return token->type; }
 
-union TokenValue getTokenValue(struct Token *token) {
-  return token->value;
-}
+union TokenValue getTokenValue(struct Token *token) { return token->value; }
 
 struct Token *createUndefinedToken() {
   struct Token *result = calloc(1, sizeof(struct Token));

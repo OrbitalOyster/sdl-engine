@@ -42,7 +42,7 @@ int cmpr(void **arr, int i1, int i2) {
 }
 
 int main() {
-  DTEST_UNIT_START("Qsort test");
+  DTEST_UNIT_START("Qsort");
   struct Entity **arr;
   unsigned int size;
   unsigned int state = 1234567890;
