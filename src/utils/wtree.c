@@ -76,7 +76,7 @@ static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
   parent->size++;
   parent->children.nodes = realloc(parent->children.nodes,
                                    parent->size * sizeof(struct WTreeNode *));
-  if (parent->children.nodes = NULL)
+  if (parent->children.nodes == NULL)
     ERR(1, "Out of memory");
   parent->children.nodes[parent->size - 1] = child;
   return child;
