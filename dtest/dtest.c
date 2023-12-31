@@ -3,6 +3,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 
 #include "utils/tmodes.h"
@@ -28,7 +29,8 @@
 
 #define DTEST_INFO(s) printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n");
 
-#define DTEST_INFOF(s, ...) printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n", __VA_ARGS__);
+#define DTEST_INFOF(s, ...)                                                    \
+  printf("\t\t* " TMSG(MODE_BOLD, COLOR_BLUE, s) " *\n", __VA_ARGS__);
 
 #define DTEST_EVAL_TIME(s)                                                     \
   {                                                                            \
@@ -90,6 +92,24 @@
     unsigned int _result = s;                                                  \
     printf("Result: %u | ", _result);                                          \
     if (_result == uint) {                                                     \
+      _ok++;                                                                   \
+      printf(TMSG(MODE_BOLD, COLOR_GREEN, "OK\n"));                            \
+    } else {                                                                   \
+      _failed++;                                                               \
+      printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
+    }                                                                          \
+    fflush(stdout);                                                            \
+    _tests_run++;                                                              \
+  }
+
+#define DTEST_EXPECT_STRING(_test, _str)                                       \
+  {                                                                            \
+    printf("\t\tTest: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT,                   \
+                             #_test) " | Expected: %s | ",                     \
+           #_str);                                                             \
+    char *_result = _test;                                                     \
+    printf("Result: \"%s\" | ", _result);                                      \
+    if (!strcmp(_result, _str)) {                                              \
       _ok++;                                                                   \
       printf(TMSG(MODE_BOLD, COLOR_GREEN, "OK\n"));                            \
     } else {                                                                   \
