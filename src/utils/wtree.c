@@ -112,6 +112,23 @@ static void split_node(struct WTreeNode *node, unsigned int n) {
   node->children.nodes[0] = tail;
 }
 
+// Joins node with his only child
+static void join_nodes(struct WTreeNode *node) {
+  INFOF("Joining %s", node->chunk);
+  struct WTreeNode *child = node->children.nodes[0];
+  INFOF("Child node: %s", child->chunk);
+  node->chunk =
+      realloc(node->chunk,
+              (strlen(node->chunk) + strlen(child->chunk) + 1) * sizeof(char));
+  if (node->chunk == NULL)
+    ERR(1, "Out of memory");
+  strcat(node->chunk, child->chunk);
+  node->size = 0;
+  free(node->children.nodes);
+  INFOF("Join result %s", node->chunk);
+  destroy_node(child);
+}
+
 void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   INFOF("Expanding by %s", word);
   // Tail length, + 1 for null char
@@ -164,6 +181,40 @@ struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   return NULL;
 }
 
+void shrink_wtree(struct WTree *wtree, char *word) {
+  INFOF("Shrinking by %s", word);
+  struct WTreeNode *to_delete = search_wtree(wtree, word);
+  if (to_delete == NULL)
+    ERRF(1, "Word not found: %s", word);
+  // Delete node from parent's array
+  struct WTreeNode *parent = to_delete->parent;
+  int i = 0, found = 0;
+  while (i < parent->size) {
+    parent->children.nodes[i] = parent->children.nodes[i + found];
+    if (parent->children.nodes[i] == to_delete) {
+      found = 1;
+      parent->size--;
+    } else
+      i++;
+  }
+  destroy_node(to_delete);
+  INFOF("New parent size: %u", parent->size);
+
+  if (parent->size)
+    parent->children.nodes = realloc(parent->children.nodes,
+                                     parent->size * sizeof(struct WTreeNode *));
+  else
+    free(parent->children.nodes);
+  if (parent->children.nodes == NULL && parent->parent != NULL)
+    ERR(1, "Out of memory");
+  // If not root and parent have 1 child end child is is endpoint
+  if (parent->parent != NULL && parent->size == 1 && parent->children.nodes[0]->size == 0) {
+    INFO("Gotta join");
+    join_nodes(parent);
+  }
+  wtree->size--;
+}
+
 void *get_wtree_endpoint(struct WTree *wtree, char *word) {
   struct WTreeNode *node = search_wtree(wtree, word);
   if (!node)
@@ -194,6 +245,9 @@ static void get_wtree_word(struct WTreeNode *node, char *word, unsigned int *n,
 }
 
 char **get_wtree_words(struct WTree *wtree) {
+  // Edge case
+  if (!wtree->size)
+    return NULL;
   char **result = calloc(wtree->size, sizeof(char *));
   if (result == NULL)
     ERR(1, "Out of memory");

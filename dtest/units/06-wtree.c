@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "utils/wtree.h"
+#include "utils/debug.h"
 
 struct Endpoint {
   int a;
@@ -23,8 +24,10 @@ int main() {
   expand_wtree(wtree, "abc", &ep1);
   expand_wtree(wtree, "abcxyz", &ep2);
   expand_wtree(wtree, "abcxxx", NULL);
+  expand_wtree(wtree, "abcxzz", NULL);
   unsigned int size = get_wtree_size(wtree);
-  DTEST_EXPECT_UINT(size, 5);
+  DTEST_INFOF("Tree size: %u", size);
+  DTEST_EXPECT_UINT(size, 6);
 
   sort_wtree(wtree);
   DTEST_INFO("Tree sorted");
@@ -33,6 +36,16 @@ int main() {
   DTEST_EXPECT_STRING(ep->c, "ep1");
   ep = get_wtree_endpoint(wtree, "abcxyz");
   DTEST_EXPECT_STRING(ep->c, "ep2");
+
+  shrink_wtree(wtree, "abcxyz");
+  shrink_wtree(wtree, "ccc");
+  shrink_wtree(wtree, "abc");
+  shrink_wtree(wtree, "abcdef");
+  shrink_wtree(wtree, "abcxxx");
+
+  size = get_wtree_size(wtree);
+  DTEST_INFOF("Tree size: %u", size);
+  DTEST_EXPECT_UINT(size, 1);
 
   destroy_wtree(wtree);
   DTEST_UNIT_END;
