@@ -140,32 +140,57 @@ int skip_white_spaces_F(FILE *f, int expecting_comma) {
   } while (1);
 }
 
+int skip_spaces_F(FILE *f) {
+  int c;
+  do {
+    c = fgetc(f);
+    if (is_white_space(c))
+      continue;
+    if (c == EOF)
+      ERR(1, "Unexpected EOF");
+    return c;
+  } while (1);
+}
+
+int skip_to_next_object_token_F(FILE *f) {
+  int c = skip_spaces_F(f);
+  // Comma or '}'
+  switch (c) {
+  case ',':
+    // Must be '"'
+    c = skip_spaces_F(f);
+    if (c != '"')
+      ERRF(1, "Expected key, got [%c]", c);
+    return c;
+  case '}':
+    // Done
+    return c;
+  default:
+    // Error
+    ERRF(1, "Expected ',' or '}', got [%c]", c);
+  }
+}
+
 struct TokenMap *parse_object_F(FILE *f) {
   struct TokenMap *result = create_token_map();
-  int done = 0, expecting_comma = 0, c;
-  do {
-    c = skip_white_spaces_F(f, expecting_comma);
-    if (c == '}') {
-      done = 1;
-    }
-    else {
-      // Key
-      if (c != '"')
-        ERRF(1, "Expected key, got [%c]", c);
-      char *key = read_string_F(f);
-      c = skip_white_spaces_F(f, 0);
-      // Colon
-      if (c != ':')
-        ERRF(1, "Expected ':', got [%c]", c);
-      c = skip_white_spaces_F(f, 0);
-      // Value
-      struct Token *new_token = parse_token_F(f, c);
-      // Add to object
-      expand_token_map(result, key, new_token);
-      free(key);
-      expecting_comma = 1;
-    }
-  } while (!done);
+  int c = skip_spaces_F(f);
+  while (c != '}') {
+    // Key
+    if (c != '"')
+      ERRF(1, "Expected key, got [%c]", c);
+    char *key = read_string_F(f);
+    c = skip_spaces_F(f);
+    // Colon
+    if (c != ':')
+      ERRF(1, "Expected ':', got [%c]", c);
+    c = skip_spaces_F(f);
+    // Value
+    struct Token *new_token = parse_token_F(f, c);
+    // Add to object
+    expand_token_map(result, key, new_token);
+    free(key);
+    c = skip_to_next_object_token_F(f);
+  }
   return result;
 }
 
@@ -233,7 +258,7 @@ struct Token *parse_token_F(FILE *f, int c) {
 struct Token *read_json_file(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
-  int c = skip_white_spaces_F(f, 0);
+  int c = skip_spaces_F(f);
   struct Token *result = parse_token_F(f, c);
   fclose(f);
   return result;
