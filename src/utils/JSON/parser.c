@@ -9,13 +9,13 @@ const char *TRUE_STRING = "true";
 const char *FALSE_STRING = "false";
 const char *NULL_STRING = "null";
 
-struct Token *parse_token_F(FILE *f, int c);
+static struct Token *parse_token_F(FILE *f, int c);
 
-int is_white_space(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
+static int is_whitespace(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
 
-int is_digit(int c) { return (c >= '0' && c <= '9'); }
+static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
-enum TokenType identify_token(int c) {
+static enum TokenType identify_token(int c) {
   enum TokenType result = Undefined;
   switch (c) {
   case '{':
@@ -50,7 +50,7 @@ enum TokenType identify_token(int c) {
   return result;
 }
 
-char *read_string_F(FILE *f) {
+static char *read_string_F(FILE *f) {
   char *string = calloc(MAX_STRING_LENGTH, sizeof(char));
   int c, n = 0, done = 0;
   do {
@@ -66,7 +66,7 @@ char *read_string_F(FILE *f) {
   return string;
 }
 
-int read_number_F(FILE *f) {
+static int read_number_F(FILE *f) {
   char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
   int c, n = 0;
   int done = 0;
@@ -86,7 +86,7 @@ int read_number_F(FILE *f) {
   return result;
 }
 
-int read_boolean_F(FILE *f) {
+static int read_boolean_F(FILE *f) {
   int c, n = 0, done = 0, reading_true = 0;
   fseek(f, -1, SEEK_CUR);
   do {
@@ -111,7 +111,7 @@ int read_boolean_F(FILE *f) {
   return reading_true;
 }
 
-void read_null_F(FILE *f) {
+static void read_null_F(FILE *f) {
   int c;
   fseek(f, -1, SEEK_CUR);
   for (int i = 0; i < 4; i++) {
@@ -122,68 +122,48 @@ void read_null_F(FILE *f) {
   }
 }
 
-int skip_white_spaces_F(FILE *f, int expecting_comma) {
+static int skip_whitespaces_F(FILE *f) {
   int c;
   do {
     c = fgetc(f);
-    if (is_white_space(c))
-      continue;
-    if (c == ',') {
-      if (!expecting_comma)
-        ERR(1, "Unexpected ','");
-      expecting_comma = 0;
-      continue;
-    }
-    if (c == EOF)
-      ERR(1, "Unexpected EOF");
-    return c;
-  } while (1);
+  } while (is_whitespace(c));
+  return c;
 }
 
-int skip_spaces_F(FILE *f) {
-  int c;
-  do {
-    c = fgetc(f);
-    if (is_white_space(c))
-      continue;
-    if (c == EOF)
-      ERR(1, "Unexpected EOF");
-    return c;
-  } while (1);
-}
-
-int skip_to_next_object_token_F(FILE *f) {
-  int c = skip_spaces_F(f);
+static int skip_to_next_object_token_F(FILE *f) {
+  int c = skip_whitespaces_F(f);
   // Comma or '}'
   switch (c) {
   case ',':
     // Must be '"'
-    c = skip_spaces_F(f);
+    c = skip_whitespaces_F(f);
     if (c != '"')
       ERRF(1, "Expected key, got [%c]", c);
     return c;
   case '}':
     // Done
     return c;
+  case EOF:
+    ERR(1, "Unexpected EOF");
   default:
     // Error
     ERRF(1, "Expected ',' or '}', got [%c]", c);
   }
 }
 
-struct TokenMap *parse_object_F(FILE *f) {
+static struct TokenMap *parse_object_F(FILE *f) {
   struct TokenMap *result = create_token_map();
-  int c = skip_spaces_F(f);
+  int c = skip_whitespaces_F(f);
   while (c != '}') {
     // Key
     if (c != '"')
       ERRF(1, "Expected key, got [%c]", c);
     char *key = read_string_F(f);
-    c = skip_spaces_F(f);
+    c = skip_whitespaces_F(f);
     // Colon
     if (c != ':')
       ERRF(1, "Expected ':', got [%c]", c);
-    c = skip_spaces_F(f);
+    c = skip_whitespaces_F(f);
     // Value
     struct Token *new_token = parse_token_F(f, c);
     // Add to object
@@ -194,32 +174,39 @@ struct TokenMap *parse_object_F(FILE *f) {
   return result;
 }
 
-struct Token *parse_next_array_element_F(FILE *f, int expecting_comma) {
-  int c = skip_white_spaces_F(f, expecting_comma);
-  if (c == ']')
-    return NULL;
-  INFOF("Read char: %i [%c]", c, c);
-  struct Token *token = parse_token_F(f, c);
-  return token;
+static int skip_to_next_array_token_F(FILE *f) {
+  int c = skip_whitespaces_F(f);
+  // Comma or ']'
+  switch (c) {
+  case ',':
+    // Must not be ',' or ']'
+    c = skip_whitespaces_F(f);
+    if (c == ',' || c == ']')
+      ERRF(1, "Expected value, got [%c]", c);
+    return c;
+  case ']':
+    // Done
+    return c;
+  case EOF:
+    ERR(1, "Unexpected EOF");
+  default:
+    // Error
+    ERRF(1, "Expected ',' or ']', got [%c]", c);
+  }
 }
 
-struct TokenMap *parse_array_F(FILE *f) {
+static struct TokenMap *parse_array_F(FILE *f) {
   struct TokenMap *result = create_token_map();
-  int done = 0;
-  int expecting_comma = 0;
-  do {
-    struct Token *next_token = parse_next_array_element_F(f, expecting_comma);
-    if (next_token == NULL)
-      done = 1;
-    else {
-      expandTokenMapN(result, next_token);
-      expecting_comma = 1;
-    }
-  } while (!done);
+  int c = skip_whitespaces_F(f);
+  while (c != ']') {
+    struct Token *next_token = parse_token_F(f, c);
+    expandTokenMapN(result, next_token);
+    c = skip_to_next_array_token_F(f);
+  }
   return result;
 }
 
-struct Token *parse_token_F(FILE *f, int c) {
+static struct Token *parse_token_F(FILE *f, int c) {
   union TokenValue value;
   enum TokenType type = identify_token(c);
   switch (type) {
@@ -258,7 +245,7 @@ struct Token *parse_token_F(FILE *f, int c) {
 struct Token *read_json_file(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
-  int c = skip_spaces_F(f);
+  int c = skip_whitespaces_F(f);
   struct Token *result = parse_token_F(f, c);
   fclose(f);
   return result;
