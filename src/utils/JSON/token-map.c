@@ -12,16 +12,16 @@ struct TokenMap {
   struct WTree *tree;
 };
 
-struct TokenMap *createTokenMap() {
+struct TokenMap *create_token_map() {
   struct TokenMap *result = calloc(1, sizeof(struct TokenMap));
   *result =
       (struct TokenMap){.size = 0, .content = NULL, .tree = create_wtree()};
   return result;
 }
 
-unsigned int getTokenMapSize(struct TokenMap *map) { return map->size; }
+unsigned int get_token_map_size(struct TokenMap *map) { return map->size; }
 
-void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
+void expand_token_map(struct TokenMap *map, char *key, struct Token *token) {
   map->size++;
   map->content = realloc(map->content, map->size * sizeof(struct Token *));
   map->content[map->size - 1] = token;
@@ -31,29 +31,29 @@ void expandTokenMap(struct TokenMap *map, char *key, struct Token *token) {
 void expandTokenMapN(struct TokenMap *map, struct Token *token) {
   char *key = calloc(MAX_KEY_LENGTH, sizeof(char));
   snprintf(key, MAX_KEY_LENGTH, "%i", map->size);
-  expandTokenMap(map, key, token);
+  expand_token_map(map, key, token);
   free(key);
 }
 
-char **getTokenMapKeys(struct TokenMap *map) {
+char **get_token_map_keys(struct TokenMap *map) {
   return get_wtree_words(map->tree);
 }
 
-struct Token *getTokenMapElement(struct TokenMap *map, unsigned int n) {
+struct Token *get_token_map_element(struct TokenMap *map, unsigned int n) {
   return map->content[n];
 }
 
-struct Token *readTokenMap(struct TokenMap *map, char *key) {
+struct Token *read_token_map(struct TokenMap *map, char *key) {
   struct Token *result = get_wtree_endpoint(map->tree, key);
   if (result == NULL)
-    result = createUndefinedToken();
+    result = create_undefined_token();
   return result;
 }
 
-void destroyTokenMap(struct TokenMap *map) {
+void destroy_token_map(struct TokenMap *map) {
   destroy_wtree(map->tree);
   for (unsigned int i = 0; i < map->size; i++)
-    destroyToken(map->content[i]);
+    destroy_token(map->content[i]);
   free(map->content);
   free(map);
 }

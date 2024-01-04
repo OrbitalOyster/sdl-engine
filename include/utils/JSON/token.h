@@ -15,22 +15,20 @@ union TokenValue {
   struct TokenMap *map;
 };
 
-struct Token *createToken(enum TokenType type, union TokenValue value);
-enum TokenType getTokenType(struct Token *token);
-union TokenValue getTokenValue(struct Token *token);
-struct Token *createUndefinedToken();
-struct Token *createObjectToken();
-struct Token *createArrayToken();
-struct Token *createNumberToken(int n);
-struct Token *createStringToken(char *s);
-struct Token *createBooleanToken(int b);
-struct Token *createNullToken();
-unsigned int getArrayTokenSize(struct Token *arr);
-struct Token *getArrayTokenElement(struct Token *arr, unsigned int n);
-void expandObjectToken(struct Token *obj, char *key, struct Token *token);
-void expandArrayToken(struct Token *arr, struct Token *token);
-char *objectTokenToString(struct TokenMap *map);
-char *tokenToString(struct Token *token);
-void destroyToken(struct Token *token);
+struct Token *create_token(enum TokenType type, union TokenValue value);
+enum TokenType get_token_type(struct Token *token);
+union TokenValue get_token_value(struct Token *token);
+struct Token *create_undefined_token();
+struct Token *create_object_token();
+struct Token *create_array_token();
+struct Token *create_number_token(int n);
+struct Token *create_string_token(char *s);
+struct Token *create_boolean_token(int b);
+struct Token *create_null_token();
+unsigned int get_array_token_size(struct Token *arr);
+struct Token *get_array_token_element(struct Token *arr, unsigned int n);
+void expand_object_token(struct Token *obj, char *key, struct Token *token);
+void expand_array_token(struct Token *arr, struct Token *token);
+void destroy_token(struct Token *token);
 
 #endif /* TOKEN_H */

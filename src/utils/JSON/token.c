@@ -1,6 +1,5 @@
 #include "utils/JSON/token.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "utils/JSON/tokenMap.h"
@@ -11,87 +10,87 @@ struct Token {
   union TokenValue value;
 };
 
-struct Token *createToken(enum TokenType type, union TokenValue value) {
+struct Token *create_token(enum TokenType type, union TokenValue value) {
   struct Token *result = calloc(1, sizeof(struct Token));
   *result = (struct Token){.type = type, .value = value};
   return result;
 }
 
-enum TokenType getTokenType(struct Token *token) { return token->type; }
+enum TokenType get_token_type(struct Token *token) { return token->type; }
 
-union TokenValue getTokenValue(struct Token *token) { return token->value; }
+union TokenValue get_token_value(struct Token *token) { return token->value; }
 
-struct Token *createUndefinedToken() {
+struct Token *create_undefined_token() {
   struct Token *result = calloc(1, sizeof(struct Token));
   *result = (struct Token){.type = Undefined};
   return result;
 }
 
-struct Token *createObjectToken() {
-  struct TokenMap *map = createTokenMap();
-  struct Token *result = createToken(Object, (union TokenValue){.map = map});
+struct Token *create_object_token() {
+  struct TokenMap *map = create_token_map();
+  struct Token *result = create_token(Object, (union TokenValue){.map = map});
   return result;
 }
 
-struct Token *createArrayToken() {
-  struct TokenMap *map = createTokenMap();
-  struct Token *result = createToken(Array, (union TokenValue){.map = map});
+struct Token *create_array_token() {
+  struct TokenMap *map = create_token_map();
+  struct Token *result = create_token(Array, (union TokenValue){.map = map});
   return result;
 }
 
-struct Token *createNumberToken(int n) {
-  struct Token *result = createToken(Number, (union TokenValue){.number = n});
+struct Token *create_number_token(int n) {
+  struct Token *result = create_token(Number, (union TokenValue){.number = n});
   return result;
 }
 
-struct Token *createStringToken(char *s) {
-  struct Token *result = createToken(String, (union TokenValue){.string = s});
+struct Token *create_string_token(char *s) {
+  struct Token *result = create_token(String, (union TokenValue){.string = s});
   return result;
 }
 
-struct Token *createBooleanToken(int b) {
+struct Token *create_boolean_token(int b) {
   struct Token *result =
-      createToken(Boolean, (union TokenValue){.boolean = !!b});
+      create_token(Boolean, (union TokenValue){.boolean = !!b});
   return result;
 }
 
-struct Token *createNullToken() {
+struct Token *create_null_token() {
   struct Token *result = calloc(1, sizeof(struct Token));
   *result = (struct Token){.type = Null};
   return result;
 }
 
-unsigned int getArrayTokenSize(struct Token *arr) {
+unsigned int get_array_token_size(struct Token *arr) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
-  return getTokenMapSize(arr->value.map);
+  return get_token_map_size(arr->value.map);
 }
 
-struct Token *getArrayTokenElement(struct Token *arr, unsigned int n) {
+struct Token *get_array_token_element(struct Token *arr, unsigned int n) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
-  return getTokenMapElement(arr->value.map, n);
+  return get_token_map_element(arr->value.map, n);
 }
 
-void expandObjectToken(struct Token *obj, char *key, struct Token *token) {
+void expand_object_token(struct Token *obj, char *key, struct Token *token) {
   if (obj->type != Object)
     ERR(1, "Unable to expand token");
-  expandTokenMap(obj->value.map, key, token);
+  expand_token_map(obj->value.map, key, token);
 }
 
-void expandArrayToken(struct Token *arr, struct Token *token) {
+void expand_array_token(struct Token *arr, struct Token *token) {
   if (arr->type != Array)
     ERR(1, "Unable to expand token");
-  unsigned int nextIndex = getArrayTokenSize(arr);
+  unsigned int next_index = get_array_token_size(arr);
   char *key = calloc(MAX_STRING_LENGTH, sizeof(char));
-  snprintf(key, MAX_STRING_LENGTH, "%i", nextIndex);
-  expandTokenMap(arr->value.map, key, token);
+  snprintf(key, MAX_STRING_LENGTH, "%i", next_index);
+  expand_token_map(arr->value.map, key, token);
   free(key);
 }
 
-void destroyToken(struct Token *token) {
+void destroy_token(struct Token *token) {
   if (token->type == Object || token->type == Array)
-    destroyTokenMap(token->value.map);
+    destroy_token_map(token->value.map);
   if (token->type == String)
     free(token->value.string);
   free(token);

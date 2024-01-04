@@ -6,10 +6,10 @@
 
 #include "utils/JSON/tokenMap.h"
 
-char *tokenMapToString(struct TokenMap *map, int keys);
+static char *token_map_to_string(struct TokenMap *map, int keys);
 
-char *objectTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map, 1);
+static char *object_token_to_string(struct TokenMap *map) {
+  char *s = token_map_to_string(map, 1);
   char *result = calloc(2 + strlen(s) + 1, sizeof(char));
   strcat(result, "{");
   strcat(result, s);
@@ -18,8 +18,8 @@ char *objectTokenToString(struct TokenMap *map) {
   return result;
 }
 
-char *arrayTokenToString(struct TokenMap *map) {
-  char *s = tokenMapToString(map, 0);
+static char *array_token_to_string(struct TokenMap *map) {
+  char *s = token_map_to_string(map, 0);
   char *result = calloc(2 + strlen(s) + 1, sizeof(char));
   strcat(result, "[");
   strcat(result, s);
@@ -28,17 +28,45 @@ char *arrayTokenToString(struct TokenMap *map) {
   return result;
 }
 
-char *tokenToString(struct Token *token) {
+static char *token_map_to_string(struct TokenMap *map, int nkeys) {
+  size_t size = 1;
+  char *result = calloc(size, sizeof(char));
+  char **keys = get_token_map_keys(map);
+  for (unsigned int i = 0; i < get_token_map_size(map); i++) {
+    char *key = keys[i];
+    char *value = token_to_string(get_token_map_element(map, i));
+    if (i) { // ", "
+      size += (2 + strlen(value)) * sizeof(char);
+      result = realloc(result, size);
+      strcat(result, ", ");
+    }
+    if (nkeys) {
+      size += (strlen(key) + 2) * sizeof(char);
+      result = realloc(result, size);
+      strcat(result, key);
+      strcat(result, ": ");
+    }
+    size += strlen(value) * sizeof(char);
+    result = realloc(result, size);
+    strcat(result, value);
+    free(value);
+    free(key);
+  }
+  free(keys);
+  return result;
+}
+
+char *token_to_string(struct Token *token) {
   char *result = NULL;
-  union TokenValue value = getTokenValue(token);
-  switch (getTokenType(token)) {
+  union TokenValue value = get_token_value(token);
+  switch (get_token_type(token)) {
   case Undefined:
     break;
   case Object:
-    result = objectTokenToString(value.map);
+    result = object_token_to_string(value.map);
     break;
   case Array:
-    result = arrayTokenToString(value.map);
+    result = array_token_to_string(value.map);
     break;
   case Number:
     result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
@@ -60,34 +88,6 @@ char *tokenToString(struct Token *token) {
     snprintf(result, 5, "%s", "null");
     break;
   }
-  return result;
-}
-
-char *tokenMapToString(struct TokenMap *map, int nkeys) {
-  size_t size = 1;
-  char *result = calloc(size, sizeof(char));
-  char **keys = getTokenMapKeys(map);
-  for (unsigned int i = 0; i < getTokenMapSize(map); i++) {
-    char *key = keys[i];
-    char *value = tokenToString(getTokenMapElement(map, i));
-    if (i) { // ", "
-      size += (2 + strlen(value)) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, ", ");
-    }
-    if (nkeys) {
-      size += (strlen(key) + 2) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, key);
-      strcat(result, ": ");
-    }
-    size += strlen(value) * sizeof(char);
-    result = realloc(result, size);
-    strcat(result, value);
-    free(value);
-    free(key);
-  }
-  free(keys);
   return result;
 }
 

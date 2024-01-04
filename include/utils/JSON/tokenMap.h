@@ -5,14 +5,13 @@
 
 struct TokenMap;
 
-struct TokenMap *createTokenMap();
-unsigned int getTokenMapSize(struct TokenMap *map);
-void expandTokenMap(struct TokenMap *map, char *key, struct Token *token);
+struct TokenMap *create_token_map();
+unsigned int get_token_map_size(struct TokenMap *map);
+void expand_token_map(struct TokenMap *map, char *key, struct Token *token);
 void expandTokenMapN(struct TokenMap *map, struct Token *token);
-char **getTokenMapKeys(struct TokenMap *map);
-struct Token *getTokenMapElement(struct TokenMap *map, unsigned int n);
-struct Token *readTokenMap(struct TokenMap *map, char *key);
-char *tokenMapToString(struct TokenMap *map, int keys);
-void destroyTokenMap(struct TokenMap *map);
+char **get_token_map_keys(struct TokenMap *map);
+struct Token *get_token_map_element(struct TokenMap *map, unsigned int n);
+struct Token *read_token_map(struct TokenMap *map, char *key);
+void destroy_token_map(struct TokenMap *map);
 
 #endif /* TOKEN_MAP_H */

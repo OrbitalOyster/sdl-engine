@@ -4,6 +4,6 @@
 #include "token.h"
 #include "tokenMap.h"
 
-struct Token *readFile(char *filename);
+struct Token *read_json_file(char *filename);
 
 #endif /* PARSER_H */

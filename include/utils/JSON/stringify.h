@@ -3,6 +3,6 @@
 
 #include "token.h"
 
-char *tokenToString(struct Token *token);
+char *token_to_string(struct Token *token);
 
 #endif /* STRINGIFY_H */

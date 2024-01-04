@@ -5,17 +5,17 @@
 
 #include "utils/debug.h"
 
-const char *trueString = "true";
-const char *falseString = "false";
-const char *nullString = "null";
+const char *TRUE_STRING = "true";
+const char *FALSE_STRING = "false";
+const char *NULL_STRING = "null";
 
-struct Token *parseTokenF(FILE *f, int c);
+struct Token *parse_token_F(FILE *f, int c);
 
-int isWhiteSpace(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
+int is_white_space(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
 
-int isDigit(int c) { return (c >= '0' && c <= '9'); }
+int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
-enum TokenType identifyToken(int c) {
+enum TokenType identify_token(int c) {
   enum TokenType result = Undefined;
   switch (c) {
   case '{':
@@ -39,7 +39,7 @@ enum TokenType identifyToken(int c) {
     INFO("Token: Null");
     break;
   default:
-    if (isDigit(c)) {
+    if (is_digit(c)) {
       if (c == '0')
         ERR(1, "Invalid number format");
       result = Number;
@@ -50,7 +50,7 @@ enum TokenType identifyToken(int c) {
   return result;
 }
 
-char *readStringF(FILE *f) {
+char *read_string_F(FILE *f) {
   char *string = calloc(MAX_STRING_LENGTH, sizeof(char));
   int c, n = 0, done = 0;
   do {
@@ -66,14 +66,14 @@ char *readStringF(FILE *f) {
   return string;
 }
 
-int readNumberF(FILE *f) {
+int read_number_F(FILE *f) {
   char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
   int c, n = 0;
   int done = 0;
   fseek(f, -1, SEEK_CUR);
   do {
     c = fgetc(f);
-    if (!isDigit(c))
+    if (!is_digit(c))
       done = 1;
     else
       number[n++] = (char)c;
@@ -86,51 +86,52 @@ int readNumberF(FILE *f) {
   return result;
 }
 
-int readBooleanF(FILE *f) {
-  int c, n = 0, done = 0, readingTrue = 0;
+int read_boolean_F(FILE *f) {
+  int c, n = 0, done = 0, reading_true = 0;
   fseek(f, -1, SEEK_CUR);
   do {
     c = fgetc(f);
     INFOF("Read char: %i [%c]", c, c);
     if (!n && c == 't')
-      readingTrue = 1;
-    if (readingTrue) {
-      if (c != trueString[n])
+      reading_true = 1;
+    if (reading_true) {
+      if (c != TRUE_STRING[n])
         ERRF(1, "Expected 'true', got '%c'", c);
       if (n == 3)
         done = 1;
     } else {
-      if (c != falseString[n])
+      if (c != FALSE_STRING[n])
         ERRF(1, "Expected 'false', got '%c'", c);
       if (n == 4)
         done = 1;
     }
     n++;
   } while (!done);
-  INFOF("Read Boolean: %i", readingTrue);
-  return readingTrue;
+  INFOF("Read Boolean: %i", reading_true);
+  return reading_true;
 }
 
-void readNullF(FILE *f) {
+void read_null_F(FILE *f) {
   int c;
   fseek(f, -1, SEEK_CUR);
   for (int i = 0; i < 4; i++) {
     c = fgetc(f);
     INFOF("Read char: %i [%c]", c, c);
-    if (c != nullString[i]) ERRF(1, "Expected 'null', got '%c'", c);
+    if (c != NULL_STRING[i])
+      ERRF(1, "Expected 'null', got '%c'", c);
   }
 }
 
-int skipWhiteSpacesF(FILE *f, int skipComma) {
+int skip_white_spaces_F(FILE *f, int expecting_comma) {
   int c;
   do {
     c = fgetc(f);
-    if (isWhiteSpace(c))
+    if (is_white_space(c))
       continue;
     if (c == ',') {
-      if (!skipComma)
+      if (!expecting_comma)
         ERR(1, "Unexpected ','");
-      skipComma = 0;
+      expecting_comma = 0;
       continue;
     }
     if (c == EOF)
@@ -139,102 +140,101 @@ int skipWhiteSpacesF(FILE *f, int skipComma) {
   } while (1);
 }
 
-struct TokenMap *parseObjectF(FILE *f) {
-  struct TokenMap *result = createTokenMap();
-  int done = 0;
-  int expectingComma = 0;
-  int c;
+struct TokenMap *parse_object_F(FILE *f) {
+  struct TokenMap *result = create_token_map();
+  int done = 0, expecting_comma = 0, c;
   do {
-    c = skipWhiteSpacesF(f, expectingComma);
-    if (c == '}')
+    c = skip_white_spaces_F(f, expecting_comma);
+    if (c == '}') {
       done = 1;
+    }
     else {
       // Key
       if (c != '"')
         ERRF(1, "Expected key, got [%c]", c);
-      char *key = readStringF(f);
-      c = skipWhiteSpacesF(f, 0);
+      char *key = read_string_F(f);
+      c = skip_white_spaces_F(f, 0);
       // Colon
       if (c != ':')
         ERRF(1, "Expected ':', got [%c]", c);
-      c = skipWhiteSpacesF(f, 0);
+      c = skip_white_spaces_F(f, 0);
       // Value
-      struct Token *newToken = parseTokenF(f, c);
+      struct Token *new_token = parse_token_F(f, c);
       // Add to object
-      expandTokenMap(result, key, newToken);
+      expand_token_map(result, key, new_token);
       free(key);
-      expectingComma = 1;
+      expecting_comma = 1;
     }
   } while (!done);
   return result;
 }
 
-struct Token *parseNextArrayElementF(FILE *f, int expectingComma) {
-  int c = skipWhiteSpacesF(f, expectingComma);
+struct Token *parse_next_array_element_F(FILE *f, int expecting_comma) {
+  int c = skip_white_spaces_F(f, expecting_comma);
   if (c == ']')
     return NULL;
   INFOF("Read char: %i [%c]", c, c);
-  struct Token *token = parseTokenF(f, c);
+  struct Token *token = parse_token_F(f, c);
   return token;
 }
 
-struct TokenMap *parseArrayF(FILE *f) {
-  struct TokenMap *result = createTokenMap();
+struct TokenMap *parse_array_F(FILE *f) {
+  struct TokenMap *result = create_token_map();
   int done = 0;
-  int expectingComma = 0;
+  int expecting_comma = 0;
   do {
-    struct Token *nextToken = parseNextArrayElementF(f, expectingComma);
-    if (nextToken == NULL)
+    struct Token *next_token = parse_next_array_element_F(f, expecting_comma);
+    if (next_token == NULL)
       done = 1;
     else {
-      expandTokenMapN(result, nextToken);
-      expectingComma = 1;
+      expandTokenMapN(result, next_token);
+      expecting_comma = 1;
     }
   } while (!done);
   return result;
 }
 
-struct Token *parseTokenF(FILE *f, int c) {
+struct Token *parse_token_F(FILE *f, int c) {
   union TokenValue value;
-  enum TokenType type = identifyToken(c);
+  enum TokenType type = identify_token(c);
   switch (type) {
   case Undefined:
     ERRF(1, "Unexpected character: %i [%c]", c, c);
     break;
   case Object:
     INFO("Processing Object...");
-    value.map = parseObjectF(f);
+    value.map = parse_object_F(f);
     break;
   case Array:
     INFO("Processing Array...");
-    value.map = parseArrayF(f);
+    value.map = parse_array_F(f);
     break;
   case Number:
     INFO("Processing Number...");
-    value.number = readNumberF(f);
+    value.number = read_number_F(f);
     break;
   case String:
     INFO("Processing String...");
-    value.string = readStringF(f);
+    value.string = read_string_F(f);
     break;
   case Boolean:
     INFO("Processing Boolean...");
-    value.boolean = readBooleanF(f);
+    value.boolean = read_boolean_F(f);
     break;
-   case Null:
+  case Null:
     INFO("Processing Null...");
-    readNullF(f);
+    read_null_F(f);
     break;
   }
-  struct Token *result = createToken(type, value);
+  struct Token *result = create_token(type, value);
   return result;
 }
 
-struct Token *readFile(char *filename) {
+struct Token *read_json_file(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
-  int c = skipWhiteSpacesF(f, 0);
-  struct Token *result = parseTokenF(f, c);
+  int c = skip_white_spaces_F(f, 0);
+  struct Token *result = parse_token_F(f, c);
   fclose(f);
   return result;
 }
