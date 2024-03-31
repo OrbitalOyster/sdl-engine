@@ -1,5 +1,6 @@
 #include "utils/JSON/token.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "utils/JSON/tokenMap.h"

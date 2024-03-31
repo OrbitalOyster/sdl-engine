@@ -13,7 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 500000000u
+#define NKEYS 5000000u
 #define KEYLENGTH 16u
 
 char **keys;
@@ -32,8 +32,20 @@ void populate_keys() {
   keys = calloc(NKEYS, sizeof(char *));
   for (unsigned int i = 0; i < NKEYS; i++) {
     keys[i] = calloc(KEYLENGTH, sizeof(char));
-    for (unsigned int j = 0; j < KEYLENGTH - 1; j++)
-      keys[i][j] = get_random_char();
+    for (unsigned int j = 0; j < KEYLENGTH - 1; j+=5) {
+      uint32_t rnd32 = lfsr(&state, taps);
+
+      keys[i][j] = WTREE_CHARS[rnd32 & 63];
+      rnd32 >>= 6;
+      keys[i][j+1] = WTREE_CHARS[rnd32 & 63];
+      rnd32 >>= 6;
+      keys[i][j+2] = WTREE_CHARS[rnd32 & 63];
+      rnd32 >>= 6;
+      keys[i][j+3] = WTREE_CHARS[rnd32 & 63];
+      rnd32 >>= 6;
+      keys[i][j+4] = WTREE_CHARS[rnd32 & 63];
+
+    }
     keys[i][KEYLENGTH - 1] = '\0';
   }
 }

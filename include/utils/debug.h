@@ -5,11 +5,12 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include <stdlib.h>
+
 // Disabled by default, use -DDEBUG_MSG to switch on
 #ifdef DEBUG_MSG
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "tmodes.h"
 
