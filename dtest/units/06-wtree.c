@@ -7,8 +7,7 @@
 #include "utils/debug.h"
 
 struct Endpoint {
-  int a;
-  int b;
+  int a, b;
   char *c;
 };
 

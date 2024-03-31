@@ -44,8 +44,7 @@ unsigned int get_str_match(char *str1, char *str2) {
 }
 
 char *trim_str(char *s, unsigned int n) {
-  unsigned int l = (unsigned int)strlen(s);
-  unsigned int i = 0;
+  unsigned int l = (unsigned int)strlen(s), i = 0;
   for (; i < l - n; i++)
     s[i] = s[i + n];
   s[i] = '\0';

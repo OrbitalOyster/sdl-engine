@@ -5,7 +5,7 @@
 #ifndef DSTRING_H
 #define DSTRING_H
 
-// Converts unsigned int to binary representation
+// Converts unsigned int to binary string representation
 char *uint_to_binary(unsigned int n);
 // Returns number of matching chars (excluding null chars)
 unsigned int get_str_match(char *str1, char *str2);
