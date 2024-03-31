@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 int main() {
+  // TODO: Memory leaks
   DTEST_UNIT_START("DStrings");
   DTEST_EXPECT_STRING(uint_to_binary(0), "0");
   DTEST_EXPECT_STRING(uint_to_binary(1), "1");

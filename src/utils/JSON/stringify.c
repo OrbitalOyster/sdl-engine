@@ -90,4 +90,3 @@ char *token_to_string(struct Token *token) {
   }
   return result;
 }
-

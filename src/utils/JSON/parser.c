@@ -5,9 +5,9 @@
 
 #include "utils/debug.h"
 
-const char *TRUE_STRING = "true";
-const char *FALSE_STRING = "false";
-const char *NULL_STRING = "null";
+#define TRUE_STRING "true"
+#define FALSE_STRING "false"
+#define NULL_STRING "null"
 
 static struct Token *parse_token_F(FILE *f, int c);
 
@@ -68,8 +68,7 @@ static char *read_string_F(FILE *f) {
 
 static int read_number_F(FILE *f) {
   char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
-  int c, n = 0;
-  int done = 0;
+  int c, n = 0, done = 0;
   fseek(f, -1, SEEK_CUR);
   do {
     c = fgetc(f);
