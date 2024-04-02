@@ -14,11 +14,11 @@ static const uint32_t p2[32] = {
     268435456, 536870912, 1073741824, 2147483648};
 
 static uint8_t get_feedback(LFSR_TYPE state, LFSR_TYPE taps) {
-  uint8_t result = 0;
+  int result = 0;
   LFSR_TYPE x = state & taps;
   for (uint8_t i = 0; i < SIZE; i++)
     result ^= GET_BIT(x, i);
-  return result;
+  return (uint8_t) result;
 }
 
 LFSR_TYPE lfsr(LFSR_TYPE *state, LFSR_TYPE taps) {
