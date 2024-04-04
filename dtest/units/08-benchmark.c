@@ -13,7 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 5000000u
+#define NKEYS 10000u
 #define KEYLENGTH 16u
 
 char **keys;
@@ -56,6 +56,8 @@ void populate_wtree(struct WTree *tree) {
       expand_wtree(tree, keys[i], oyster);
     else
       expand_wtree(tree, keys[i], NULL);
+
+    sort_wtree(tree);
   }
 }
 

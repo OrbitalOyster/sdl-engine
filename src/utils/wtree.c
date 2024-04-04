@@ -7,6 +7,8 @@
 #include "utils/dstrings.h"
 #include "utils/qsort.h"
 
+#include <stdio.h>
+
 union WTreeChildren {
   struct WTreeNode **nodes;
   void *endpoint;
@@ -63,10 +65,63 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
     return NULL;
   }
   INFOF("Seaching node %s, size %u for %c(%i)", node->chunk, node->size, c, c);
+
+  // Edge case - empty node
+  if (!node->size)
+    return NULL;
+
+
+  // Binary search
+  unsigned int i1 = 0;
+  unsigned int i2 = (unsigned int) node->size - 1;
+  unsigned int s = i2 - i1;
+  unsigned int i = s / 2;
+
+
+  while(1) {
+
+//    printf("i1: %u, i: %u, i2: %u, s: %u\n", i1, i, i2, s);
+//    printf("str[i]: %c\n", str[i]);
+//    printf("%c/%c [%c]\n\n", str[i1], str[i2], str[i]);
+
+    // Three edge cases
+    if (node->children.nodes[i1]->chunk[0] == c)
+      return node->children.nodes[i1];
+
+    if (node->children.nodes[i2]->chunk[0] == c)
+      return node->children.nodes[i2];
+
+    if (node->children.nodes[i]->chunk[0] == c)
+      return node->children.nodes[i];
+
+
+//    printf("c: %c, c1: %c, c2: %c, c3: %c(%i)\n", c,
+//        node->children.nodes[i1]->chunk[0],
+//        node->children.nodes[i]->chunk[0],
+//        node->children.nodes[i2]->chunk[0],
+//        node->children.nodes[i2]->chunk[0]
+//    );
+
+    if (node->children.nodes[i]->chunk[0] > c)
+      i2 = i;
+    else
+      i1 = i;
+
+    s = i2 - i1;
+
+    // Nothing found
+    if (s <= 1)
+      return NULL;
+
+    i = i1 + s / 2;
+  }
+
+/*
   for (unsigned short int i = 0; i < node->size; i++)
     if (node->children.nodes[i]->chunk[0] == c)
       return node->children.nodes[i];
   return NULL;
+*/
 }
 
 // Creates new node (chuck) and appends it to parent
