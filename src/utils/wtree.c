@@ -58,6 +58,13 @@ static void sort_node(struct WTreeNode *node) {
 }
 
 // TODO Less brutal approach
+static struct WTreeNode *get_child_brutal(struct WTreeNode *node, char c) {
+  for (unsigned short int i = 0; i < node->size; i++)
+    if (node->children.nodes[i]->chunk[0] == c)
+      return node->children.nodes[i];
+  return NULL;
+}
+
 static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
   // TODO: Debug flag
   if (node == NULL) {
@@ -115,13 +122,6 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
 
     i = i1 + s / 2;
   }
-
-/*
-  for (unsigned short int i = 0; i < node->size; i++)
-    if (node->children.nodes[i]->chunk[0] == c)
-      return node->children.nodes[i];
-  return NULL;
-*/
 }
 
 // Creates new node (chuck) and appends it to parent
@@ -193,19 +193,23 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
     ERR(1, "Out of memory");
   strcpy(tail, word);
   struct WTreeNode *node = wtree->root;
-  struct WTreeNode *next_node = get_child(node, tail[0]);
+  struct WTreeNode *next_node = get_child_brutal(node, tail[0]);
   while (next_node) {
     INFOF("Switched to node: %s", next_node->chunk);
     unsigned int l = (unsigned int)strlen(next_node->chunk);
     unsigned int matched = get_str_match(next_node->chunk, tail);
     INFOF("tl == %u, l == %u, matched == %u", tl, l, matched);
+    // Matched all chars - wtree already has this word
+    if (l == matched && tl == matched + 1)
+      ERRF(1, "Attempt to add existing word '%s' to wtree", word);
     tail = trim_str(tail, matched);
     tl -= matched;
     if (matched < l || (matched == l && !next_node->size))
       split_node(next_node, matched);
     node = next_node;
-    next_node = get_child(node, tail[0]);
+    next_node = get_child_brutal(node, tail[0]);
   }
+  // At some point we reach uncharted territory
   INFOF("Child not found, appending tail %s", tail);
   struct WTreeNode *appended = append_node(node, tail);
   appended->children.endpoint = endpoint;

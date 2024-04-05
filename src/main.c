@@ -4,10 +4,11 @@
 #include "input.h"
 #include "utils/debug.h"
 
-int main() {
+#include "utils/wtree.h"
 
-  char *str = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-  char c = '_';
+int main() {
+  char *str = "012346789";
+  char c = '5';
 
   int result = -1;
   unsigned int i1 = 0;
@@ -15,7 +16,9 @@ int main() {
   unsigned int s = i2 - i1;
   unsigned int i = s / 2;
 
-  while(1) {
+  int tmp = 5;
+
+  while(tmp--) {
 
     printf("i1: %u, i2: %u, s: %u, i:%u\n", i1, i2, s, i);
     printf("str[i]: %c\n", str[i]);
