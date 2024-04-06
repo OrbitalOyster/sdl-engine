@@ -1,4 +1,4 @@
-// obj/utils/wtree.o obj/utils/dstrings.o obj/utils/qsort.o
+// obj/utils/wtree.o obj/utils/dstrings.o
 // 0
 
 #include <stdlib.h>

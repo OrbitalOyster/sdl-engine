@@ -5,7 +5,7 @@
 
 #include "utils/debug.h"
 #include "utils/dstrings.h"
-#include "utils/qsort.h"
+// #include "utils/qsort.h"
 
 #include <stdio.h>
 
@@ -45,6 +45,7 @@ struct WTree *create_wtree() {
   return result;
 }
 
+/*
 // Which node should come first?
 static int node_sort_func(void **arr, int i1, int i2) {
   return strcmp(((struct WTreeNode *)arr[i1])->chunk,
@@ -56,6 +57,7 @@ static void sort_node(struct WTreeNode *node) {
   for (unsigned short int i = 0; i < node->size; i++)
     sort_node(node->children.nodes[i]);
 }
+*/
 
 // TODO Less brutal approach
 /*
@@ -129,24 +131,15 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
   unsigned int i = s / 2;
 
   while(1) {
-
-//    printf("i1: %u, i: %u, i2: %u, s: %u\n", i1, i, i2, s);
-//    printf("str[i]: %c\n", str[i]);
-//    printf("%c/%c [%c]\n\n", str[i1], str[i2], str[i]);
-
-    // Two edge cases
     if (node->children.nodes[i1]->chunk[0] == c)
       return node->children.nodes[i1];
 
     if (node->children.nodes[i2]->chunk[0] == c)
       return node->children.nodes[i2];
 
-//    printf("c: %c, c1: %c, c2: %c, c3: %c(%i)\n", c,
-//        node->children.nodes[i1]->chunk[0],
-//        node->children.nodes[i]->chunk[0],
-//        node->children.nodes[i2]->chunk[0],
-//        node->children.nodes[i2]->chunk[0]
-//    );
+    // Nothing found
+    if (s <= 1)
+      return NULL;
 
     if (node->children.nodes[i]->chunk[0] > c)
       i2 = i;
@@ -154,11 +147,6 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
       i1 = i;
 
     s = i2 - i1;
-
-    // Nothing found
-    if (s <= 1)
-      return NULL;
-
     i = i1 + s / 2;
   }
 }
@@ -285,7 +273,9 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
 
 unsigned int get_wtree_size(struct WTree *wtree) { return wtree->size; }
 
+/*
 void sort_wtree(struct WTree *wtree) { sort_node(wtree->root); }
+*/
 
 struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));

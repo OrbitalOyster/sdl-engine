@@ -1,4 +1,4 @@
-// obj/utils/wtree.o obj/utils/lfsr.o obj/utils/qsort.o obj/utils/dstrings.o
+// obj/utils/wtree.o obj/utils/lfsr.o obj/utils/dstrings.o
 // 0
 
 #include <stdio.h>
@@ -13,7 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 1000u
+#define NKEYS 1000000u
 #define KEYLENGTH 16u
 
 char **keys;
@@ -56,8 +56,6 @@ void populate_wtree(struct WTree *tree) {
       expand_wtree(tree, keys[i], oyster);
     else
       expand_wtree(tree, keys[i], NULL);
-
-//    sort_wtree(tree);
   }
 }
 
@@ -83,13 +81,10 @@ int main() {
   struct WTree *tree = create_wtree();
   DTEST_EVAL_TIME(populate_wtree(tree));
   unsigned int size = get_wtree_size(tree);
-  DTEST_EVAL_TIME(sort_wtree(tree));
+  DTEST_EXPECT_UINT(size, NKEYS);
+//  DTEST_EVAL_TIME(sort_wtree(tree));
   char **words;
   DTEST_EVAL_TIME(words = get_wtree_words(tree));
-  for (unsigned int i = 0; i < size; i++) {
-    INFOF("%s", words[i]);
-    free(words[i]);
-  }
   free(words);
   DTEST_EVAL_TIME(lookup(tree));
   free(oyster);
