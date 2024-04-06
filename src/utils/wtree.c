@@ -58,11 +58,56 @@ static void sort_node(struct WTreeNode *node) {
 }
 
 // TODO Less brutal approach
+/*
 static struct WTreeNode *get_child_brutal(struct WTreeNode *node, char c) {
   for (unsigned short int i = 0; i < node->size; i++)
     if (node->children.nodes[i]->chunk[0] == c)
       return node->children.nodes[i];
   return NULL;
+}
+*/
+
+static unsigned int get_new_child_ind(struct WTreeNode *node, char c) {
+  // TODO: Debug flag
+  if (node == NULL) {
+    WARN("Attempt to access NULL node");
+    return 0;
+  }
+
+  INFOF("Searching place in node %s, size %u for %i(%c)", node->chunk, node->size, c, c);
+
+  // Edge case - empty node
+  if (!node->size)
+    return 0;
+
+  // Binary search
+  unsigned int i1 = 0;
+  unsigned int i2 = (unsigned int) node->size - 1;
+  unsigned int s = i2 - i1;
+  unsigned int i = s / 2;
+
+  INFOF("i1: %u, i2: %u, s: %u, i: %u, chunk: %c", i1, i2, s, i, node->children.nodes[i1]->chunk[0]);
+
+  // Two edge cases
+  if (node->children.nodes[i1]->chunk[0] > c)
+    return i1;
+
+  if (node->children.nodes[i2]->chunk[0] < c)
+    return i2 + 1;
+
+  while(1) {
+    if (node->children.nodes[i]->chunk[0] > c)
+      i2 = i;
+    else
+      i1 = i;
+
+    s = i2 - i1;
+
+    if (s < 2)
+      return i2;
+
+    i = i1 + s / 2;
+  }
 }
 
 static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
@@ -77,13 +122,11 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
   if (!node->size)
     return NULL;
 
-
   // Binary search
   unsigned int i1 = 0;
   unsigned int i2 = (unsigned int) node->size - 1;
   unsigned int s = i2 - i1;
   unsigned int i = s / 2;
-
 
   while(1) {
 
@@ -91,16 +134,12 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
 //    printf("str[i]: %c\n", str[i]);
 //    printf("%c/%c [%c]\n\n", str[i1], str[i2], str[i]);
 
-    // Three edge cases
+    // Two edge cases
     if (node->children.nodes[i1]->chunk[0] == c)
       return node->children.nodes[i1];
 
     if (node->children.nodes[i2]->chunk[0] == c)
       return node->children.nodes[i2];
-
-    if (node->children.nodes[i]->chunk[0] == c)
-      return node->children.nodes[i];
-
 
 //    printf("c: %c, c1: %c, c2: %c, c3: %c(%i)\n", c,
 //        node->children.nodes[i1]->chunk[0],
@@ -128,12 +167,39 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
 static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
   INFO2F("Appending node %s to %s", chunk, parent->chunk);
   struct WTreeNode *child = create_node(parent, chunk);
+
+  unsigned int new_ind = get_new_child_ind(parent, chunk[0]);
+//  unsigned int new_ind = parent->size;
+  INFO2F("New index: %u (%u)", new_ind, get_new_child_ind(parent, chunk[0]));
+
   parent->size++;
+
   parent->children.nodes = realloc(parent->children.nodes,
                                    parent->size * sizeof(struct WTreeNode *));
+
+  // parent->children.nodes[parent->size - 1] = calloc(1, sizeof(struct WTreeNode*));
+
+//  parent->children.nodes[parent->size - 1] = NULL;
+
   if (parent->children.nodes == NULL)
     ERR(1, "Out of memory");
-  parent->children.nodes[parent->size - 1] = child;
+
+  unsigned int nodes_to_copy = parent->size - 1u - new_ind;
+
+  if (nodes_to_copy) {
+    INFOF("memcpy: %u %u", new_ind, nodes_to_copy);
+    memcpy(
+        &(parent->children.nodes[new_ind + 1]),
+        &(parent->children.nodes[new_ind]),
+        nodes_to_copy * sizeof(struct WTreeNode *)
+    );
+    INFO("YAY");
+  } else INFO ("Skipped memcpy");
+
+  // int new_ind = parent->size - 1;
+  // INFO2F("New index: %u", new_ind);
+
+  parent->children.nodes[new_ind] = child;
   return child;
 }
 
@@ -193,7 +259,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
     ERR(1, "Out of memory");
   strcpy(tail, word);
   struct WTreeNode *node = wtree->root;
-  struct WTreeNode *next_node = get_child_brutal(node, tail[0]);
+  struct WTreeNode *next_node = get_child(node, tail[0]);
   while (next_node) {
     INFOF("Switched to node: %s", next_node->chunk);
     unsigned int l = (unsigned int)strlen(next_node->chunk);
@@ -207,7 +273,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
     if (matched < l || (matched == l && !next_node->size))
       split_node(next_node, matched);
     node = next_node;
-    next_node = get_child_brutal(node, tail[0]);
+    next_node = get_child(node, tail[0]);
   }
   // At some point we reach uncharted territory
   INFOF("Child not found, appending tail %s", tail);

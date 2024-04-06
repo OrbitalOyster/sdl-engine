@@ -7,16 +7,27 @@
 #include "utils/wtree.h"
 
 int main() {
-  char *str = "012346789";
-  char c = '5';
+  char *str = "abcdhijkl";
+  char c = 'f';
 
-  int result = -1;
+  unsigned int result = 777;
   unsigned int i1 = 0;
   unsigned int i2 = (unsigned int) strlen(str) - 1;
   unsigned int s = i2 - i1;
   unsigned int i = s / 2;
 
-  int tmp = 5;
+  int tmp = 100;
+
+  // Edge cases
+  if (str[i1] > c) {
+    result = i1;
+    tmp = 0;
+  }
+
+  if (str[i2] < c) {
+    result = i2 + 1;
+    tmp = 0;
+  }
 
   while(tmp--) {
 
@@ -24,37 +35,27 @@ int main() {
     printf("str[i]: %c\n", str[i]);
     printf("%c/%c [%c]\n\n", str[i1], str[i2], str[i]);
 
-    if (str[i1] == c) {
-      result = str[i1];
-      break;
-    }
+    if (str[i] > c)
+      i2 = i;
+    else
+      i1 = i;
 
-    if (str[i2] == c) {
-      result = str[i2];
-      break;
-    }
+    s = i2 - i1;
 
-    if (str[i] == c) {
-      result = str[i];
-      break;
-    }
-    else {
-      if (str[i] > c)
-        i2 = i;
-      else
-        i1 = i;
+    // End of the line
+    if (s < 2) {
+      printf("END: s == %u\n", s);
+      printf("%c/%c [%c]\n\n", str[i1], str[i2], str[i]);
 
-      s = i2 - i1;
-
-      if (!s) {
+        result = i2;
         break;
-      }
 
-      i = i1 + s / 2;
     }
+
+    i = i1 + s / 2;
   }
 
-  printf("%c %i\n", result, result);
+  printf("%c %i\n", str[result], result);
 
   return 0;
 
