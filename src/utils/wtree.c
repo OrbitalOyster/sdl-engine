@@ -5,10 +5,8 @@
 
 #include "utils/debug.h"
 #include "utils/dstrings.h"
-// #include "utils/qsort.h"
 
-#include <stdio.h>
-
+// Either some endpoint or more nodes
 union WTreeChildren {
   struct WTreeNode **nodes;
   void *endpoint;
@@ -17,6 +15,7 @@ union WTreeChildren {
 struct WTreeNode {
   char *chunk;
   struct WTreeNode *parent;
+  // Size shouldn't be more than 128
   unsigned short int size;
   union WTreeChildren children;
 };
@@ -45,30 +44,6 @@ struct WTree *create_wtree() {
   return result;
 }
 
-/*
-// Which node should come first?
-static int node_sort_func(void **arr, int i1, int i2) {
-  return strcmp(((struct WTreeNode *)arr[i1])->chunk,
-                ((struct WTreeNode *)arr[i2])->chunk) < 0;
-}
-
-static void sort_node(struct WTreeNode *node) {
-  sort((void **)node->children.nodes, 0, (int)node->size - 1, node_sort_func);
-  for (unsigned short int i = 0; i < node->size; i++)
-    sort_node(node->children.nodes[i]);
-}
-*/
-
-// TODO Less brutal approach
-/*
-static struct WTreeNode *get_child_brutal(struct WTreeNode *node, char c) {
-  for (unsigned short int i = 0; i < node->size; i++)
-    if (node->children.nodes[i]->chunk[0] == c)
-      return node->children.nodes[i];
-  return NULL;
-}
-*/
-
 static unsigned int get_new_child_ind(struct WTreeNode *node, char c) {
   // TODO: Debug flag
   if (node == NULL) {
@@ -76,7 +51,8 @@ static unsigned int get_new_child_ind(struct WTreeNode *node, char c) {
     return 0;
   }
 
-  INFOF("Searching place in node %s, size %u for %i(%c)", node->chunk, node->size, c, c);
+  INFOF("Searching place in node %s, size %u for %i(%c)", node->chunk,
+        node->size, c, c);
 
   // Edge case - empty node
   if (!node->size)
@@ -84,11 +60,12 @@ static unsigned int get_new_child_ind(struct WTreeNode *node, char c) {
 
   // Binary search
   unsigned int i1 = 0;
-  unsigned int i2 = (unsigned int) node->size - 1;
+  unsigned int i2 = (unsigned int)node->size - 1;
   unsigned int s = i2 - i1;
   unsigned int i = s / 2;
 
-  INFOF("i1: %u, i2: %u, s: %u, i: %u, chunk: %c", i1, i2, s, i, node->children.nodes[i1]->chunk[0]);
+  INFOF("i1: %u, i2: %u, s: %u, i: %u, chunk: %c", i1, i2, s, i,
+        node->children.nodes[i1]->chunk[0]);
 
   // Two edge cases
   if (node->children.nodes[i1]->chunk[0] > c)
@@ -97,7 +74,7 @@ static unsigned int get_new_child_ind(struct WTreeNode *node, char c) {
   if (node->children.nodes[i2]->chunk[0] < c)
     return i2 + 1;
 
-  while(1) {
+  while (1) {
     if (node->children.nodes[i]->chunk[0] > c)
       i2 = i;
     else
@@ -126,11 +103,11 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
 
   // Binary search
   unsigned int i1 = 0;
-  unsigned int i2 = (unsigned int) node->size - 1;
+  unsigned int i2 = (unsigned int)node->size - 1;
   unsigned int s = i2 - i1;
   unsigned int i = s / 2;
 
-  while(1) {
+  while (1) {
     if (node->children.nodes[i1]->chunk[0] == c)
       return node->children.nodes[i1];
 
@@ -151,41 +128,24 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
   }
 }
 
-// Creates new node (chuck) and appends it to parent
+// Creates new node (chunk) and appends it to parent
 static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
   INFO2F("Appending node %s to %s", chunk, parent->chunk);
   struct WTreeNode *child = create_node(parent, chunk);
-
   unsigned int new_ind = get_new_child_ind(parent, chunk[0]);
-//  unsigned int new_ind = parent->size;
-  INFO2F("New index: %u (%u)", new_ind, get_new_child_ind(parent, chunk[0]));
-
+  INFO2F("New index: %u", new_ind);
   parent->size++;
-
   parent->children.nodes = realloc(parent->children.nodes,
                                    parent->size * sizeof(struct WTreeNode *));
-
-  // parent->children.nodes[parent->size - 1] = calloc(1, sizeof(struct WTreeNode*));
-
-//  parent->children.nodes[parent->size - 1] = NULL;
 
   if (parent->children.nodes == NULL)
     ERR(1, "Out of memory");
 
   unsigned int nodes_to_copy = parent->size - 1u - new_ind;
-
-  if (nodes_to_copy) {
-    INFOF("memcpy: %u %u", new_ind, nodes_to_copy);
-    memcpy(
-        &(parent->children.nodes[new_ind + 1]),
-        &(parent->children.nodes[new_ind]),
-        nodes_to_copy * sizeof(struct WTreeNode *)
-    );
-    INFO("YAY");
-  } else INFO ("Skipped memcpy");
-
-  // int new_ind = parent->size - 1;
-  // INFO2F("New index: %u", new_ind);
+  if (nodes_to_copy)
+    memcpy(&(parent->children.nodes[new_ind + 1]),
+           &(parent->children.nodes[new_ind]),
+           nodes_to_copy * sizeof(struct WTreeNode *));
 
   parent->children.nodes[new_ind] = child;
   return child;
@@ -273,10 +233,6 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
 
 unsigned int get_wtree_size(struct WTree *wtree) { return wtree->size; }
 
-/*
-void sort_wtree(struct WTree *wtree) { sort_node(wtree->root); }
-*/
-
 struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   if (tail == NULL)
@@ -323,7 +279,8 @@ void shrink_wtree(struct WTree *wtree, char *word) {
   if (parent->children.nodes == NULL && parent->parent != NULL)
     ERR(1, "Out of memory");
   // If not root and parent have 1 child end child is is endpoint
-  if (parent->parent != NULL && parent->size == 1 && parent->children.nodes[0]->size == 0) {
+  if (parent->parent != NULL && parent->size == 1 &&
+      parent->children.nodes[0]->size == 0) {
     INFO("Gotta join");
     join_nodes(parent);
   }
