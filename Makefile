@@ -18,7 +18,7 @@ OPTIMIZATION := -O2
 # Debugging info
 DEBUG := -ggdb3
 # Preprocessor flags (example -DDEBUG -DLOG)
-DFLAGS := # -DDEBUG_MSG -DCOLOR_OUTPUT
+DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
 
 CC := gcc
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
@@ -57,7 +57,7 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 # Compile all .c files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 # Header dependencies
