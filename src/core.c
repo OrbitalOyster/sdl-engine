@@ -9,7 +9,7 @@ struct Core {
   SDL_Renderer *renderer;
 };
 
-Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title) {
+Core *init_core(int32_t windowWidth, int32_t windowHeight, char *title) {
   INFO("Initializing SDL");
   Core *core = calloc(1, sizeof(Core));
   // Init SDL
@@ -36,11 +36,11 @@ Core *initCore(int32_t windowWidth, int32_t windowHeight, char *title) {
   return core;
 }
 
-SDL_Renderer *getRenderer(Core *core) {
+SDL_Renderer *get_renderer(Core *core) {
   return core->renderer;
 }
 
-void destroyCore(Core *core) {
+void destroy_core(Core *core) {
   SDL_DestroyRenderer(core->renderer);
   core->renderer = NULL;
   SDL_DestroyWindow(core->window);

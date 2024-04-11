@@ -11,8 +11,8 @@
 
 typedef struct Core Core;
 
-Core *initCore(int windowWidth, int windowHeight, char *title);
-SDL_Renderer *getRenderer(Core *core);
-void destroyCore(Core *core);
+Core *init_core(int windowWidth, int windowHeight, char *title);
+SDL_Renderer *get_renderer(Core *core);
+void destroy_core(Core *core);
 
 #endif /* CORE_H */

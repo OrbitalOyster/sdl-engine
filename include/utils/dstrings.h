@@ -12,4 +12,4 @@ unsigned int get_str_match(char *str1, char *str2);
 // Removes first n char of string
 char *trim_str(char *s, unsigned int n);
 
-#endif
+#endif /* DSTRINGS_H */

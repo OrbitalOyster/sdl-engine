@@ -18,7 +18,7 @@ static uint8_t get_feedback(LFSR_TYPE state, LFSR_TYPE taps) {
   LFSR_TYPE x = state & taps;
   for (uint8_t i = 0; i < SIZE; i++)
     result ^= GET_BIT(x, i);
-  return (uint8_t) result;
+  return (uint8_t)result;
 }
 
 LFSR_TYPE lfsr(LFSR_TYPE *state, LFSR_TYPE taps) {
