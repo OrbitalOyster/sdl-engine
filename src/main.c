@@ -5,6 +5,20 @@
 #include "utils/debug.h"
 
 int main() {
+
+  unsigned int INITIAL_STR_LENGTH = 16;
+  unsigned int l = 0;
+  char *str = "Test string";
+
+  char *result = calloc(INITIAL_STR_LENGTH, sizeof(char));
+  char c = str[0];
+  while (c) {
+    result[l] = c;
+    c = str[++l];
+  }
+  printf("res = %s, l = %u", result , l);
+  return 0;
+
   int quit = 0;
   Core *core = init_core(640, 480, "Untitled");
   // Something went wrong
