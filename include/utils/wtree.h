@@ -4,7 +4,6 @@
 #define WTREE_CHARS_NUMBER 64
 #define WTREE_CHARS                                                            \
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz"
-#define WTREE_MAX_WORD_LENGTH 64
 
 struct WTree *create_wtree();
 void expand_wtree(struct WTree *wtree, char *word, void *endpoint);

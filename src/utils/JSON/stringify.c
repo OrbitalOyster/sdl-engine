@@ -41,10 +41,14 @@ static char *token_map_to_string(struct TokenMap *map, int nkeys) {
       strcat(result, ", ");
     }
     if (nkeys) {
-      size += (strlen(key) + 2) * sizeof(char);
+      size_t key_length = strlen(key);
+      // 5 stands for: quote, quote, colon, whitespace, end of string 
+      size_t total_length = key_length + 5;
+      char* key_str = calloc(total_length, sizeof(char));
+      size += total_length * sizeof(char);
       result = realloc(result, size);
-      strcat(result, key);
-      strcat(result, ": ");
+      snprintf(key_str, total_length, "\"%s\": ", key);
+      strcat(result, key_str);
     }
     size += strlen(value) * sizeof(char);
     result = realloc(result, size);
