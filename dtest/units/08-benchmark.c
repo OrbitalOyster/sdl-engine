@@ -13,7 +13,7 @@ const LFSR_TYPE taps = 61680; // 1111000011110000
 const LFSR_TYPE initialState = 12345;
 LFSR_TYPE state = initialState;
 
-#define NKEYS 1000000u
+#define NKEYS 10000000u
 #define KEYLENGTH 16u
 
 char **keys;
@@ -82,9 +82,10 @@ int main() {
   DTEST_EVAL_TIME(populate_wtree(tree));
   unsigned int size = get_wtree_size(tree);
   DTEST_EXPECT_UINT(size, NKEYS);
-//  DTEST_EVAL_TIME(sort_wtree(tree));
   char **words;
   DTEST_EVAL_TIME(words = get_wtree_words(tree));
+  for (unsigned int i = 0; i < size; i++)
+    free(words[i]);
   free(words);
   DTEST_EVAL_TIME(lookup(tree));
   free(oyster);

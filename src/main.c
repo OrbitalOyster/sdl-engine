@@ -16,7 +16,7 @@ int main() {
     result[l] = c;
     c = str[++l];
   }
-  printf("res = %s, l = %u\n", result , l);
+  printf("res = %s, l = %u strlen = %lu\n", result , l, strlen("123"));
   return 0;
 
   int quit = 0;

@@ -14,6 +14,7 @@ union WTreeChildren {
 
 struct WTreeNode {
   char *chunk;
+  unsigned int chunk_length;
   struct WTreeNode *parent;
   // Size shouldn't be more than 128
   unsigned short int size;
@@ -27,12 +28,16 @@ struct WTree {
 
 static void destroy_node(struct WTreeNode *node);
 
-static struct WTreeNode *create_node(struct WTreeNode *parent, char *chunk) {
+static struct WTreeNode *create_node(struct WTreeNode *parent, char *chunk,
+                                     unsigned int chunk_length) {
   struct WTreeNode *result = calloc(1, sizeof(struct WTreeNode));
   if (result == NULL)
     ERR(1, "Out of memory");
-  *result = (struct WTreeNode){
-      .parent = parent, .chunk = chunk, .size = 0, .children.nodes = NULL};
+  *result = (struct WTreeNode){.parent = parent,
+                               .chunk = chunk,
+                               .chunk_length = chunk_length,
+                               .size = 0,
+                               .children.nodes = NULL};
   return result;
 }
 
@@ -40,7 +45,7 @@ struct WTree *create_wtree() {
   struct WTree *result = calloc(1, sizeof(struct WTree));
   if (result == NULL)
     ERR(1, "Out of memory");
-  *result = (struct WTree){.root = create_node(NULL, NULL), .size = 0};
+  *result = (struct WTree){.root = create_node(NULL, NULL, 0), .size = 0};
   return result;
 }
 
@@ -129,9 +134,10 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
 }
 
 // Creates new node (chunk) and appends it to parent
-static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
+static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk,
+                                     unsigned int chunk_length) {
   INFO2F("Appending node %s to %s", chunk, parent->chunk);
-  struct WTreeNode *child = create_node(parent, chunk);
+  struct WTreeNode *child = create_node(parent, chunk, chunk_length);
   unsigned int new_ind = get_new_child_ind(parent, chunk[0]);
   INFO2F("New index: %u", new_ind);
   parent->size++;
@@ -156,7 +162,7 @@ static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
 static void split_node(struct WTreeNode *node, unsigned int n) {
   INFO2F("Splitting node %s by char #%i", node->chunk, n);
   // Splitting word
-  unsigned int l = (unsigned int)strlen(node->chunk) + 1; // + null char
+  unsigned int l = node->chunk_length;
   char *head_chunk = calloc(n + 1, sizeof(char));
   char *tail_chunk = calloc(l - n, sizeof(char));
   if (head_chunk == NULL || tail_chunk == NULL)
@@ -168,11 +174,12 @@ static void split_node(struct WTreeNode *node, unsigned int n) {
     tail_chunk[i - n] = node->chunk[i];
   INFOF("head == %s, tail == %s", head_chunk, tail_chunk);
   // Creating tail
-  struct WTreeNode *tail = create_node(node, tail_chunk);
+  struct WTreeNode *tail = create_node(node, tail_chunk, l - n);
   tail->size = node->size;
   tail->children = node->children;
   // Replacing head
   node->size = 1;
+  node->chunk_length = n + 1;
   free(node->chunk);
   node->chunk = head_chunk;
   node->children.nodes = calloc(1, sizeof(struct WTreeNode *));
@@ -188,7 +195,7 @@ static void join_nodes(struct WTreeNode *node) {
   INFOF("Child node: %s", child->chunk);
   node->chunk =
       realloc(node->chunk,
-              (strlen(node->chunk) + strlen(child->chunk) + 1) * sizeof(char));
+              (node->chunk_length + child->chunk_length - 1) * sizeof(char));
   if (node->chunk == NULL)
     ERR(1, "Out of memory");
   strcat(node->chunk, child->chunk);
@@ -210,7 +217,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   struct WTreeNode *next_node = get_child(node, tail[0]);
   while (next_node) {
     INFOF("Switched to node: %s", next_node->chunk);
-    unsigned int l = (unsigned int)strlen(next_node->chunk);
+    unsigned int l = next_node->chunk_length - 1;
     unsigned int matched = get_str_match(next_node->chunk, tail);
     INFOF("tl == %u, l == %u, matched == %u", tl, l, matched);
     // Matched all chars - wtree already has this word
@@ -225,7 +232,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   }
   // At some point we reach uncharted territory
   INFOF("Child not found, appending tail %s", tail);
-  struct WTreeNode *appended = append_node(node, tail);
+  struct WTreeNode *appended = append_node(node, tail, tl);
   appended->children.endpoint = endpoint;
   wtree->size++;
   INFO2("Expand complete");
@@ -299,7 +306,7 @@ static void get_wtree_word(struct WTreeNode *node, char *word, unsigned int *n,
                            unsigned int *size, char **result) {
   unsigned int l = 0;
   if (node->chunk) {
-    l = (unsigned int)strlen(node->chunk);
+    l = node->chunk_length - 1;
     strcat(word, node->chunk);
   }
   *n += l;
