@@ -1,6 +1,7 @@
 TEST_DIR := dtest
 TEST_OUTPUT := output
 DELIMITER := "********************************************************************************"
+VALGRIND := valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all --track-origins=yes --gen-suppressions=all
 
 # All test units
 TESTS := $(patsubst $(TEST_DIR)/%, %, $(wildcard $(TEST_DIR)/units/*.c))
@@ -28,6 +29,18 @@ test:
 		echo $(DELIMITER); \
 	done
 
+test-valgrind:
+	@echo $(DELIMITER)
+	@for t in $(TESTS); do \
+		echo "Compiling" $$t; \
+		EXTRA_UNITS=$$(cut $(TEST_DIR)/$$t -c 3- | head -1); \
+		EXPECTED=$$(cut $(TEST_DIR)/$$t -c 3- | head -2 | tail -1); \
+		echo "Extra files:" $$EXTRA_UNITS; \
+		$(CC) $(CFLAGS) $$EXTRA_UNITS $(TEST_DIR)/dtest.c -DTEST_FILE=$$t \
+		-o $(TEST_DIR)/$(TEST_OUTPUT) && $(VALGRIND) ./$(TEST_DIR)/$(TEST_OUTPUT); \
+		echo $(DELIMITER); \
+	done
+
 test-strict:
 	@echo $(DELIMITER)
 	@for t in $(TESTS); do \
@@ -35,7 +48,7 @@ test-strict:
 		EXTRA_UNITS=$$(cut $(TEST_DIR)/$$t -c 3- | head -1); \
 		EXPECTED=$$(cut $(TEST_DIR)/$$t -c 3- | head -2 | tail -1); \
 		echo "Extra files:" $$EXTRA_UNITS; \
-		$(CC) $(CFLAGS) $$EXTRA_UNITS $(TEST_DIR)/dtest.c -DTEST_FILE=$$t -DTEST_STRICT\
+		$(CC) $(CFLAGS) $$EXTRA_UNITS $(TEST_DIR)/dtest.c -DTEST_FILE=$$t -DTEST_STRICT \
 		-o $(TEST_DIR)/$(TEST_OUTPUT); \
 		COMPILE_RES=$$?; \
 		if [ $$COMPILE_RES -ne 0 ]; then \
