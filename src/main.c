@@ -6,6 +6,7 @@
 
 int main() {
 
+  /*
   unsigned int INITIAL_STR_LENGTH = 16;
   unsigned int l = 0;
   char *str = "Test string";
@@ -17,6 +18,10 @@ int main() {
     c = str[++l];
   }
   printf("res = %s, l = %u strlen = %lu\n", result , l, strlen("123"));
+  */
+
+
+
   return 0;
 
   int quit = 0;
@@ -26,6 +31,7 @@ int main() {
     WARN("Unable to start engine");
     return 0;
   }
+
   reset_key_input();
 
   SDL_Renderer *renderer = get_renderer(core);
