@@ -34,8 +34,8 @@ char *uint_to_binary(unsigned int n) {
   return result;
 }
 
-unsigned int get_str_match(char *str1, char *str2) {
-  unsigned int n = 0;
+size_t get_str_match(char *str1, char *str2) {
+  size_t n = 0;
   do {
     if (str1[n] != str2[n] || str1[n] == '\0' || str2[n] == '\0')
       return n;
@@ -43,8 +43,8 @@ unsigned int get_str_match(char *str1, char *str2) {
   return n; // Should not happen
 }
 
-char *trim_str(char *s, unsigned int n) {
-  unsigned int l = (unsigned int)strlen(s), i = 0;
+char *trim_str(char *s, size_t n) {
+  size_t l = strlen(s), i = 0;
   for (; i < l - n; i++)
     s[i] = s[i + n];
   s[i] = '\0';

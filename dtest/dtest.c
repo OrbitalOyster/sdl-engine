@@ -102,6 +102,24 @@
     _tests_run++;                                                              \
   }
 
+#define DTEST_EXPECT_LONG_UINT(s, lu)                                          \
+  {                                                                            \
+    printf("\t\tTest: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT,                   \
+                             #s) " | Expected: %lu | ",                        \
+           lu);                                                                \
+    unsigned long int _result = s;                                             \
+    printf("Result: %lu | ", _result);                                         \
+    if (_result == lu) {                                                       \
+      _ok++;                                                                   \
+      printf(TMSG(MODE_BOLD, COLOR_GREEN, "OK\n"));                            \
+    } else {                                                                   \
+      _failed++;                                                               \
+      printf(TMSG(MODE_BLINK, COLOR_RED, "FAIL\n"));                           \
+    }                                                                          \
+    fflush(stdout);                                                            \
+    _tests_run++;                                                              \
+  }
+
 #define DTEST_EXPECT_STRING(_test, _str)                                       \
   {                                                                            \
     printf("\t\tTest: " TMSG(MODE_UNDERSCORE, COLOR_DEFAULT,                   \

@@ -24,13 +24,13 @@ int main() {
   expand_wtree(wtree, "abcxyz", &ep2);
   expand_wtree(wtree, "abcxxx", NULL);
   expand_wtree(wtree, "abcxzz", NULL);
-  unsigned int size = get_wtree_size(wtree);
-  DTEST_INFOF("Tree size: %u", size);
-  DTEST_EXPECT_UINT(size, 6);
+  size_t size = get_wtree_size(wtree);
+  DTEST_INFOF("Tree size: %lu", size);
+  DTEST_EXPECT_LONG_UINT(size, 6ul);
 
   char **words;
   words = get_wtree_words(wtree);
-  for (unsigned int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     INFOF("%s", words[i]);
     free(words[i]);
   }
@@ -52,8 +52,8 @@ int main() {
   shrink_wtree(wtree, "abcxxx");
 
   size = get_wtree_size(wtree);
-  DTEST_INFOF("Tree size: %u", size);
-  DTEST_EXPECT_UINT(size, 1);
+  DTEST_INFOF("Tree size: %lu", size);
+  DTEST_EXPECT_LONG_UINT(size, 1ul);
 
   destroy_wtree(wtree);
   DTEST_UNIT_END;

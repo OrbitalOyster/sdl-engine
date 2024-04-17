@@ -21,7 +21,7 @@ struct WTreeNode {
 
 struct WTree {
   struct WTreeNode *root;
-  unsigned int size;
+  size_t size;
 };
 
 static void destroy_node(struct WTreeNode *node);
@@ -152,18 +152,18 @@ static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
 
 // Creates new node by splitting existing node by n chars (first n goes to the
 // head)
-static void split_node(struct WTreeNode *node, unsigned int n) {
-  INFO2F("Splitting node %s by char #%i", node->chunk, n);
+static void split_node(struct WTreeNode *node, size_t n) {
+  INFO2F("Splitting node %s by char #%lu", node->chunk, n);
   // Splitting word
   size_t l = strlen(node->chunk) + 1; // + null char
   char *head_chunk = calloc(n + 1, sizeof(char));
   char *tail_chunk = calloc(l - n, sizeof(char));
   if (head_chunk == NULL || tail_chunk == NULL)
     ERR(1, "Out of memory");
-  for (unsigned int i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++)
     head_chunk[i] = node->chunk[i];
   head_chunk[n] = '\0';
-  for (unsigned int i = n; i < l; i++)
+  for (size_t i = n; i < l; i++)
     tail_chunk[i - n] = node->chunk[i];
   INFOF("head == %s, tail == %s", head_chunk, tail_chunk);
   // Creating tail
@@ -210,8 +210,8 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   while (next_node) {
     INFOF("Switched to node: %s", next_node->chunk);
     size_t l = strlen(next_node->chunk);
-    unsigned int matched = get_str_match(next_node->chunk, tail);
-    INFOF("tl == %lu, l == %lu, matched == %u", tl, l, matched);
+    size_t matched = get_str_match(next_node->chunk, tail);
+    INFOF("tl == %lu, l == %lu, matched == %lu", tl, l, matched);
     // Matched all chars - wtree already has this word
     if (l == matched && tl == matched + 1)
       ERRF(1, "Attempt to add existing word '%s' to wtree", word);
@@ -230,7 +230,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   INFO2("Expand complete");
 }
 
-unsigned int get_wtree_size(struct WTree *wtree) { return wtree->size; }
+size_t get_wtree_size(struct WTree *wtree) { return wtree->size; }
 
 struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
@@ -239,7 +239,7 @@ struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   strcpy(tail, word);
   struct WTreeNode *node = get_child(wtree->root, tail[0]);
   while (node) {
-    unsigned int matched = get_str_match(node->chunk, tail);
+    size_t matched = get_str_match(node->chunk, tail);
     if (!node->size && node->chunk[matched] == '\0' && tail[matched] == '\0') {
       free(tail);
       return node;
