@@ -36,9 +36,6 @@ int main() {
   }
   free(words);
 
-//  sort_wtree(wtree);
-//  DTEST_INFO("Tree sorted");
-
   struct Endpoint* ep = get_wtree_endpoint(wtree, "abc");
   DTEST_EXPECT_STRING(ep->c, "ep1");
   ep = get_wtree_endpoint(wtree, "abcxyz");
