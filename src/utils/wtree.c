@@ -50,7 +50,7 @@ static size_t get_new_child_ind(struct WTreeNode *node, char c) {
     return 0;
   }
 
-  INFOF("Searching place in node %s, size %u for %i(%c)", node->chunk,
+  INFOF("Searching place in node %s, size %lu for %i(%c)", node->chunk,
         node->size, c, c);
 
   // Edge case - empty node
@@ -63,7 +63,7 @@ static size_t get_new_child_ind(struct WTreeNode *node, char c) {
   size_t s = i2 - i1;
   size_t i = s / 2;
 
-  INFOF("i1: %u, i2: %u, s: %u, i: %u, chunk: %c", i1, i2, s, i,
+  INFOF("i1: %lu, i2: %lu, s: %lu, i: %lu, chunk: %c", i1, i2, s, i,
         node->children.nodes[i1]->chunk[0]);
 
   // Two edge cases
@@ -94,7 +94,7 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
     WARN("Attempt to access NULL node");
     return NULL;
   }
-  INFOF("Seaching node %s, size %u for %c(%i)", node->chunk, node->size, c, c);
+  INFOF("Seaching node %s, size %lu for %c(%i)", node->chunk, node->size, c, c);
 
   // Edge case - empty node
   if (!node->size)
@@ -132,7 +132,7 @@ static struct WTreeNode *append_node(struct WTreeNode *parent, char *chunk) {
   INFO2F("Appending node %s to %s", chunk, parent->chunk);
   struct WTreeNode *child = create_node(parent, chunk);
   size_t new_ind = get_new_child_ind(parent, chunk[0]);
-  INFO2F("New index: %u", new_ind);
+  INFO2F("New index: %lu", new_ind);
   parent->size++;
   parent->children.nodes = realloc(parent->children.nodes,
                                    parent->size * sizeof(struct WTreeNode *));
@@ -211,7 +211,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
     INFOF("Switched to node: %s", next_node->chunk);
     size_t l = strlen(next_node->chunk);
     unsigned int matched = get_str_match(next_node->chunk, tail);
-    INFOF("tl == %u, l == %u, matched == %u", tl, l, matched);
+    INFOF("tl == %lu, l == %lu, matched == %u", tl, l, matched);
     // Matched all chars - wtree already has this word
     if (l == matched && tl == matched + 1)
       ERRF(1, "Attempt to add existing word '%s' to wtree", word);
@@ -268,7 +268,7 @@ void shrink_wtree(struct WTree *wtree, char *word) {
       i++;
   }
   destroy_node(to_delete);
-  INFOF("New parent size: %u", parent->size);
+  INFOF("New parent size: %lu", parent->size);
 
   if (parent->size)
     parent->children.nodes = realloc(parent->children.nodes,
