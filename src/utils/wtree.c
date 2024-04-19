@@ -227,7 +227,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
   struct WTreeNode *appended = append_node(node, tail);
   appended->children.endpoint = endpoint;
   wtree->size++;
-  INFO2("Expand complete");
+  INFOF("Expand complete, appended %p to word %s", endpoint, word);
 }
 
 size_t get_wtree_size(struct WTree *wtree) { return wtree->size; }
