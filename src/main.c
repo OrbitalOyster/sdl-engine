@@ -3,8 +3,14 @@
 #include "core.h"
 #include "input.h"
 #include "utils/debug.h"
+#include "utils/JSON/JSON.h"
 
 int main() {
+
+  struct JSON *json = create_JSON();
+  parse_JSON_file(json, "sample.json");
+  char *s = JSON_to_string(json);
+  printf("res = %s\n", s);
 
   /*
   unsigned int INITIAL_STR_LENGTH = 16;

@@ -244,6 +244,8 @@ static struct Token *parse_token_F(FILE *f, int c) {
 struct Token *read_json_file(char *filename) {
   FILE *f;
   f = fopen(filename, "r");
+  if (!f)
+    ERRF(1, "Unable to open file: %s", filename);
   int c = skip_whitespaces_F(f);
   struct Token *result = parse_token_F(f, c);
   fclose(f);
