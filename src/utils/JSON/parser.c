@@ -40,8 +40,6 @@ static enum TokenType identify_token(int c) {
     break;
   default:
     if (is_digit(c)) {
-      if (c == '0')
-        ERR(1, "Invalid number format");
       result = Number;
       INFO("Token: Number");
     }
