@@ -23,3 +23,9 @@ void parse_JSON_file(struct JSON *json, char *filename) {
 char *JSON_to_string(struct JSON *json) {
   return token_to_string(json->root);
 }
+
+struct JSON *string_to_JSON(char *str) {
+  struct JSON *json = create_JSON();
+  json->root = read_json_string(str);
+  return json;
+}

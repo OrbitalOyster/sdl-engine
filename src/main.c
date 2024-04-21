@@ -7,11 +7,14 @@
 
 int main() {
 
-  struct JSON *json = create_JSON();
-  parse_JSON_file(json, "sample.json");
-  // parse_JSON_file(json, "test-data/large-file.json");
-  char *s = JSON_to_string(json);
-  printf("res = %s\n", s);
+  struct JSON *json1 = create_JSON();
+  parse_JSON_file(json1, "sample.json");
+  char *s1 = JSON_to_string(json1);
+  printf("res1 = %s\n", s1);
+
+  struct JSON *json2 = string_to_JSON(s1);
+  char *s2 = JSON_to_string(json2);
+  printf("res2 = %s\n", s2);
 
   /*
   unsigned int INITIAL_STR_LENGTH = 16;
