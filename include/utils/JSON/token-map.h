@@ -13,7 +13,8 @@ void expand_token_map(struct TokenMap *map, char *key, struct Token *token);
 void expandTokenMapN(struct TokenMap *map, struct Token *token);
 
 char **get_token_map_keys(struct TokenMap *map);
-struct Token *get_token_map_element(struct TokenMap *map, unsigned int n);
+struct Token *get_token_map_element(struct TokenMap *map, char *key);
+struct Token *get_token_map_element_by_ind(struct TokenMap *map, unsigned int i);
 struct Token *read_token_map(struct TokenMap *map, char *key);
 void destroy_token_map(struct TokenMap *map);
 

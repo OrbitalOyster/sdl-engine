@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/tokenMap.h"
+#include "utils/JSON/token-map.h"
 
 static char *token_map_to_string(struct TokenMap *map, int keys);
 
@@ -34,7 +34,7 @@ static char *token_map_to_string(struct TokenMap *map, int nkeys) {
   char **keys = get_token_map_keys(map);
   for (unsigned int i = 0; i < get_token_map_size(map); i++) {
     char *key = keys[i];
-    char *value = token_to_string(get_token_map_element(map, i));
+    char *value = token_to_string(get_token_map_element(map, key));
     if (i) { // ", "
       size += (2 + strlen(value)) * sizeof(char);
       result = realloc(result, size);

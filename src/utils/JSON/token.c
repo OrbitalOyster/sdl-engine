@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "utils/JSON/tokenMap.h"
+#include "utils/JSON/token-map.h"
 #include "utils/debug.h"
 
 struct Token {
@@ -72,7 +72,7 @@ unsigned int get_array_token_size(struct Token *arr) {
 struct Token *get_array_token_element(struct Token *arr, unsigned int n) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
-  return get_token_map_element(arr->value.map, n);
+  return get_token_map_element_by_ind(arr->value.map, n);
 }
 
 void expand_object_token(struct Token *obj, char *key, struct Token *token) {

@@ -1,4 +1,4 @@
-#include "utils/JSON/tokenMap.h"
+#include "utils/JSON/token-map.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,8 +39,12 @@ char **get_token_map_keys(struct TokenMap *map) {
   return get_wtree_words(map->tree);
 }
 
-struct Token *get_token_map_element(struct TokenMap *map, unsigned int n) {
-  return map->content[n];
+struct Token *get_token_map_element(struct TokenMap *map, char *key) {
+  return get_wtree_endpoint(map->tree, key);
+}
+
+struct Token *get_token_map_element_by_ind(struct TokenMap *map, unsigned int i) {
+  return map->content[i];
 }
 
 struct Token *read_token_map(struct TokenMap *map, char *key) {
