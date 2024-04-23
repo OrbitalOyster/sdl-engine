@@ -77,10 +77,12 @@ char *token_to_string(struct Token *token) {
     result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
     snprintf(result, MAX_NUMBER_LENGTH, "%i", value.number);
     break;
-  case String:
-    result = calloc(MAX_STRING_LENGTH, sizeof(char));
-    snprintf(result, MAX_STRING_LENGTH, "\"%s\"", value.string);
+  case String: {
+    size_t max = strlen(value.string) + 3;
+    result = calloc(max, sizeof(char));
+    snprintf(result, max, "\"%s\"", value.string);
     break;
+  }
   case Boolean:
     result = calloc(6, sizeof(char));
     if (value.boolean)

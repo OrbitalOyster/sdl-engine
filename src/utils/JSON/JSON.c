@@ -29,3 +29,8 @@ struct JSON *string_to_JSON(char *str) {
   json->root = read_json_string(str);
   return json;
 }
+
+void destroy_JSON(struct JSON *json) {
+  destroy_token(json->root);
+  free(json);
+}

@@ -5,6 +5,7 @@
 
 #include "utils/debug.h"
 
+#define INITIAL_STRING_LENGTH 8
 #define TRUE_STRING "true"
 #define FALSE_STRING "false"
 #define NULL_STRING "null"
@@ -50,40 +51,61 @@ static enum TokenType identify_token(int c) {
 }
 
 static char *read_string_F(FILE *f) {
-  char *string = calloc(MAX_STRING_LENGTH, sizeof(char));
-  int c, n = 0, done = 0;
+  size_t l = INITIAL_STRING_LENGTH, n = 0;
+  char *string = calloc(l, sizeof(char));
+  int esc = 0, c, done = 0;
   do {
     c = fgetc(f);
     if (c == EOF)
       ERR(1, "Unexpected EOF");
-    if (c == '"')
+    // Check if we're done
+    if (c == '"' && !esc)
       done = 1;
     else
       string[n++] = (char)c;
+    // Check string size
+    if (n == l - 1) {
+      l *= 2;
+      string = realloc(string, sizeof(char) * l);
+    }
+    // Check for ESC sequence
+    esc = (c == '\\' && !esc);
   } while (!done);
+  string[n] = '\0';
   INFOF("Read String: %s", string);
   return string;
 }
 
 static char *read_string_S(char *str, unsigned int *char_num) {
-  char *string = calloc(MAX_STRING_LENGTH, sizeof(char));
-  int c, n = 0, done = 0;
+  size_t l = INITIAL_STRING_LENGTH, n = 0;
+  char *string = calloc(l, sizeof(char));
+  int esc = 0, c, done = 0;
   do {
     c = str[(*char_num)++];
     if (c == EOF)
       ERR(1, "Unexpected EOF");
+    // Check if we're done
     if (c == '"')
       done = 1;
     else
       string[n++] = (char)c;
+    // Check string size
+    if (n == l - 1) {
+      l *= 2;
+      string = realloc(string, sizeof(char) * l);
+    }
+    // Check for ESC sequence
+    esc = (c == '\\' && !esc);
   } while (!done);
+  string[n] = '\0';
   INFOF("Read String: %s", string);
   return string;
 }
 
 static int read_number_F(FILE *f) {
-  char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
-  int c, n = 0, done = 0;
+  size_t l = INITIAL_STRING_LENGTH, n = 0;
+  char *number = calloc(l, sizeof(char));
+  int c, done = 0;
   fseek(f, -1, SEEK_CUR);
   do {
     c = fgetc(f);
@@ -91,7 +113,13 @@ static int read_number_F(FILE *f) {
       done = 1;
     else
       number[n++] = (char)c;
+    // Check string size
+    if (n == l - 1) {
+      l *= 2;
+      number = realloc(number, sizeof(char) * l);
+    }
   } while (!done);
+  number[n] = '\0';
   INFOF("Read Number: %s", number);
   int result = atoi(number);
   INFOF("Actual number: %s", number);
@@ -101,8 +129,9 @@ static int read_number_F(FILE *f) {
 }
 
 static int read_number_S(char *str, unsigned int *char_num) {
-  char *number = calloc(MAX_STRING_LENGTH, sizeof(int));
-  int c, n = 0, done = 0;
+  size_t l = INITIAL_STRING_LENGTH, n = 0;
+  char *number = calloc(l, sizeof(char));
+  int c, done = 0;
   (*char_num)--;
   do {
     c = str[(*char_num)++];
@@ -110,7 +139,13 @@ static int read_number_S(char *str, unsigned int *char_num) {
       done = 1;
     else
       number[n++] = (char)c;
+    // Check string size
+    if (n == l - 1) {
+      l *= 2;
+      number = realloc(number, sizeof(char) * l);
+    }
   } while (!done);
+  number[n] = '\0';
   INFOF("Read Number: %s", number);
   int result = atoi(number);
   INFOF("Actual number: %s", number);

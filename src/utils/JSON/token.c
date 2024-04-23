@@ -13,6 +13,8 @@ struct Token {
 
 struct Token *create_token(enum TokenType type, union TokenValue value) {
   struct Token *result = calloc(1, sizeof(struct Token));
+  if (!result)
+    ERR(1, "Out of memory");
   *result = (struct Token){.type = type, .value = value};
   return result;
 }
@@ -25,6 +27,8 @@ union TokenValue get_token_value(struct Token *token) {
 
 struct Token *create_undefined_token() {
   struct Token *result = calloc(1, sizeof(struct Token));
+  if (!result)
+    ERR(1, "Out of memory");
   *result = (struct Token){.type = Undefined};
   return result;
 }
@@ -59,6 +63,8 @@ struct Token *create_boolean_token(int b) {
 
 struct Token *create_null_token() {
   struct Token *result = calloc(1, sizeof(struct Token));
+  if (!result)
+    ERR(1, "Out of memory");
   *result = (struct Token){.type = Null};
   return result;
 }
@@ -85,8 +91,8 @@ void expand_array_token(struct Token *arr, struct Token *token) {
   if (arr->type != Array)
     ERR(1, "Unable to expand token");
   unsigned int next_index = get_array_token_size(arr);
-  char *key = calloc(MAX_STRING_LENGTH, sizeof(char));
-  snprintf(key, MAX_STRING_LENGTH, "%i", next_index);
+  char *key = calloc(MAX_KEY_LENGTH, sizeof(char));
+  snprintf(key, MAX_KEY_LENGTH, "%i", next_index);
   expand_token_map(arr->value.map, key, token);
   free(key);
 }

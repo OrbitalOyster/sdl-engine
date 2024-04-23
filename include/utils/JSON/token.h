@@ -3,7 +3,6 @@
 
 #define MAX_KEY_LENGTH 255
 #define MAX_NUMBER_LENGTH 64
-#define MAX_STRING_LENGTH 255
 
 struct Token;
 

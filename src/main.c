@@ -8,7 +8,7 @@
 int main() {
 
   struct JSON *json1 = create_JSON();
-  parse_JSON_file(json1, "sample.json");
+  parse_JSON_file(json1, "assets/sample.json");
   char *s1 = JSON_to_string(json1);
   printf("res1 = %s\n", s1);
 
@@ -16,21 +16,11 @@ int main() {
   char *s2 = JSON_to_string(json2);
   printf("res2 = %s\n", s2);
 
-  /*
-  unsigned int INITIAL_STR_LENGTH = 16;
-  unsigned int l = 0;
-  char *str = "Test string";
+  destroy_JSON(json1);
+  free(s1);
 
-  char *result = calloc(INITIAL_STR_LENGTH, sizeof(char));
-  char c = str[0];
-  while (c) {
-    result[l] = c;
-    c = str[++l];
-  }
-  printf("res = %s, l = %u strlen = %lu\n", result , l, strlen("123"));
-  */
-
-
+  destroy_JSON(json2);
+  free(s2);
 
   return 0;
 
