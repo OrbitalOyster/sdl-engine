@@ -77,8 +77,7 @@ struct JSON *file_to_JSON(char *filename) {
   }
   json->source = f;
   // Skip trailing whitespaces
-  skip_whitespaces(json, get_next_char_F, rewind_F);
-  struct Token *root = parse_token(json, get_next_char_F, rewind_F);
+  struct Token *root = parse_next_token(json, get_next_char_F, rewind_F);
   json->root = root;
   fclose(f);
 

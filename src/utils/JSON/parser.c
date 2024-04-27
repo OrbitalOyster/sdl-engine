@@ -7,8 +7,6 @@
 
 #define INITIAL_STRING_LENGTH 8
 
-static int is_whitespace(int c) { return (c == ' ' || c == '\n' || c == '\t'); }
-
 static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
 static char *read_string(void *json, int (*get_next_char)(void *json)) {
@@ -33,11 +31,12 @@ static char *read_string(void *json, int (*get_next_char)(void *json)) {
     esc = (c == '\\' && !esc);
   } while (!done);
   string[n] = '\0';
-  INFOF("Read String: %s", string);
+  INFOF("Read string: %s", string);
   return string;
 }
 
-static int read_number(void *json, int (*get_next_char)(void *json), void (*rewind)(void *json)) {
+static int read_number(void *json, int (*get_next_char)(void *json),
+                       void (*rewind)(void *json)) {
   size_t l = INITIAL_STRING_LENGTH, n = 0;
   char *number = calloc(l, sizeof(char));
   int c, done = 0;
@@ -67,9 +66,22 @@ static int read_number(void *json, int (*get_next_char)(void *json), void (*rewi
   return result;
 }
 
-static int read_boolean(void *json, int (*get_next_char)(void *json), void (*rewind)(void *json)) {
+static int read_true(void *json, int (*get_next_char)(void *json),
+                        void (*rewind)(void *json)) {
+  // TRUE_STRING length
+  unsigned int l = 4;
+  for (int i = 1; i < l; i++)
+
+}
+
+static int read_false(void *json, int (*get_next_char)(void *json),
+                        void (*rewind)(void *json)) {
+}
+
+static int read_boolean(void *json, int (*get_next_char)(void *json),
+                        void (*rewind)(void *json)) {
   int c, n = 0, done = 0, reading_true = 0;
-  
+
   rewind(json);
 
   do {
@@ -94,7 +106,8 @@ static int read_boolean(void *json, int (*get_next_char)(void *json), void (*rew
   return reading_true;
 }
 
-static void read_null(void *json, int (*get_next_char)(void *json), void (*rewind)(void *json)) {
+static void read_null(void *json, int (*get_next_char)(void *json),
+                      void (*rewind)(void *json)) {
   int c;
   rewind(json);
   for (int i = 0; i < 4; i++) {
@@ -105,28 +118,30 @@ static void read_null(void *json, int (*get_next_char)(void *json), void (*rewin
   }
 }
 
-void skip_whitespaces(void *json, int (*get_next_char)(void *json),
-                      void (*rewind)(void *json)) {
-  INFO("Skipping whitespaces...");
+int next_non_whitespace(void *json, int (*get_next_char)(void *json)) {
+  INFO("Skipping to non-whitespace...");
   int c;
-  do {
-    c = get_next_char(json);
-  } while (is_whitespace(c));
-  rewind(json);
+  while (1) {
+    switch (c = get_next_char(json)) {
+    case ' ':
+    case '\t':
+    case '\n':
+      break;
+    default:
+      return c;
+    }
+  }
 }
 
 static int skip_to_next_object_token(void *json,
-                                     int (*get_next_char)(void *json),
-                                     void (*rewind)(void *json)) {
+                                     int (*get_next_char)(void *json)) {
   INFO("Skipping to next object token");
-  skip_whitespaces(json, get_next_char, rewind);
-  int c = get_next_char(json);
+  int c = next_non_whitespace(json, get_next_char);
   // Comma or '}'
   switch (c) {
   case ',':
     // Must be '"'
-    skip_whitespaces(json, get_next_char, rewind);
-    c = get_next_char(json);
+    c = next_non_whitespace(json, get_next_char);
     if (c != '"')
       ERRF(1, "Expected key, got [%c]", c);
     return c;
@@ -145,42 +160,36 @@ static struct TokenMap *parse_object(void *json,
                                      int (*get_next_char)(void *json),
                                      void (*rewind)(void *json)) {
   struct TokenMap *result = create_token_map();
-  skip_whitespaces(json, get_next_char, rewind);
-  int c = get_next_char(json);
+  int c = next_non_whitespace(json, get_next_char);
   while (c != '}') {
     INFO("Reading next key-value pair");
     // Key
     if (c != '"')
       ERRF(1, "Expected key, got [%c]", c);
     char *key = read_string(json, get_next_char);
-    skip_whitespaces(json, get_next_char, rewind);
-    c = get_next_char(json);
+    c = next_non_whitespace(json, get_next_char);
     // Colon
     if (c != ':')
       ERRF(1, "Expected ':', got [%c]", c);
-    skip_whitespaces(json, get_next_char, rewind);
-    // c = get_next_char(json);
     // Value
-    struct Token *new_token = parse_token(json, get_next_char, rewind);
+    struct Token *new_token = parse_next_token(json, get_next_char, rewind);
     // Add to object
     expand_token_map(result, key, new_token);
     free(key);
-    c = skip_to_next_object_token(json, get_next_char, rewind);
-    // c = get_next_char(json);
+    c = skip_to_next_object_token(json, get_next_char);
   }
   return result;
 }
 
-static int skip_to_next_array_token(void *json, int (*get_next_char)(void *json), void (*rewind)(void *json)) {
+static int skip_to_next_array_token(void *json,
+                                    int (*get_next_char)(void *json)) {
   INFO("Skipping to next array token...");
-  skip_whitespaces(json, get_next_char, rewind);
-  int c = get_next_char(json);
+  int c = next_non_whitespace(json, get_next_char);
   // Comma or ']'
   switch (c) {
   case ',':
+    c = next_non_whitespace(json, get_next_char);
     // Must not be ',' or ']'
-    skip_whitespaces(json, get_next_char, rewind);
-    c = get_next_char(json);
     if (c == ',' || c == ']')
       ERRF(1, "Expected value, got [%c]", c);
     return c;
@@ -195,40 +204,39 @@ static int skip_to_next_array_token(void *json, int (*get_next_char)(void *json)
   }
 }
 
-static struct TokenMap *parse_array(void *json, int (*get_next_char)(void *json), void (*rewind)(void *json)) {
+static struct TokenMap *parse_array(void *json,
+                                    int (*get_next_char)(void *json),
+                                    void (*rewind)(void *json)) {
   INFO("Parsing array...");
   struct TokenMap *result = create_token_map();
-  skip_whitespaces(json, get_next_char, rewind);
-  // int c = -1; //get_next_char(json);
-  int c = get_next_char(json);
+  int c = next_non_whitespace(json, get_next_char);
   while (c != ']') {
     INFO("Reading next array token");
-    // skip_whitespaces(json, get_next_char, rewind);
     rewind(json);
-    struct Token *next_token = parse_token(json, get_next_char, rewind);
+    struct Token *next_token = parse_next_token(json, get_next_char, rewind);
     expandTokenMapN(result, next_token);
-    c = skip_to_next_array_token(json, get_next_char, rewind);
+    c = skip_to_next_array_token(json, get_next_char);
   }
   return result;
 }
 
-struct Token *parse_token(void *json, int (*get_next_char)(void *json),
-                                 void (*rewind)(void *json)) {
+struct Token *parse_next_token(void *json, int (*get_next_char)(void *json),
+                          void (*rewind)(void *json)) {
   enum TokenType type = Undefined;
   union TokenValue value;
-  int c = get_next_char(json);
+  int c = next_non_whitespace(json, get_next_char);
   switch (c) {
-//  case Undefined:
-//    ERRF(1, "Unexpected character: %i [%c]", c, c);
-//    break;
+    //  case Undefined:
+    //    ERRF(1, "Unexpected character: %i [%c]", c, c);
+    //    break;
   case '{':
     INFO("Processing Object...");
-    type = Object; 
+    type = Object;
     value.map = parse_object(json, get_next_char, rewind);
     break;
   case '[':
     INFO("Processing Array...");
-    type = Array; 
+    type = Array;
     value.map = parse_array(json, get_next_char, rewind);
     break;
   case '0':
@@ -242,23 +250,27 @@ struct Token *parse_token(void *json, int (*get_next_char)(void *json),
   case '8':
   case '9':
     INFO("Processing Number...");
-    type = Number; 
+    type = Number;
     value.number = read_number(json, get_next_char, rewind);
     break;
   case '\"':
     INFO("Processing String...");
-    type = String; 
+    type = String;
     value.string = read_string(json, get_next_char);
     break;
-  case 't':
-  case 'f':
-    INFO("Processing Boolean...");
-    type = Boolean; 
-    value.boolean = read_boolean(json, get_next_char, rewind);
+  case TRUE_STRING[0]:
+    INFO("Processing Boolean (true)...");
+    value.boolean = read_true(json, get_next_char);
+    type = Boolean;
+    break;
+  case FALSE_STRING[0]:
+    INFO("Processing Boolean (false)...");
+    value.boolean = read_false(json, get_next_char);
+    type = Boolean;
     break;
   case 'n':
     INFO("Processing Null...");
-    type = Null; 
+    type = Null;
     read_null(json, get_next_char, rewind);
     break;
   default:

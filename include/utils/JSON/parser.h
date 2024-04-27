@@ -9,7 +9,7 @@
 void skip_whitespaces(void *json, int (*get_next_char)(void *json),
                       void (*rewind)(void *json));
 
-struct Token *parse_token(void *json, int (*get_next_char)(void *json),
+struct Token *parse_next_token(void *json, int (*get_next_char)(void *json),
                           void (*rewind)(void *json));
 
 struct Token *read_json_file(char *filename, size_t *char_num, size_t *line_num,
