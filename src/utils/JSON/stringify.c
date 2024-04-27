@@ -44,7 +44,7 @@ static char *token_map_to_string(struct TokenMap *map, int nkeys) {
       size_t key_length = strlen(key);
       // 5 stands for: quote, quote, colon, whitespace, end of string
       size_t total_length = key_length + 5;
-      char* key_str = calloc(total_length, sizeof(char));
+      char *key_str = calloc(total_length, sizeof(char));
       size += total_length * sizeof(char);
       result = realloc(result, size);
       snprintf(key_str, total_length, "\"%s\": ", key);
@@ -77,12 +77,11 @@ char *token_to_string(struct Token *token) {
     result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
     snprintf(result, MAX_NUMBER_LENGTH, "%i", value.number);
     break;
-  case String: {
+  case String:;
     size_t max = strlen(value.string) + 3;
     result = calloc(max, sizeof(char));
     snprintf(result, max, "\"%s\"", value.string);
     break;
-  }
   case Boolean:
     result = calloc(6, sizeof(char));
     if (value.boolean)

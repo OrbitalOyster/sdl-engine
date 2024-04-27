@@ -24,5 +24,6 @@
     "Thomas",
     "Trevor"
   ],
+  "comment": "Foo: \"Bar\"",
   "spouse": null
 }

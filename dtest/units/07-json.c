@@ -11,7 +11,7 @@
 
 int main() {
   DTEST_UNIT_START("JSON parser");
-  struct Token *token = read_json_file("sample.json");
+  struct Token *token = read_json_file("assets/sample.json");
   char *s = token_to_string(token);
   INFOF("Token to string: %s", s);
   destroy_token(token);

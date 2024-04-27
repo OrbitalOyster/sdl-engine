@@ -4,6 +4,10 @@
 #define MAX_KEY_LENGTH 255
 #define MAX_NUMBER_LENGTH 64
 
+#define TRUE_STRING "true"
+#define FALSE_STRING "false"
+#define NULL_STRING "null"
+
 struct Token;
 
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Null };
