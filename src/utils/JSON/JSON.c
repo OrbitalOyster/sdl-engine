@@ -39,6 +39,10 @@ void set_JSON_err(struct JSON *json, char *err) {
   strcpy(json->err, err);
 }
 
+char *get_JSON_err(struct JSON *json) {
+  return json->err;
+}
+
 static int get_next_char_F(void *json_arg) {
 
   struct JSON *json = (struct JSON *)json_arg;
@@ -78,6 +82,10 @@ struct JSON *file_to_JSON(char *filename) {
   json->source = f;
   // Skip trailing whitespaces
   struct Token *root = parse_next_token(json, get_next_char_F, rewind_F);
+
+  if (get_JSON_err(json))
+    INFO2F("JSON error: %s", get_JSON_err(json));
+
   json->root = root;
   fclose(f);
 

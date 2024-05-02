@@ -8,8 +8,7 @@
 int main() {
 
   struct JSON *json1 = file_to_JSON("assets/sample.json");
-//  parse_JSON_file(json1, "test-data/large-file.json");
-//  parse_JSON_file(json1, "assets/sample.json");
+//  struct JSON *json1 = file_to_JSON("test-data/large-file.json");
   char *s1 = JSON_to_string(json1);
   printf("res1 = %s\n", s1);
 

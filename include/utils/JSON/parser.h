@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+#include "JSON.h"
 #include "token-map.h"
 #include "token.h"
 
