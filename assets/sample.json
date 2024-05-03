@@ -11,7 +11,7 @@
   },
   "phoneNumbers": [
     {
-      "type": "home"
+      "type": "home",
       "number": "212 555-1234"
     },
     {
@@ -25,5 +25,9 @@
     "Trevor"
   ],
   "comment": "Foo: \"Bar\"",
+  "lagreNumber": 1234567890,
   "spouse": null
 }
+
+
+

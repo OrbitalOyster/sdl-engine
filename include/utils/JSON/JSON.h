@@ -13,6 +13,9 @@ char *get_JSON_err(struct JSON *json);
 
 struct JSON *file_to_JSON(char *filename);
 char *JSON_to_string(struct JSON *json);
+
+struct JSON *string_to_JSON(char *s);
+
 void destroy_JSON(struct JSON *json);
 
 #endif /* JSON_H */

@@ -12,17 +12,17 @@ int main() {
   char *s1 = JSON_to_string(json1);
   printf("res1 = %s\n", s1);
 
-//  struct JSON *json2 = string_to_JSON(s1);
-//  char *s2 = JSON_to_string(json2);
-//  printf("res2 = %s\n", s2);
+  struct JSON *json2 = string_to_JSON(s1);
+  char *s2 = JSON_to_string(json2);
+  printf("res2 = %s\n", s2);
 
-//  printf("res = %i\n", strcmp(s1, s2));
+  printf("cmp = %i\n", strcmp(s1, s2));
 
   destroy_JSON(json1);
   free(s1);
 
-//  destroy_JSON(json2);
-//  free(s2);
+  destroy_JSON(json2);
+  free(s2);
 
   return 0;
 
