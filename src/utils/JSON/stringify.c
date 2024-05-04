@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
 
+static char *token_array_to_string(struct TokenArray *array);
 static char *token_map_to_string(struct TokenMap *map, int keys);
 
 static char *object_token_to_string(struct TokenMap *map) {
@@ -18,13 +20,31 @@ static char *object_token_to_string(struct TokenMap *map) {
   return result;
 }
 
-static char *array_token_to_string(struct TokenMap *map) {
-  char *s = token_map_to_string(map, 0);
+static char *array_token_to_string(struct TokenArray *array) {
+  char *s = token_array_to_string(array);
   char *result = calloc(2 + strlen(s) + 1, sizeof(char));
   strcat(result, "[");
   strcat(result, s);
   strcat(result, "]");
   free(s);
+  return result;
+}
+
+static char *token_array_to_string(struct TokenArray *array) {
+  size_t size = 1;
+  char *result = calloc(size, sizeof(char));
+  for (size_t i = 0; i < get_token_array_size(array); i++) {
+    char *value = token_to_string(get_token_array_element(array, i));
+    if (i) { // ", "
+      size += (2 + strlen(value)) * sizeof(char);
+      result = realloc(result, size);
+      strcat(result, ", ");
+    }
+    size += strlen(value) * sizeof(char);
+    result = realloc(result, size);
+    strcat(result, value);
+    free(value);
+  }
   return result;
 }
 
@@ -71,7 +91,7 @@ char *token_to_string(struct Token *token) {
     result = object_token_to_string(value.map);
     break;
   case Array:
-    result = array_token_to_string(value.map);
+    result = array_token_to_string(value.array);
     break;
   case Number:
     result = calloc(MAX_NUMBER_LENGTH, sizeof(char));

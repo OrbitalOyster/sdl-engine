@@ -5,6 +5,7 @@
 
 #include "utils/JSON/token.h"
 #include "utils/JSON/token-map.h"
+#include "utils/JSON/token-array.h"
 
 #include "utils/debug.h"
 
@@ -235,11 +236,11 @@ static int skip_to_next_array_token(struct JSON *json,
   }
 }
 
-static struct TokenMap *parse_array(struct JSON *json,
+static struct TokenArray *parse_array(struct JSON *json,
                                     int (*get_next_char)(struct JSON *json),
                                     void (*rewind)(struct JSON *json)) {
   INFO("Parsing array...");
-  struct TokenMap *result = create_token_map();
+  struct TokenArray *result = create_token_array();
   int c = next_non_whitespace(json, get_next_char);
   while (c != ']') {
     INFO("Reading next array token");
@@ -249,7 +250,7 @@ static struct TokenMap *parse_array(struct JSON *json,
     if (get_JSON_err(json))
       return result;
 
-    expandTokenMapN(result, next_token);
+    expand_token_array(result, next_token);
     c = skip_to_next_array_token(json, get_next_char);
 
     if (get_JSON_err(json))
@@ -272,7 +273,7 @@ struct Token *parse_next_token(struct JSON *json, int (*get_next_char)(struct JS
   case '[':
     INFO("Processing Array...");
     type = Array;
-    value.map = parse_array(json, get_next_char, rewind);
+    value.array = parse_array(json, get_next_char, rewind);
     break;
   case '0':
   case '1':

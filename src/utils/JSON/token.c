@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
 #include "utils/debug.h"
 
@@ -40,8 +41,8 @@ struct Token *create_object_token() {
 }
 
 struct Token *create_array_token() {
-  struct TokenMap *map = create_token_map();
-  struct Token *result = create_token(Array, (union TokenValue){.map = map});
+  struct TokenArray *array = create_token_array();
+  struct Token *result = create_token(Array, (union TokenValue){.array = array});
   return result;
 }
 
@@ -69,16 +70,16 @@ struct Token *create_null_token() {
   return result;
 }
 
-unsigned int get_array_token_size(struct Token *arr) {
+size_t get_array_token_size(struct Token *arr) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
-  return get_token_map_size(arr->value.map);
+  return get_token_array_size(arr->value.array);
 }
 
-struct Token *get_array_token_element(struct Token *arr, unsigned int n) {
+struct Token *get_array_token_element(struct Token *arr, size_t n) {
   if (arr->type != Array)
     ERR(1, "Token is not array");
-  return get_token_map_element_by_ind(arr->value.map, n);
+  return get_token_array_element(arr->value.array, n);
 }
 
 void expand_object_token(struct Token *obj, char *key, struct Token *token) {
@@ -90,17 +91,25 @@ void expand_object_token(struct Token *obj, char *key, struct Token *token) {
 void expand_array_token(struct Token *arr, struct Token *token) {
   if (arr->type != Array)
     ERR(1, "Unable to expand token");
-  unsigned int next_index = get_array_token_size(arr);
-  char *key = calloc(MAX_KEY_LENGTH, sizeof(char));
-  snprintf(key, MAX_KEY_LENGTH, "%i", next_index);
-  expand_token_map(arr->value.map, key, token);
-  free(key);
+  expand_token_array(arr->value.array, token);
 }
 
 void destroy_token(struct Token *token) {
-  if (token->type == Object || token->type == Array)
-    destroy_token_map(token->value.map);
-  if (token->type == String)
-    free(token->value.string);
+  switch (token->type) {
+    case Object:
+      destroy_token_map(token->value.map);
+      break;
+    case Array:
+      destroy_token_array(token->value.array);
+      break;
+    case String:
+      free(token->value.string);
+      break;
+    case Undefined:
+    case Number:
+    case Boolean:
+    case Null:
+      break;
+  }
   free(token);
 }

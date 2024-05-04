@@ -1,6 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <stddef.h>
+
 #define MAX_KEY_LENGTH 255
 #define MAX_NUMBER_LENGTH 64
 
@@ -12,6 +14,7 @@ union TokenValue {
   int number, boolean;
   char *string;
   struct TokenMap *map;
+  struct TokenArray *array;
 };
 
 struct Token *create_token(enum TokenType type, union TokenValue value);
@@ -24,8 +27,8 @@ struct Token *create_number_token(int n);
 struct Token *create_string_token(char *s);
 struct Token *create_boolean_token(int b);
 struct Token *create_null_token();
-unsigned int get_array_token_size(struct Token *arr);
-struct Token *get_array_token_element(struct Token *arr, unsigned int n);
+size_t get_array_token_size(struct Token *arr);
+struct Token *get_array_token_element(struct Token *arr, size_t n);
 void expand_object_token(struct Token *obj, char *key, struct Token *token);
 void expand_array_token(struct Token *arr, struct Token *token);
 void destroy_token(struct Token *token);

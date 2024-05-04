@@ -28,12 +28,14 @@ void expand_token_map(struct TokenMap *map, char *key, struct Token *token) {
   expand_wtree(map->tree, key, map->content[map->size - 1]);
 }
 
+/*
 void expandTokenMapN(struct TokenMap *map, struct Token *token) {
   char *key = calloc(MAX_KEY_LENGTH, sizeof(char));
   snprintf(key, MAX_KEY_LENGTH, "%i", map->size);
   expand_token_map(map, key, token);
   free(key);
 }
+*/
 
 char **get_token_map_keys(struct TokenMap *map) {
   return get_wtree_words(map->tree);
