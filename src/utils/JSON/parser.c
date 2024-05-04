@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "utils/JSON/token.h"
-#include "utils/JSON/token-map.h"
 #include "utils/JSON/token-array.h"
+#include "utils/JSON/token-map.h"
+#include "utils/JSON/token.h"
 
 #include "utils/debug.h"
 
@@ -25,27 +25,28 @@
 
 static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
-static char *read_string(struct JSON *json, int (*get_next_char)(struct JSON *json)) {
+static char *read_string(struct JSON *json,
+                         int (*get_next_char)(struct JSON *json)) {
   size_t l = INITIAL_STRING_LENGTH, n = 0;
   char *string = calloc(l, sizeof(char));
   int esc = 0, c, done = 0;
   do {
     c = get_next_char(json);
     switch (c) {
-      // No unexpected EOF
-      case EOF:
-        set_JSON_err(json, "Unexpected EOF");
-        free(string);
-        return NULL;
-      // No multiline strings
-      case '\n':
-        set_JSON_err(json, "Unexpected \\n");
-        free(string);
-        return NULL;
-      // Check if we're done
-      case '"':
-        done = !esc; // Ignore [\"], finish parasing on ["]
-        break;
+    // No unexpected EOF
+    case EOF:
+      set_JSON_err(json, "Unexpected EOF");
+      free(string);
+      return NULL;
+    // No multiline strings
+    case '\n':
+      set_JSON_err(json, "Unexpected \\n");
+      free(string);
+      return NULL;
+    // Check if we're done
+    case '"':
+      done = !esc; // Ignore [\"], finish parasing on ["]
+      break;
     }
     if (!done) {
       string[n++] = (char)c;
@@ -63,7 +64,8 @@ static char *read_string(struct JSON *json, int (*get_next_char)(struct JSON *js
   return string;
 }
 
-static int read_number(int c1, struct JSON *json, int (*get_next_char)(struct JSON *json),
+static int read_number(int c1, struct JSON *json,
+                       int (*get_next_char)(struct JSON *json),
                        void (*rewind)(struct JSON *json)) {
   size_t l = INITIAL_STRING_LENGTH, n = 1;
   char *number = calloc(l, sizeof(char));
@@ -94,7 +96,8 @@ static int read_number(int c1, struct JSON *json, int (*get_next_char)(struct JS
   return result;
 }
 
-static void read_true(struct JSON *json, int (*get_next_char)(struct JSON *json)) {
+static void read_true(struct JSON *json,
+                      int (*get_next_char)(struct JSON *json)) {
   int c;
   for (unsigned int i = 1; i < TRUE_STRING_LENGTH; i++) {
     c = get_next_char(json);
@@ -105,7 +108,8 @@ static void read_true(struct JSON *json, int (*get_next_char)(struct JSON *json)
   }
 }
 
-static void read_false(struct JSON *json, int (*get_next_char)(struct JSON *json)) {
+static void read_false(struct JSON *json,
+                       int (*get_next_char)(struct JSON *json)) {
   int c;
   for (unsigned int i = 1; i < FALSE_STRING_LENGTH; i++) {
     c = get_next_char(json);
@@ -116,7 +120,8 @@ static void read_false(struct JSON *json, int (*get_next_char)(struct JSON *json
   }
 }
 
-static void read_null(struct JSON *json, int (*get_next_char)(struct JSON *json)) {
+static void read_null(struct JSON *json,
+                      int (*get_next_char)(struct JSON *json)) {
   int c;
   for (unsigned int i = 1; i < NULL_STRING_LENGTH; i++) {
     c = get_next_char(json);
@@ -127,7 +132,8 @@ static void read_null(struct JSON *json, int (*get_next_char)(struct JSON *json)
   }
 }
 
-int next_non_whitespace(struct JSON *json, int (*get_next_char)(struct JSON *json)) {
+int next_non_whitespace(struct JSON *json,
+                        int (*get_next_char)(struct JSON *json)) {
   INFO("Skipping to non-whitespace...");
   int c;
   while (1) {
@@ -237,8 +243,8 @@ static int skip_to_next_array_token(struct JSON *json,
 }
 
 static struct TokenArray *parse_array(struct JSON *json,
-                                    int (*get_next_char)(struct JSON *json),
-                                    void (*rewind)(struct JSON *json)) {
+                                      int (*get_next_char)(struct JSON *json),
+                                      void (*rewind)(struct JSON *json)) {
   INFO("Parsing array...");
   struct TokenArray *result = create_token_array();
   int c = next_non_whitespace(json, get_next_char);
@@ -259,7 +265,8 @@ static struct TokenArray *parse_array(struct JSON *json,
   return result;
 }
 
-struct Token *parse_next_token(struct JSON *json, int (*get_next_char)(struct JSON *json),
+struct Token *parse_next_token(struct JSON *json,
+                               int (*get_next_char)(struct JSON *json),
                                void (*rewind)(struct JSON *json)) {
   enum TokenType type = Undefined;
   union TokenValue value;

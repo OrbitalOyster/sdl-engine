@@ -52,7 +52,7 @@ static char *token_map_to_string(struct TokenMap *map, int nkeys) {
   size_t size = 1;
   char *result = calloc(size, sizeof(char));
   char **keys = get_token_map_keys(map);
-  for (unsigned int i = 0; i < get_token_map_size(map); i++) {
+  for (size_t i = 0; i < get_token_map_size(map); i++) {
     char *key = keys[i];
     char *value = token_to_string(get_token_map_element(map, key));
     if (i) { // ", "

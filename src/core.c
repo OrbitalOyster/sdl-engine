@@ -36,9 +36,7 @@ Core *init_core(int32_t windowWidth, int32_t windowHeight, char *title) {
   return core;
 }
 
-SDL_Renderer *get_renderer(Core *core) {
-  return core->renderer;
-}
+SDL_Renderer *get_renderer(Core *core) { return core->renderer; }
 
 void destroy_core(Core *core) {
   SDL_DestroyRenderer(core->renderer);
