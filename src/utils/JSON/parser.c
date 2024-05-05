@@ -65,8 +65,7 @@ static char *read_string(struct JSON *json,
 }
 
 static int read_number(int c1, struct JSON *json,
-                       int (*get_next_char)(struct JSON *json),
-                       void (*rewind)(struct JSON *json)) {
+                       int (*get_next_char)(struct JSON *json)) {
   size_t l = INITIAL_STRING_LENGTH, n = 1;
   char *number = calloc(l, sizeof(char));
   int c, done = 0;
@@ -92,7 +91,7 @@ static int read_number(int c1, struct JSON *json,
   int result = atoi(number);
   INFOF("Actual number: %s", number);
   free(number);
-  rewind(json);
+  skip_next_JSON_char(json);
   return result;
 }
 
@@ -177,8 +176,7 @@ static int skip_to_next_object_token(struct JSON *json,
 }
 
 static struct TokenMap *parse_object(struct JSON *json,
-                                     int (*get_next_char)(struct JSON *json),
-                                     void (*rewind)(struct JSON *json)) {
+                                     int (*get_next_char)(struct JSON *json)) {
   struct TokenMap *result = create_token_map();
   int c = next_non_whitespace(json, get_next_char);
   while (c != '}') {
@@ -200,7 +198,7 @@ static struct TokenMap *parse_object(struct JSON *json,
       return result;
     }
     // Value
-    struct Token *new_token = parse_next_token(json, get_next_char, rewind);
+    struct Token *new_token = parse_next_token(json, get_next_char);
 
     if (get_JSON_err(json))
       return result;
@@ -243,15 +241,15 @@ static int skip_to_next_array_token(struct JSON *json,
 }
 
 static struct TokenArray *parse_array(struct JSON *json,
-                                      int (*get_next_char)(struct JSON *json),
-                                      void (*rewind)(struct JSON *json)) {
+                                      int (*get_next_char)(struct JSON *json)
+                                      ) {
   INFO("Parsing array...");
   struct TokenArray *result = create_token_array();
   int c = next_non_whitespace(json, get_next_char);
   while (c != ']') {
     INFO("Reading next array token");
-    rewind(json);
-    struct Token *next_token = parse_next_token(json, get_next_char, rewind);
+    skip_next_JSON_char(json);
+    struct Token *next_token = parse_next_token(json, get_next_char);
 
     if (get_JSON_err(json))
       return result;
@@ -266,8 +264,7 @@ static struct TokenArray *parse_array(struct JSON *json,
 }
 
 struct Token *parse_next_token(struct JSON *json,
-                               int (*get_next_char)(struct JSON *json),
-                               void (*rewind)(struct JSON *json)) {
+                               int (*get_next_char)(struct JSON *json)) {
   enum TokenType type = Undefined;
   union TokenValue value;
   int c = next_non_whitespace(json, get_next_char);
@@ -275,12 +272,12 @@ struct Token *parse_next_token(struct JSON *json,
   case '{':
     INFO("Processing Object...");
     type = Object;
-    value.map = parse_object(json, get_next_char, rewind);
+    value.map = parse_object(json, get_next_char);
     break;
   case '[':
     INFO("Processing Array...");
     type = Array;
-    value.array = parse_array(json, get_next_char, rewind);
+    value.array = parse_array(json, get_next_char);
     break;
   case '0':
   case '1':
@@ -294,7 +291,7 @@ struct Token *parse_next_token(struct JSON *json,
   case '9':
     INFO("Processing Number...");
     type = Number;
-    value.number = read_number(c, json, get_next_char, rewind);
+    value.number = read_number(c, json, get_next_char);
     break;
   case '\"':
     INFO("Processing String...");

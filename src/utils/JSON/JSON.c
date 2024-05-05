@@ -10,26 +10,33 @@
 #include "utils/debug.h"
 
 #define MAX_JSON_ERR_LENGTH 64
+#define CHUNK_LENGTH 1024
 
 struct JSON {
   struct Token *root;
   int c;
+  int skip;
   size_t char_num;
   size_t line_num;
   size_t col_num;
   char *err;
   void *source;
+  char *chunk;
+  size_t chunk_read;
 };
 
 struct JSON *create_JSON() {
   struct JSON *json = calloc(1, sizeof(struct JSON));
   *json = (struct JSON){.root = NULL,
                         .c = '\n',
+                        .skip = 0,
                         .char_num = 0,
                         .line_num = 0,
                         .col_num = 0,
                         .err = NULL,
-                        .source = NULL};
+                        .source = NULL,
+                        .chunk = calloc(CHUNK_LENGTH, sizeof(char)),
+                        .chunk_read = 0};
   return json;
 }
 
@@ -44,6 +51,12 @@ void set_JSON_err(struct JSON *json, char *err) {
 char *get_JSON_err(struct JSON *json) { return json->err; }
 
 static int get_next_char_F(struct JSON *json) {
+
+  if (json->skip) {
+    json->skip = 0;
+    return json->c;
+  }
+
   FILE *f = (FILE *)json->source;
 
   json->char_num++;
@@ -54,22 +67,28 @@ static int get_next_char_F(struct JSON *json) {
   } else
     json->col_num++;
 
-  json->c = getc(f);
+  json->c = json->chunk[json->chunk_read++];
+  if (json->chunk_read == CHUNK_LENGTH) {
+    INFO("Reading next chunk...");
+    fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+    json->chunk_read = 0;
+  }
+
   INFOF("Next char %i [%c]", json->c, json->c);
   return json->c;
 }
 
-void rewind_F(struct JSON *json) {
-  FILE *f = (FILE *)json->source;
-
-  json->char_num--;
-  json->col_num--;
-
-  INFO("Rewind...");
-  fseek(f, -1, SEEK_CUR);
+void skip_next_JSON_char(struct JSON *json) {
+  json->skip = 1;
 }
 
 static int get_next_char_S(struct JSON *json) {
+
+  if (json->skip) {
+    json->skip = 0;
+    return json->c;
+  }
+
   char *s = (char *)json->source;
 
   json->char_num++;
@@ -85,13 +104,6 @@ static int get_next_char_S(struct JSON *json) {
   return json->c;
 }
 
-void rewind_S(struct JSON *json) {
-  json->char_num--;
-  json->col_num--;
-
-  INFO("Rewind...");
-}
-
 struct JSON *file_to_JSON(char *filename) {
   struct JSON *json = create_JSON();
 
@@ -102,8 +114,11 @@ struct JSON *file_to_JSON(char *filename) {
     return json;
   }
   json->source = f;
+
+  fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+
   // Skip trailing whitespaces
-  struct Token *root = parse_next_token(json, get_next_char_F, rewind_F);
+  struct Token *root = parse_next_token(json, get_next_char_F);
 
   if (get_JSON_err(json))
     INFO2F("JSON error: %s, line: %lu, col: %lu, char: %i [%c]",
@@ -119,7 +134,7 @@ struct JSON *string_to_JSON(char *s) {
   struct JSON *json = create_JSON();
   json->source = (void *)s;
   // Skip trailing whitespaces
-  struct Token *root = parse_next_token(json, get_next_char_S, rewind_S);
+  struct Token *root = parse_next_token(json, get_next_char_S);
 
   if (get_JSON_err(json))
     INFO2F("JSON error: %s, line: %lu, col: %lu, char: %i [%c]",
@@ -133,5 +148,6 @@ char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 
 void destroy_JSON(struct JSON *json) {
   destroy_token(json->root);
+  free(json->chunk);
   free(json);
 }
