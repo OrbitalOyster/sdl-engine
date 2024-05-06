@@ -70,7 +70,9 @@ static int get_next_char_F(struct JSON *json) {
   json->c = json->chunk[json->chunk_read++];
   if (json->chunk_read == CHUNK_LENGTH) {
     INFO("Reading next chunk...");
-    fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+    const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+    if (fread_res != CHUNK_LENGTH && ferror(f))
+      set_JSON_err(json, "Error reading file");
     json->chunk_read = 0;
   }
 
@@ -115,7 +117,9 @@ struct JSON *file_to_JSON(char *filename) {
   }
   json->source = f;
 
-  fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+  const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+  if (fread_res != CHUNK_LENGTH && ferror(f))
+    set_JSON_err(json, "Error reading file");
 
   // Skip trailing whitespaces
   struct Token *root = parse_next_token(json, get_next_char_F);
