@@ -10,12 +10,11 @@
 #include "utils/debug.h"
 
 #define MAX_JSON_ERR_LENGTH 64
-#define CHUNK_LENGTH 1024
+#define CHUNK_LENGTH 4096
 
 struct JSON {
   struct Token *root;
   int c;
-  int skip;
   size_t char_num;
   size_t line_num;
   size_t col_num;
@@ -29,7 +28,6 @@ struct JSON *create_JSON() {
   struct JSON *json = calloc(1, sizeof(struct JSON));
   *json = (struct JSON){.root = NULL,
                         .c = '\n',
-                        .skip = 0,
                         .char_num = 0,
                         .line_num = 0,
                         .col_num = 0,
@@ -48,61 +46,58 @@ void set_JSON_err(struct JSON *json, char *err) {
   strcpy(json->err, err);
 }
 
+
 char *get_JSON_err(struct JSON *json) { return json->err; }
 
-static int get_next_char_F(struct JSON *json) {
+static int is_whitespace(int c) {
+  return c == ' ' || c == '\t' || c == '\n';
+}
 
-  if (json->skip) {
-    json->skip = 0;
-    return json->c;
-  }
-
-  FILE *f = (FILE *)json->source;
-
-  json->char_num++;
-  // Check previous char
-  if (json->c == '\n') {
-    json->line_num++;
-    json->col_num = 1;
-  } else
-    json->col_num++;
-
-  json->c = json->chunk[json->chunk_read++];
-  if (json->chunk_read == CHUNK_LENGTH) {
-    INFO("Reading next chunk...");
-    const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
-    if (fread_res != CHUNK_LENGTH && ferror(f))
-      set_JSON_err(json, "Error reading file");
-    json->chunk_read = 0;
-  }
-
-  INFOF("Next char %i [%c]", json->c, json->c);
+int get_JSON_char(struct JSON *json) {
   return json->c;
 }
 
-void skip_next_JSON_char(struct JSON *json) {
-  json->skip = 1;
+static int get_next_char_F(struct JSON *json, int skip_whitespaces) {
+  FILE *f = (FILE *)json->source;
+  do {
+    json->char_num++;
+    // Check previous char
+    if (json->c == '\n') {
+      json->line_num++;
+      json->col_num = 1;
+    } else
+      json->col_num++;
+
+    json->c = json->chunk[json->chunk_read++];
+    if (json->chunk_read == CHUNK_LENGTH) {
+      INFO("Reading next chunk...");
+      const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+      if (fread_res != CHUNK_LENGTH && ferror(f))
+        set_JSON_err(json, "Error reading file");
+      json->chunk_read = 0;
+    }
+    INFOF("Next char %i [%c]", json->c, json->c);
+  } while (skip_whitespaces && is_whitespace(json->c));
+
+  return json->c;
 }
 
-static int get_next_char_S(struct JSON *json) {
-
-  if (json->skip) {
-    json->skip = 0;
-    return json->c;
-  }
-
+static int get_next_char_S(struct JSON *json, int skip_whitespaces) {
   char *s = (char *)json->source;
 
-  json->char_num++;
-  // Check previous char
-  if (json->c == '\n') {
-    json->line_num++;
-    json->col_num = 1;
-  } else
-    json->col_num++;
+  do {
+    json->char_num++;
+    // Check previous char
+    if (json->c == '\n') {
+      json->line_num++;
+      json->col_num = 1;
+    } else
+      json->col_num++;
 
-  json->c = s[json->char_num - 1];
-  INFOF("Next char %i [%c]", json->c, json->c);
+    json->c = s[json->char_num - 1];
+    INFOF("Next char %i [%c]", json->c, json->c);
+  } while (skip_whitespaces && is_whitespace(json->c));
+
   return json->c;
 }
 
@@ -122,6 +117,7 @@ struct JSON *file_to_JSON(char *filename) {
     set_JSON_err(json, "Error reading file");
 
   // Skip trailing whitespaces
+  get_next_char_F(json, 1);
   struct Token *root = parse_next_token(json, get_next_char_F);
 
   if (get_JSON_err(json))
@@ -137,7 +133,9 @@ struct JSON *file_to_JSON(char *filename) {
 struct JSON *string_to_JSON(char *s) {
   struct JSON *json = create_JSON();
   json->source = (void *)s;
+
   // Skip trailing whitespaces
+  get_next_char_S(json, 1);
   struct Token *root = parse_next_token(json, get_next_char_S);
 
   if (get_JSON_err(json))

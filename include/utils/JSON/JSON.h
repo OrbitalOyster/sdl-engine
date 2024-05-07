@@ -11,7 +11,9 @@ struct JSON *create_JSON();
 void set_JSON_err(struct JSON *json, char *err);
 char *get_JSON_err(struct JSON *json);
 
-void skip_next_JSON_char(struct JSON *json);
+int get_JSON_char(struct JSON *json);
+
+// void skip_next_JSON_char(struct JSON *json);
 
 struct JSON *file_to_JSON(char *filename);
 char *JSON_to_string(struct JSON *json);
