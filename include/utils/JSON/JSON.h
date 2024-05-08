@@ -12,6 +12,7 @@ void set_JSON_err(struct JSON *json, char *err);
 char *get_JSON_err(struct JSON *json);
 
 int get_JSON_char(struct JSON *json);
+char *get_JSON_number_str(struct JSON *json);
 
 // void skip_next_JSON_char(struct JSON *json);
 

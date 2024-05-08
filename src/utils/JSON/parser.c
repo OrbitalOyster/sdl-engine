@@ -21,7 +21,7 @@
 #define NULL_STRING_0 'n'
 #define NULL_STRING_LENGTH 4
 
-#define INITIAL_STRING_LENGTH 32
+#define INITIAL_STRING_LENGTH 64
 
 static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
@@ -64,70 +64,48 @@ static char *read_string(struct JSON *json,
   return string;
 }
 
-static int read_number(int c1, struct JSON *json,
+static int read_number(struct JSON *json,
                        int (*get_next_char)(struct JSON*, int)) {
-  size_t l = INITIAL_STRING_LENGTH, n = 1;
-  char *number = calloc(l, sizeof(char));
-  int c, done = 0;
+  unsigned int n = 0;
+  char *number = get_JSON_number_str(json);
 
-  // Already got first digit
-  number[0] = (char)c1;
-
-  do {
-    c = get_next_char(json, 0);
-    if (!is_digit(c))
-      done = 1;
-    else
-      number[n++] = (char)c;
-    // Check string size
-    if (n == l - 1) {
-      l *= 2;
-      number = realloc(number, sizeof(char) * l);
-    }
-  } while (!done);
+  while (is_digit(get_JSON_char(json))) {
+    number[n++] = (char)get_JSON_char(json);
+    get_next_char(json, 0);
+  }
 
   number[n] = '\0';
   INFOF("Read Number: %s", number);
   int result = atoi(number);
   INFOF("Actual number: %s", number);
-  free(number);
   return result;
 }
 
 static void read_true(struct JSON *json,
                       int (*get_next_char)(struct JSON *, int)) {
-  int c;
-  for (unsigned int i = 1; i < TRUE_STRING_LENGTH; i++) {
-    c = get_next_char(json, 0);
-    if (c != TRUE_STRING[i]) {
+  for (int i = 1; i < TRUE_STRING_LENGTH; i++)
+    if (get_next_char(json, 0) != TRUE_STRING[i]) {
       set_JSON_err(json, "Expected \"true\"");
       return;
     }
-  }
 }
 
 static void read_false(struct JSON *json,
                        int (*get_next_char)(struct JSON *, int)) {
-  int c;
-  for (unsigned int i = 1; i < FALSE_STRING_LENGTH; i++) {
-    c = get_next_char(json, 0);
-    if (c != FALSE_STRING[i]) {
+  for (int i = 1; i < FALSE_STRING_LENGTH; i++)
+    if (get_next_char(json, 0) != FALSE_STRING[i]) {
       set_JSON_err(json, "Expected \"false\"");
       return;
     }
-  }
 }
 
 static void read_null(struct JSON *json,
                       int (*get_next_char)(struct JSON *, int)) {
-  int c;
-  for (unsigned int i = 1; i < NULL_STRING_LENGTH; i++) {
-    c = get_next_char(json, 0);
-    if (c != NULL_STRING[i]) {
+  for (int i = 1; i < NULL_STRING_LENGTH; i++)
+    if (get_next_char(json, 0) != NULL_STRING[i]) {
       set_JSON_err(json, "Expected \"null\"");
       return;
     }
-  }
 }
 
 static void read_comma_or_brace(struct JSON *json, int (*get_next_char)(struct JSON *, int)) {
@@ -187,8 +165,7 @@ static struct TokenMap *parse_object(struct JSON *json,
       return result;
 
     // Colon
-    get_next_char(json, 1);
-    if (get_JSON_char(json) != ':') {
+    if (get_next_char(json, 1) != ':') {
       set_JSON_err(json, "Expected ':'");
       return result;
     }
@@ -239,8 +216,7 @@ struct Token *parse_next_token(struct JSON *json,
   INFO("Parsing next token...");
   enum TokenType type = Undefined;
   union TokenValue value;
-  int c = get_JSON_char(json);
-  switch (c) {
+  switch (get_JSON_char(json)) {
   case '{':
     INFO("Processing Object...");
     type = Object;
@@ -265,7 +241,7 @@ struct Token *parse_next_token(struct JSON *json,
   case '9':
     INFO("Processing Number...");
     type = Number;
-    value.number = read_number(c, json, get_next_char);
+    value.number = read_number(json, get_next_char);
     break;
   case '\"':
     INFO("Processing String...");

@@ -12,6 +12,9 @@
 #define MAX_JSON_ERR_LENGTH 64
 #define CHUNK_LENGTH 4096
 
+// 2 ** 64 + '\0'
+#define MAX_NUMBER_STR_LENGTH 21
+
 struct JSON {
   struct Token *root;
   int c;
@@ -22,6 +25,7 @@ struct JSON {
   void *source;
   char *chunk;
   size_t chunk_read;
+  char *number_str;
 };
 
 struct JSON *create_JSON() {
@@ -34,7 +38,8 @@ struct JSON *create_JSON() {
                         .err = NULL,
                         .source = NULL,
                         .chunk = calloc(CHUNK_LENGTH, sizeof(char)),
-                        .chunk_read = 0};
+                        .chunk_read = 0,
+                        .number_str = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char))};
   return json;
 }
 
@@ -55,6 +60,10 @@ static int is_whitespace(int c) {
 
 int get_JSON_char(struct JSON *json) {
   return json->c;
+}
+
+char *get_JSON_number_str(struct JSON *json) {
+  return json->number_str;
 }
 
 static int get_next_char_F(struct JSON *json, int skip_whitespaces) {
@@ -151,5 +160,6 @@ char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 void destroy_JSON(struct JSON *json) {
   destroy_token(json->root);
   free(json->chunk);
+  free(json->number_str);
   free(json);
 }

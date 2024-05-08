@@ -10,7 +10,7 @@ int main() {
   struct JSON *json1 = file_to_JSON("assets/sample.json");
 //  struct JSON *json1 = file_to_JSON("test-data/large-file.json");
   char *s1 = JSON_to_string(json1);
-  printf("res1 = %s\n", s1);
+  printf("res1 = %s\n\n\n", s1);
 
   struct JSON *json2 = string_to_JSON(s1);
   char *s2 = JSON_to_string(json2);
