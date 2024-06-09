@@ -71,6 +71,8 @@ struct Token *create_null_token() {
 }
 
 void destroy_token(struct Token *token) {
+  if (token == NULL)
+    ERR(1, "Attempt to destroy NULL token");
   switch (token->type) {
   case Object:
     destroy_token_map(token->value.map);

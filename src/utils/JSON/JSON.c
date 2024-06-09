@@ -153,6 +153,8 @@ struct JSON *string_to_JSON(char *s) {
 char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 
 void destroy_JSON(struct JSON *json) {
+  if (json == NULL)
+    ERR(1, "Attempt to destroy NULL JSON");
   destroy_token(json->root);
   free(json->chunk);
   free(json->number_str);
