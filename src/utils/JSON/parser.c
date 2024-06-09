@@ -45,7 +45,7 @@ static char *read_string(struct JSON *json,
       return NULL;
     // Check if we're done
     case '"':
-      done = !esc; // Ignore [\"], finish parasing on ["]
+      done = !esc; // Ignore [\"], finish parsing on ["]
       break;
     }
     if (!done) {
@@ -65,7 +65,7 @@ static char *read_string(struct JSON *json,
 }
 
 static int read_number(struct JSON *json,
-                       int (*get_next_char)(struct JSON*, int)) {
+                       int (*get_next_char)(struct JSON *, int)) {
   unsigned int n = 0;
   char *number = get_JSON_number_str(json);
 
@@ -108,41 +108,43 @@ static void read_null(struct JSON *json,
     }
 }
 
-static void read_comma_or_brace(struct JSON *json, int (*get_next_char)(struct JSON *, int)) {
+static void read_comma_or_brace(struct JSON *json,
+                                int (*get_next_char)(struct JSON *, int)) {
   INFOF("Reading comma or brace, current char: %c", get_JSON_char(json));
   switch (get_JSON_char(json)) {
-    case ',':
-      get_next_char(json, 1);
-      break;
-    case '}':
-      break;
-    case ' ':
-    case '\t':
-    case '\n':
-      get_next_char(json, 1);
-      read_comma_or_brace(json, get_next_char);
-      break;
-    default:
-      set_JSON_err(json, "Expected ',' or '}'");
+  case ',':
+    get_next_char(json, 1);
+    break;
+  case '}':
+    break;
+  case ' ':
+  case '\t':
+  case '\n':
+    get_next_char(json, 1);
+    read_comma_or_brace(json, get_next_char);
+    break;
+  default:
+    set_JSON_err(json, "Expected ',' or '}'");
   }
 }
 
-static void read_comma_or_bracket(struct JSON *json, int (*get_next_char)(struct JSON *, int)) {
+static void read_comma_or_bracket(struct JSON *json,
+                                  int (*get_next_char)(struct JSON *, int)) {
   INFOF("Reading comma or bracket, current char: %c", get_JSON_char(json));
   switch (get_JSON_char(json)) {
-    case ',':
-      get_next_char(json, 1);
-      break;
-    case ']':
-      break;
-    case ' ':
-    case '\t':
-    case '\n':
-      get_next_char(json, 1);
-      read_comma_or_bracket(json, get_next_char);
-      break;
-    default:
-      set_JSON_err(json, "Expected ',' or ']'");
+  case ',':
+    get_next_char(json, 1);
+    break;
+  case ']':
+    break;
+  case ' ':
+  case '\t':
+  case '\n':
+    get_next_char(json, 1);
+    read_comma_or_bracket(json, get_next_char);
+    break;
+  default:
+    set_JSON_err(json, "Expected ',' or ']'");
   }
 }
 
@@ -169,12 +171,9 @@ static struct TokenMap *parse_object(struct JSON *json,
       set_JSON_err(json, "Expected ':'");
       return result;
     }
-    INFO("Read colon");
     // Value
     get_next_char(json, 1);
     struct Token *new_token = parse_next_token(json, get_next_char);
-
-    INFO("Read value");
 
     if (get_JSON_err(json))
       return result;
@@ -184,14 +183,15 @@ static struct TokenMap *parse_object(struct JSON *json,
     free(key);
 
     read_comma_or_brace(json, get_next_char);
-    
+
     if (get_JSON_err(json))
       return result;
   }
   return result;
 }
 
-static struct TokenArray *parse_array(struct JSON *json, int (*get_next_char)(struct JSON *, int)) {
+static struct TokenArray *
+parse_array(struct JSON *json, int (*get_next_char)(struct JSON *, int)) {
   INFO("Parsing array...");
   struct TokenArray *result = create_token_array();
   get_next_char(json, 1);
@@ -212,7 +212,7 @@ static struct TokenArray *parse_array(struct JSON *json, int (*get_next_char)(st
 }
 
 struct Token *parse_next_token(struct JSON *json,
-                               int (*get_next_char)(struct JSON*, int)) {
+                               int (*get_next_char)(struct JSON *, int)) {
   INFO("Parsing next token...");
   enum TokenType type = Undefined;
   union TokenValue value;

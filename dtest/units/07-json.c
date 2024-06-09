@@ -11,10 +11,17 @@
 
 int main() {
   DTEST_UNIT_START("JSON parser");
-  struct Token *token = read_json_file("assets/sample.json");
-  char *s = token_to_string(token);
-  INFOF("Token to string: %s", s);
-  destroy_token(token);
-  free(s);
+  struct JSON *json1 = file_to_JSON("assets/sample.json");
+  char *s1 = JSON_to_string(json1);
+  struct JSON *json2 = string_to_JSON(s1);
+  char *s2 = JSON_to_string(json2);
+
+  DTEST_EXPECT_FALSE(strcmp(s1, s2));
+
+  destroy_JSON(json1);
+  free(s1);
+  destroy_JSON(json2);
+  free(s2);
+
   DTEST_UNIT_END;
 }

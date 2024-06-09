@@ -39,6 +39,7 @@ void *my_thread(void *args) {
   process_shared(start, finish);
   return NULL;
 }
+
 void printout_shared() {
   printf("%lu %lu %lu\n", shared[0], shared[SIZE / 2], shared[SIZE - 1]);
 }

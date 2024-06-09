@@ -30,16 +30,17 @@ struct JSON {
 
 struct JSON *create_JSON() {
   struct JSON *json = calloc(1, sizeof(struct JSON));
-  *json = (struct JSON){.root = NULL,
-                        .c = '\n',
-                        .char_num = 0,
-                        .line_num = 0,
-                        .col_num = 0,
-                        .err = NULL,
-                        .source = NULL,
-                        .chunk = calloc(CHUNK_LENGTH, sizeof(char)),
-                        .chunk_read = 0,
-                        .number_str = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char))};
+  *json =
+      (struct JSON){.root = NULL,
+                    .c = '\n',
+                    .char_num = 0,
+                    .line_num = 0,
+                    .col_num = 0,
+                    .err = NULL,
+                    .source = NULL,
+                    .chunk = calloc(CHUNK_LENGTH, sizeof(char)),
+                    .chunk_read = 0,
+                    .number_str = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char))};
   return json;
 }
 
@@ -51,20 +52,13 @@ void set_JSON_err(struct JSON *json, char *err) {
   strcpy(json->err, err);
 }
 
-
 char *get_JSON_err(struct JSON *json) { return json->err; }
 
-static int is_whitespace(int c) {
-  return c == ' ' || c == '\t' || c == '\n';
-}
+static int is_whitespace(int c) { return c == ' ' || c == '\t' || c == '\n'; }
 
-int get_JSON_char(struct JSON *json) {
-  return json->c;
-}
+int get_JSON_char(struct JSON *json) { return json->c; }
 
-char *get_JSON_number_str(struct JSON *json) {
-  return json->number_str;
-}
+char *get_JSON_number_str(struct JSON *json) { return json->number_str; }
 
 static int get_next_char_F(struct JSON *json, int skip_whitespaces) {
   FILE *f = (FILE *)json->source;
@@ -80,7 +74,8 @@ static int get_next_char_F(struct JSON *json, int skip_whitespaces) {
     json->c = json->chunk[json->chunk_read++];
     if (json->chunk_read == CHUNK_LENGTH) {
       INFO("Reading next chunk...");
-      const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
+      const size_t fread_res =
+          fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
       if (fread_res != CHUNK_LENGTH && ferror(f))
         set_JSON_err(json, "Error reading file");
       json->chunk_read = 0;
