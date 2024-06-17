@@ -6,6 +6,7 @@
 
 #include "utils/JSON/parser.h"
 #include "utils/JSON/stringify.h"
+#include "utils/JSON/token-map.h"
 #include "utils/JSON/token.h"
 #include "utils/debug.h"
 
@@ -151,6 +152,41 @@ struct JSON *string_to_JSON(char *s) {
 }
 
 char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
+
+// Helper functions
+int JSON_is_undefined(struct JSON *json) {
+  return get_token_type(json->root) == Undefined;
+}
+
+int JSON_is_object(struct JSON *json) {
+  return get_token_type(json->root) == Object;
+}
+
+int JSON_is_array(struct JSON *json) {
+  return get_token_type(json->root) == Array;
+}
+
+int JSON_is_number(struct JSON *json) {
+  return get_token_type(json->root) == Number;
+}
+
+int JSON_is_string(struct JSON *json) {
+  return get_token_type(json->root) == String;
+}
+
+int JSON_is_boolean(struct JSON *json) {
+  return get_token_type(json->root) == Boolean;
+}
+
+int JSON_is_null(struct JSON *json) {
+  return get_token_type(json->root) == Null;
+}
+
+int JSON_object_has_prop(struct JSON *json, char *prop) {
+  union TokenValue value = get_token_value(json->root);
+  struct TokenMap *map = value.map;
+  return check_token_map_has_key(map, prop);
+}
 
 void destroy_JSON(struct JSON *json) {
   if (json == NULL)

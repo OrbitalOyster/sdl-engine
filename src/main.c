@@ -13,8 +13,17 @@ struct Config {
 
 struct Config *loadConfig(char *filename) {
   struct JSON *config_json = file_to_JSON(filename);
+  // Check if config is parsed ok
   if (get_JSON_err(config_json))
-    ERR(1, get_JSON_err(config_json))
+    ERR(1, get_JSON_err(config_json));
+  // Check if root token is object
+  if (!JSON_is_object(config_json))
+    ERR(1, "Invalid config: not an object");
+  // Check if "width" and "height" props are present
+  if (!JSON_object_has_prop(config_json, "windowWidth") ||
+      !JSON_object_has_prop(config_json, "windowHeight"))
+    ERR(1, "Invalid config: missing screen size props");
+
   struct Config *result = calloc(1, sizeof(struct Config));
   destroy_JSON(config_json);
   return result;
@@ -23,9 +32,10 @@ struct Config *loadConfig(char *filename) {
 int main() {
   int quit = 0;
 
-  struct Config* config = loadConfig("config.json");
+  struct Config *config = loadConfig("config.json");
 
-  if (config){}
+  if (config) {
+  }
 
   Core *core = init_core(640, 480, "Untitled");
   // Something went wrong

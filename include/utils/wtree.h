@@ -9,6 +9,7 @@
 
 struct WTree *create_wtree();
 void expand_wtree(struct WTree *wtree, char *word, void *endpoint);
+int check_wtree_has_word(struct WTree *wtree, char *word);
 void shrink_wtree(struct WTree *wtree, char *word);
 size_t get_wtree_size(struct WTree *wtree);
 void *get_wtree_endpoint(struct WTree *wtree, char *word);

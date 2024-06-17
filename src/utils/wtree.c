@@ -233,7 +233,7 @@ void expand_wtree(struct WTree *wtree, char *word, void *endpoint) {
 
 size_t get_wtree_size(struct WTree *wtree) { return wtree->size; }
 
-struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
+static struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   char *tail = calloc(strlen(word) + 1, sizeof(char));
   if (tail == NULL)
     ERR(1, "Out of memory");
@@ -250,6 +250,11 @@ struct WTreeNode *search_wtree(struct WTree *wtree, char *word) {
   }
   free(tail);
   return NULL;
+}
+
+int check_wtree_has_word(struct WTree *wtree, char *word) {
+  struct WTreeNode *node = search_wtree(wtree, word);
+  return node != NULL;
 }
 
 void shrink_wtree(struct WTree *wtree, char *word) {
@@ -296,7 +301,7 @@ void *get_wtree_endpoint(struct WTree *wtree, char *word) {
 }
 
 static void get_wtree_word(struct WTreeNode *node, char *word, size_t *n,
-                           unsigned int *size, char **result) {
+                           size_t *size, char **result) {
   size_t l = 0;
   if (node->chunk) {
     l = strlen(node->chunk);
@@ -316,6 +321,7 @@ static void get_wtree_word(struct WTreeNode *node, char *word, size_t *n,
   word[*n] = '\0';
 }
 
+// Returns all wtree keys (words)
 char **get_wtree_words(struct WTree *wtree) {
   // Edge case
   if (!wtree->size)
@@ -323,7 +329,7 @@ char **get_wtree_words(struct WTree *wtree) {
   char **result = calloc(wtree->size, sizeof(char *));
   if (result == NULL)
     ERR(1, "Out of memory");
-  unsigned int size = 0;
+  size_t size = 0;
   char *word = calloc(WTREE_CHARS_NUMBER, sizeof(char));
   if (word == NULL)
     ERR(1, "Out of memory");
