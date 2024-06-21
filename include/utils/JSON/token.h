@@ -17,7 +17,10 @@ union TokenValue {
 
 struct Token *create_token(enum TokenType type, union TokenValue value);
 enum TokenType get_token_type(struct Token *token);
+
 union TokenValue get_token_value(struct Token *token);
+union TokenValue get_token_value_deep(struct Token *token, char *key);
+
 struct Token *create_undefined_token();
 struct Token *create_object_token();
 struct Token *create_array_token();

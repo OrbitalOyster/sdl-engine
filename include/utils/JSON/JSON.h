@@ -27,6 +27,10 @@ int JSON_is_null(struct JSON *json);
 
 int JSON_object_has_prop(struct JSON *json, char *prop);
 
+int JSON_get_number_prop(struct JSON *json, char *prop);
+// int JSON_get_number_prop(struct JSON *json, char *prop);
+char *JSON_get_string_prop(struct JSON *json, char *prop);
+
 void destroy_JSON(struct JSON *json);
 
 #endif /* JSON_H */

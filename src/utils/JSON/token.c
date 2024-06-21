@@ -2,11 +2,15 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
 
 #include "utils/debug.h"
+
+// JSON tokens delimeters
+const char *TOKEN_DELIMITERS = "/";
 
 struct Token {
   enum TokenType type;
@@ -21,9 +25,105 @@ struct Token *create_token(enum TokenType type, union TokenValue value) {
   return result;
 }
 
+struct Token *get_token(struct Token *token, char *key) {
+ // Make a copy of key
+  size_t l = strlen(key) + 1;
+  char *s = calloc(l, sizeof(char));
+  memcpy(s, key, l);
+
+  INFO2F("Reading deep token: %s", key);
+
+  char *next_key = NULL;
+
+  struct Token *current_token = token;
+
+  while (1) {
+
+    if (!next_key) // First run
+      next_key = strtok(s, TOKEN_DELIMITERS);
+    else
+      next_key = strtok(NULL, TOKEN_DELIMITERS);
+
+    INFO2F("Next key: %s", next_key);
+    if (next_key == NULL)
+      break;
+    switch (current_token->type) {
+      case Object:
+        if (check_token_map_has_key(current_token->value.map, next_key)) {
+          current_token = get_token_map_element(current_token->value.map, next_key);
+        }
+        else
+          // TODO: Set JSON error
+          ERRF(1, "Attempt to get undefined object prop (%s)", next_key);
+        break;
+      case Array: {
+        size_t n = (size_t) atoi(next_key);
+        // TODO: Set JSON error
+        if (n >= get_token_array_size(current_token->value.array))
+          ERRF(1, "Attempt to get out of bounds array element (%li)", n);
+        current_token = get_token_array_element(current_token->value.array, n);
+        break;
+      }
+      default:
+        ERR(1, "Attempt to get deep value from non-map token");
+    }
+  }
+
+  free(s);
+  return current_token;
+}
+
 enum TokenType get_token_type(struct Token *token) { return token->type; }
 
 union TokenValue get_token_value(struct Token *token) { return token->value; }
+
+union TokenValue get_token_value_deep(struct Token *token, char *key) {
+  // Make a copy of key
+  size_t l = strlen(key) + 1;
+  char *s = calloc(l, sizeof(char));
+  memcpy(s, key, l);
+
+  INFO2F("Reading deep token: %s", key);
+
+  char *next_key = NULL;
+
+  struct Token *current_token = token;
+
+  while (1) {
+
+    if (!next_key) // First run
+      next_key = strtok(s, TOKEN_DELIMITERS);
+    else
+      next_key = strtok(NULL, TOKEN_DELIMITERS);
+
+    INFO2F("Next key: %s", next_key);
+    if (next_key == NULL)
+      break;
+    switch (current_token->type) {
+      case Object:
+        if (check_token_map_has_key(current_token->value.map, next_key)) {
+          current_token = get_token_map_element(current_token->value.map, next_key);
+        }
+        else
+          // TODO: Set JSON error
+          ERRF(1, "Attempt to get undefined object prop (%s)", next_key);
+        break;
+      case Array: {
+        size_t n = (size_t) atoi(next_key);
+        // TODO: Set JSON error
+        if (n >= get_token_array_size(current_token->value.array))
+          ERRF(1, "Attempt to get out of bounds array element (%li)", n);
+        current_token = get_token_array_element(current_token->value.array, n);
+        break;
+      }
+      default:
+        ERR(1, "Attempt to get deep value from non-map token");
+    }
+  }
+
+  free(s);
+  return current_token->value;
+}
 
 struct Token *create_undefined_token() {
   struct Token *result = calloc(1, sizeof(struct Token));

@@ -23,8 +23,8 @@ void expand_token_array(struct TokenArray *arr, struct Token *token) {
   arr->content[arr->size - 1] = token;
 }
 
-struct Token *get_token_array_element(struct TokenArray *arr, size_t i) {
-  return arr->content[i];
+struct Token *get_token_array_element(struct TokenArray *arr, size_t n) {
+  return arr->content[n];
 }
 
 void destroy_token_array(struct TokenArray *arr) {

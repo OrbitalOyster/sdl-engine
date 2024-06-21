@@ -188,6 +188,27 @@ int JSON_object_has_prop(struct JSON *json, char *prop) {
   return check_token_map_has_key(map, prop);
 }
 
+union TokenValue JSON_get_prop_value(struct JSON *json, char *prop) {
+  return get_token_value_deep(json->root, prop);
+}
+
+int JSON_get_number_prop(struct JSON *json, char *prop) {
+  union TokenValue value = JSON_get_prop_value(json, prop);
+  return value.number;
+}
+
+/*
+int JSON_check_prop_is_number(struct JSON *json, char *prop) {
+  struct Token *token = ;
+  return token->type == Number;
+}
+*/
+
+char *JSON_get_string_prop(struct JSON *json, char *prop) {
+  union TokenValue value = JSON_get_prop_value(json, prop);
+  return value.string;
+}
+
 void destroy_JSON(struct JSON *json) {
   if (json == NULL)
     ERR(1, "Attempt to destroy NULL JSON");

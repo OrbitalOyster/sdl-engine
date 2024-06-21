@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "core.h"
 #include "input.h"
@@ -24,6 +25,9 @@ struct Config *loadConfig(char *filename) {
       !JSON_object_has_prop(config_json, "windowHeight"))
     ERR(1, "Invalid config: missing screen size props");
 
+  int value = JSON_get_number_prop(config_json, "windowWidth");
+  printf("Success: %i\n", value);
+
   struct Config *result = calloc(1, sizeof(struct Config));
   destroy_JSON(config_json);
   return result;
@@ -35,7 +39,11 @@ int main() {
   struct Config *config = loadConfig("config.json");
 
   if (config) {
+    free(config->title);
+    free(config);
   }
+
+  return 0;
 
   Core *core = init_core(640, 480, "Untitled");
   // Something went wrong
