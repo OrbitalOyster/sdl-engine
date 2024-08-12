@@ -16,6 +16,7 @@ int main() {
   struct JSON *json2 = string_to_JSON(s1);
   char *s2 = JSON_to_string(json2);
 
+  // strcmp returns 0 on equal strings
   DTEST_EXPECT_FALSE(strcmp(s1, s2));
 
   destroy_JSON(json1);

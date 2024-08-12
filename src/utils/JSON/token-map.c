@@ -36,12 +36,6 @@ int check_token_map_has_key(struct TokenMap *map, char *key) {
   return check_wtree_has_word(map->tree, key);
 }
 
-int check_token_map_element_is_number(struct TokenMap *map, char *key) {
-  struct Token *token = get_wtree_endpoint(map->tree, key);
-  enum TokenType type = get_token_type(token);
-  return type == Number;
-}
-
 struct Token *get_token_map_element(struct TokenMap *map, char *key) {
   return get_wtree_endpoint(map->tree, key);
 }

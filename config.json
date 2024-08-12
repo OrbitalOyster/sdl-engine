@@ -4,6 +4,6 @@
   "title": "SDL Engine test",
 
   "arr": ["foo", "bar"],
-  "obj": { "foo": 15, "bar": [16,17,18] },
+  "obj": { "foo": 15, "bar": [16,17,18,"baz"] },
   "num": 14
 }

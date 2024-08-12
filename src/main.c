@@ -24,6 +24,10 @@ struct Config *loadConfig(char *filename) {
   if (!JSON_object_has_prop(config_json, "windowWidth") ||
       !JSON_object_has_prop(config_json, "windowHeight"))
     ERR(1, "Invalid config: missing screen size props");
+  // Check if they're numbers
+  if (!JSON_prop_is_number(config_json, "windowWidth") ||
+      !JSON_prop_is_number(config_json, "windowHeight"))
+    ERR(1, "Invalid config: screen size props must be numbers");
 
   int value = JSON_get_number_prop(config_json, "windowWidth");
   printf("Success: %i\n", value);
