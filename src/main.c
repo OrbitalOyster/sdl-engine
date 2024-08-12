@@ -7,58 +7,51 @@
 #include "utils/debug.h"
 
 struct Config {
-  int32_t width;
-  int32_t height;
-  char *title;
+  int32_t window_width;
+  int32_t window_height;
+  char *window_title;
 };
 
-struct Config *loadConfig(char *filename) {
+struct Config *load_config(char *filename) {
   struct JSON *config_json = file_to_JSON(filename);
   // Check if config is parsed ok
   if (get_JSON_err(config_json))
     ERR(1, get_JSON_err(config_json));
-  // Check if root token is object
-  if (!JSON_is_object(config_json))
-    ERR(1, "Invalid config: not an object");
-  // Check if "width" and "height" props are present
-  if (!JSON_object_has_prop(config_json, "windowWidth") ||
-      !JSON_object_has_prop(config_json, "windowHeight"))
-    ERR(1, "Invalid config: missing screen size props");
-  // Check if they're numbers
-  if (!JSON_prop_is_number(config_json, "windowWidth") ||
-      !JSON_prop_is_number(config_json, "windowHeight"))
-    ERR(1, "Invalid config: screen size props must be numbers");
-
-  int value = JSON_get_number_prop(config_json, "windowWidth");
-  printf("Success: %i\n", value);
-
+  // Check window props
+  check_JSON_token(config_json, "window/width", Number);
+  check_JSON_token(config_json, "window/height", Number);
+  check_JSON_token(config_json, "window/title", String);
+  if (get_JSON_err(config_json))
+    ERRF(1, "Invalid config: %s", get_JSON_err(config_json));
+  // Create and read config
   struct Config *result = calloc(1, sizeof(struct Config));
+  result->window_width = JSON_get_number_prop(config_json, "window/width");
+  result->window_height = JSON_get_number_prop(config_json, "window/height");
+  char *title = JSON_get_string_prop(config_json, "window/title");
+  result->window_title = calloc(strlen(title) + 1, sizeof(char));
+  strcpy(result->window_title, title);
   destroy_JSON(config_json);
   return result;
 }
 
+void destroy_config(struct Config *config) {
+  free(config->window_title);
+  free(config);
+}
+
 int main() {
-  int quit = 0;
-
-  struct Config *config = loadConfig("config.json");
-
-  if (config) {
-    free(config->title);
-    free(config);
-  }
-
-  return 0;
-
-  Core *core = init_core(640, 480, "Untitled");
+  // Load config
+  struct Config *config = load_config("config.json");
+  // Init core
+  Core *core = init_core(config->window_width, config->window_height, config->window_title);
   // Something went wrong
   if (!core) {
     WARN("Unable to start engine");
     return 0;
   }
-
   reset_key_input();
-
   SDL_Renderer *renderer = get_renderer(core);
+  int quit = 0;
   while (!quit) {
     // Input
     process_input(&quit);
@@ -70,6 +63,7 @@ int main() {
     // Delay
     SDL_Delay(50);
   }
-
+  // Cleanup
   destroy_core(core);
+  destroy_config(config);
 }

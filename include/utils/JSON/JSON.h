@@ -5,6 +5,8 @@
 #ifndef JSON_H
 #define JSON_H
 
+#include "utils/JSON/token.h"
+
 struct JSON;
 
 struct JSON *create_JSON();
@@ -16,6 +18,8 @@ char *get_JSON_number_str(struct JSON *json);
 struct JSON *file_to_JSON(char *filename);
 char *JSON_to_string(struct JSON *json);
 struct JSON *string_to_JSON(char *s);
+
+void check_JSON_token(struct JSON *json, char *key, enum TokenType type);
 
 int JSON_is_undefined(struct JSON *json);
 int JSON_is_object(struct JSON *json);

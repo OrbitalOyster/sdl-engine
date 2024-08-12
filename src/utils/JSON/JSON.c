@@ -52,7 +52,6 @@ struct JSON *create_JSON() {
 void set_JSON_err(struct JSON *json, char *err) {
   if (json->err)
     free(json->err);
-
   json->err = calloc(strlen(err) + 1, sizeof(char));
   strcpy(json->err, err);
 }
@@ -157,7 +156,7 @@ struct JSON *string_to_JSON(char *s) {
 
 char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 
-struct Token *get_token_deep(struct JSON *json, char *key) {
+struct Token *get_token(struct JSON *json, char *key) {
   // Make a copy of key
   size_t l = strlen(key) + 1;
   char *key_copy = calloc(l, sizeof(char));
@@ -178,27 +177,39 @@ struct Token *get_token_deep(struct JSON *json, char *key) {
     switch (type) {
     case Object:
       if (check_token_map_has_key(value.map, next_key)) {
-        current_token =
-            get_token_map_element(value.map, next_key);
-      } else
-        // TODO: Set JSON error
-        ERRF(1, "Attempt to get undefined object prop (%s)", next_key);
+        current_token = get_token_map_element(value.map, next_key);
+      } else {
+        set_JSON_err(json, "Undefined prop");
+        return NULL;
+      }
       break;
     case Array: {
       size_t n = (size_t)atoi(next_key);
-      // TODO: Set JSON error
-      if (n >= get_token_array_size(value.array))
-        ERRF(1, "Attempt to get out of bounds array element (%li)", n);
+      if (n >= get_token_array_size(value.array)) {
+        set_JSON_err(json, "Array prop out of bounds");
+        return NULL;
+      }
       current_token = get_token_array_element(value.array, n);
       break;
     }
-    default:
-      // TODO: Set JSON error
-      ERR(1, "Attempt to get deep value from non-map token");
+    default: {
+      set_JSON_err(json, "Array prop out of bounds");
+      return NULL;
+    }
     }
   }
   free(key_copy);
   return current_token;
+}
+
+void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
+  // Already having issues
+  if (json->err)
+    return;
+
+  struct Token *token = get_token(json, key);
+  if (get_token_type(token) != type)
+    set_JSON_err(json, "Invalid token type");
 }
 
 // Helper functions
@@ -237,32 +248,39 @@ int JSON_object_has_prop(struct JSON *json, char *prop) {
 }
 
 int JSON_prop_is_number(struct JSON *json, char *prop) {
-  struct Token *token = get_token_deep(json, prop);
+  struct Token *token = get_token(json, prop);
   enum TokenType type = get_token_type(token);
   return type == Number;
 }
 
 int JSON_prop_is_string(struct JSON *json, char *prop) {
-  struct Token *token = get_token_deep(json, prop);
+  struct Token *token = get_token(json, prop);
   enum TokenType type = get_token_type(token);
   return type == String;
 }
 
 // Getters
 int JSON_get_number_prop(struct JSON *json, char *prop) {
-  struct Token *token = get_token_deep(json, prop);
+  struct Token *token = get_token(json, prop);
+  char *err = get_JSON_err(json);
+  if (err)
+    ERRF(1, "%s", err);
   if (get_token_type(token) != Number)
-    ERRF(1, "Type mismatch for prop %s (not a number)", prop)
+    ERRF(1, "Type mismatch for prop %s (not a number)", prop);
   return get_token_value(token).number;
 }
 
 char *JSON_get_string_prop(struct JSON *json, char *prop) {
-  struct Token *token = get_token_deep(json, prop);
+  struct Token *token = get_token(json, prop);
+  char *err = get_JSON_err(json);
+  if (err)
+    ERRF(1, "%s", err);
   if (get_token_type(token) != String)
     ERRF(1, "Type mismatch for prop %s (not a string)", prop)
   return get_token_value(token).string;
 }
 
+// Destructor
 void destroy_JSON(struct JSON *json) {
   if (json == NULL)
     ERR(1, "Attempt to destroy NULL JSON");
