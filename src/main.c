@@ -56,7 +56,7 @@ int main() {
     // Input
     process_input(&quit);
     // Render
-    SDL_SetRenderDrawColor(renderer, 0x77, 0x77, 0xCC, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
     SDL_RenderClear(renderer);
     // Done
     SDL_RenderPresent(renderer);
