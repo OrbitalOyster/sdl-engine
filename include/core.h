@@ -11,7 +11,7 @@
 
 struct Core;
 
-struct Core *init_core(int window_width, int window_height, char *title);
+struct Core *create_core(int window_width, int window_height, char *title);
 SDL_Renderer *get_renderer(struct Core *core);
 void destroy_core(struct Core *core);
 

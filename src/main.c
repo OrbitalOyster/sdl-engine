@@ -53,8 +53,8 @@ int main() {
   // Load config
   struct Config *config = load_config("config.json");
   // Init core
-  struct Core *core = init_core(config->window_width, config->window_height,
-                         config->window_title);
+  struct Core *core = create_core(config->window_width, config->window_height,
+                                  config->window_title);
   // Something went wrong
   if (!core) {
     WARN("Unable to start engine");

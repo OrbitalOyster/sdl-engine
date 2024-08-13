@@ -9,12 +9,12 @@ struct Core {
   SDL_Renderer *renderer;
 };
 
-struct Core *init_core(int window_width, int window_height, char *title) {
+struct Core *create_core(int window_width, int window_height, char *title) {
   INFO("Initializing SDL");
   struct Core *core = calloc(1, sizeof(struct Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    WARNF("Unable to initilize SDL: %s", SDL_GetError());
+    WARNF("Unable to create SDL: %s", SDL_GetError());
     free(core);
     return NULL;
   }
