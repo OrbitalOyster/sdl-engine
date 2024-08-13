@@ -212,35 +212,6 @@ void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
     set_JSON_err(json, "Invalid token type");
 }
 
-// Helper functions
-int JSON_is_undefined(struct JSON *json) {
-  return get_token_type(json->root) == Undefined;
-}
-
-int JSON_is_object(struct JSON *json) {
-  return get_token_type(json->root) == Object;
-}
-
-int JSON_is_array(struct JSON *json) {
-  return get_token_type(json->root) == Array;
-}
-
-int JSON_is_number(struct JSON *json) {
-  return get_token_type(json->root) == Number;
-}
-
-int JSON_is_string(struct JSON *json) {
-  return get_token_type(json->root) == String;
-}
-
-int JSON_is_boolean(struct JSON *json) {
-  return get_token_type(json->root) == Boolean;
-}
-
-int JSON_is_null(struct JSON *json) {
-  return get_token_type(json->root) == Null;
-}
-
 int JSON_object_has_prop(struct JSON *json, char *prop) {
   union TokenValue value = get_token_value(json->root);
   struct TokenMap *map = value.map;
@@ -278,6 +249,35 @@ char *JSON_get_string_prop(struct JSON *json, char *prop) {
   if (get_token_type(token) != String)
     ERRF(1, "Type mismatch for prop %s (not a string)", prop)
   return get_token_value(token).string;
+}
+
+// Helper functions
+int JSON_is_undefined(struct JSON *json) {
+  return get_token_type(json->root) == Undefined;
+}
+
+int JSON_is_object(struct JSON *json) {
+  return get_token_type(json->root) == Object;
+}
+
+int JSON_is_array(struct JSON *json) {
+  return get_token_type(json->root) == Array;
+}
+
+int JSON_is_number(struct JSON *json) {
+  return get_token_type(json->root) == Number;
+}
+
+int JSON_is_string(struct JSON *json) {
+  return get_token_type(json->root) == String;
+}
+
+int JSON_is_boolean(struct JSON *json) {
+  return get_token_type(json->root) == Boolean;
+}
+
+int JSON_is_null(struct JSON *json) {
+  return get_token_type(json->root) == Null;
 }
 
 // Destructor

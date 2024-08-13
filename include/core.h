@@ -9,10 +9,10 @@
 #define WINDOW_FLAGS SDL_WINDOW_SHOWN
 #define RENDERER_FLAGS SDL_RENDERER_ACCELERATED
 
-typedef struct Core Core;
+struct Core;
 
-Core *init_core(int windowWidth, int windowHeight, char *title);
-SDL_Renderer *get_renderer(Core *core);
-void destroy_core(Core *core);
+struct Core *init_core(int window_width, int window_height, char *title);
+SDL_Renderer *get_renderer(struct Core *core);
+void destroy_core(struct Core *core);
 
 #endif /* CORE_H */

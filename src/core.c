@@ -9,9 +9,9 @@ struct Core {
   SDL_Renderer *renderer;
 };
 
-Core *init_core(int32_t windowWidth, int32_t windowHeight, char *title) {
+struct Core *init_core(int window_width, int window_height, char *title) {
   INFO("Initializing SDL");
-  Core *core = calloc(1, sizeof(Core));
+  struct Core *core = calloc(1, sizeof(struct Core));
   // Init SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     WARNF("Unable to initilize SDL: %s", SDL_GetError());
@@ -19,8 +19,8 @@ Core *init_core(int32_t windowWidth, int32_t windowHeight, char *title) {
     return NULL;
   }
   // Init window
-  core->window = SDL_CreateWindow(title, WINDOW_POSX, WINDOW_POSY, windowWidth,
-                                  windowHeight, WINDOW_FLAGS);
+  core->window = SDL_CreateWindow(title, WINDOW_POSX, WINDOW_POSY, window_width,
+                                  window_height, WINDOW_FLAGS);
   if (!core->window) {
     WARNF("Unable to create window: %s", SDL_GetError());
     free(core);
@@ -36,9 +36,9 @@ Core *init_core(int32_t windowWidth, int32_t windowHeight, char *title) {
   return core;
 }
 
-SDL_Renderer *get_renderer(Core *core) { return core->renderer; }
+SDL_Renderer *get_renderer(struct Core *core) { return core->renderer; }
 
-void destroy_core(Core *core) {
+void destroy_core(struct Core *core) {
   SDL_DestroyRenderer(core->renderer);
   core->renderer = NULL;
   SDL_DestroyWindow(core->window);

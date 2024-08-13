@@ -10,17 +10,33 @@
 struct JSON;
 
 struct JSON *create_JSON();
+
+// Error handling
 void set_JSON_err(struct JSON *json, char *err);
 char *get_JSON_err(struct JSON *json);
 
+// For parsing
 int get_JSON_char(struct JSON *json);
 char *get_JSON_number_str(struct JSON *json);
+
+// Conversions
 struct JSON *file_to_JSON(char *filename);
 char *JSON_to_string(struct JSON *json);
 struct JSON *string_to_JSON(char *s);
 
+// Checks if token is present and has corresponding type, else sets the error
 void check_JSON_token(struct JSON *json, char *key, enum TokenType type);
 
+int JSON_object_has_prop(struct JSON *json, char *prop);
+
+int JSON_prop_is_number(struct JSON *json, char *prop);
+int JSON_prop_is_string(struct JSON *json, char *prop);
+
+// Getters
+int JSON_get_number_prop(struct JSON *json, char *prop);
+char *JSON_get_string_prop(struct JSON *json, char *prop);
+
+// Helper functions
 int JSON_is_undefined(struct JSON *json);
 int JSON_is_object(struct JSON *json);
 int JSON_is_array(struct JSON *json);
@@ -29,14 +45,7 @@ int JSON_is_string(struct JSON *json);
 int JSON_is_boolean(struct JSON *json);
 int JSON_is_null(struct JSON *json);
 
-int JSON_object_has_prop(struct JSON *json, char *prop);
-
-int JSON_prop_is_number(struct JSON *json, char *prop);
-int JSON_prop_is_string(struct JSON *json, char *prop);
-
-int JSON_get_number_prop(struct JSON *json, char *prop);
-char *JSON_get_string_prop(struct JSON *json, char *prop);
-
+// Destructor
 void destroy_JSON(struct JSON *json);
 
 #endif /* JSON_H */
