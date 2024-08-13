@@ -8,6 +8,6 @@
 void register_on_key_down_func(void (*func)());
 void register_on_key_up_func(void (*func)());
 void reset_key_input();
-int process_input(int *quit);
+void process_input(int *quit);
 
 #endif /* INPUT_H */
