@@ -25,7 +25,7 @@ struct Font *create_font(char *filename, int size, int outline_size) {
 
   font->line_height = 0;
 
-  INFOF("Loaded font \"%s\", size %u", filename, size);
+  INFOF("Loaded font \"%s\", size %i", filename, size);
   return font;
 }
 

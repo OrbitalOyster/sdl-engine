@@ -10,7 +10,7 @@
 int quit = 0;
 
 void on_key_down(SDL_Scancode key) {
-  INFOF("Key pressed: %c [%i]", SDL_GetKeyFromScancode(key), key);
+  INFOF("Key pressed: %c [%u]", SDL_GetKeyFromScancode(key), key);
   switch (key) {
   case 20: // q
     quit = 1;
@@ -34,7 +34,7 @@ void on_key_down(SDL_Scancode key) {
 }
 
 void on_key_up(SDL_Scancode key) {
-  INFOF("Key released: %c [%i]", SDL_GetKeyFromScancode(key), key);
+  INFOF("Key released: %c [%u]", SDL_GetKeyFromScancode(key), key);
   switch (key) {
   case 26: // w
     break;

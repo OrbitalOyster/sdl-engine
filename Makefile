@@ -12,7 +12,7 @@ EXE := engine
 # Compiler options
 OUTPUT := $(BIN_DIR)/$(EXE)
 WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion \
-						-Wfloat-equal -Werror
+						-Wformat -Wformat-signedness -Wfloat-equal -Werror
 STANDART := -std=c11
 OPTIMIZATION := -O2
 # Debugging info
