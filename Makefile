@@ -27,10 +27,16 @@ CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
 LDLIBS := -lm -lSDL2 -lSDL2_ttf
 
 # All source subdirectories
-SRC_SDIRS := $(SRC_DIR)/ $(wildcard $(SRC_DIR)/*/) $(wildcard $(SRC_DIR)/**/*/)
+SRC_SDIRS := $(SRC_DIR)/ \
+						 $(wildcard $(SRC_DIR)/*/) $(wildcard $(SRC_DIR)/**/*/)
+INCLUDE_SDIRS := $(INCLUDE_DIR)/ \
+								 $(wildcard $(INCLUDE_DIR)/*/) $(wildcard $(INCLUDE_DIR)/**/*/)
 
 # All .c files
 C_FILES := $(foreach d, $(SRC_SDIRS), $(wildcard $(d)*.c))
+
+# All .h files
+H_FILES := $(foreach d, $(INCLUDE_SDIRS), $(wildcard $(d)*.h))
 
 # All .o files
 OBJS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(C_FILES:.c=.o))
@@ -67,6 +73,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 run: $(OUTPUT)
 	./$(OUTPUT)
 
+format:
+	clang-format $(C_FILES) -i
+	clang-format $(H_FILES) -i
+
 valgrind:
 	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all \
 		--track-origins=yes  --gen-suppressions=all \
@@ -77,4 +87,4 @@ clean:
 	-rm $(OBJ_DIR)/* -r
 	-rm $(OUTPUT)
 
-.PHONY: all run test clean
+.PHONY: all run format valgrind test clean
