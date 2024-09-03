@@ -66,7 +66,7 @@ int main() {
   struct GUI *gui = create_gui(core);
   struct GUI_Container *c = calloc(1, sizeof(struct GUI_Container));
   *c = (struct GUI_Container) {
-    .top_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .top_distance = {.type = GUT_AUTO, .px = 10},
     .top_anchor = {.type = GUT_ABSOLUTE, .px = 0},
 
     .right_distance = {.type = GUT_ABSOLUTE, .px = 10},
@@ -75,11 +75,11 @@ int main() {
     .bottom_distance = {.type = GUT_ABSOLUTE, .px = 10},
     .bottom_anchor = {.type = GUT_ABSOLUTE, .px = 0},
 
-    .left_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .left_distance = {.type = GUT_AUTO, .px = 10},
     .left_anchor = {.type = GUT_ABSOLUTE, .px = 0},
 
-    .width = {.type = GUT_AUTO, .px = 0},
-    .height = {.type = GUT_AUTO, .px = 0}
+    .width = {.type = GUT_ABSOLUTE, .px = 250},
+    .height = {.type = GUT_ABSOLUTE, .px = 250}
   };
   add_gui_container(gui, c);
   INFO2F("GUI: %u", gui->number_of_containers);
