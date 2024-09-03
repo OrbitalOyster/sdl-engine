@@ -13,6 +13,7 @@ struct Core;
 
 struct Core *create_core(int window_width, int window_height, char *title);
 SDL_Renderer *get_renderer(struct Core *core);
+SDL_Window *get_window(struct Core *core);
 void destroy_core(struct Core *core);
 
 #endif /* CORE_H */

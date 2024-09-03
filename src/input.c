@@ -57,8 +57,11 @@ void process_input(int *quit) {
     case SDL_WINDOWEVENT: {
       switch (event.window.event) {
       case SDL_WINDOWEVENT_RESIZED:
+        INFO2F("Window resize (%i x %i)", event.window.data1,
+               event.window.data2);
+        break;
       case SDL_WINDOWEVENT_SIZE_CHANGED:
-        INFO2("Window resize");
+        INFO2("Window size changed");
         break;
       }
       break;

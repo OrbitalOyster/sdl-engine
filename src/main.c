@@ -7,6 +7,8 @@
 #include "utils/JSON/JSON.h"
 #include "utils/debug.h"
 
+#include "gui/gui.h"
+
 int quit = 0;
 
 void on_key_down(SDL_Scancode key) {
@@ -60,6 +62,28 @@ int main() {
     WARN("Unable to start engine");
     return 1;
   }
+
+  struct GUI *gui = create_gui(core);
+  struct GUI_Container *c = calloc(1, sizeof(struct GUI_Container));
+  *c = (struct GUI_Container) {
+    .top_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .top_anchor = {.type = GUT_ABSOLUTE, .px = 0},
+
+    .right_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .right_anchor = {.type = GUT_ABSOLUTE, .px = 0},
+
+    .bottom_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .bottom_anchor = {.type = GUT_ABSOLUTE, .px = 0},
+
+    .left_distance = {.type = GUT_ABSOLUTE, .px = 10},
+    .left_anchor = {.type = GUT_ABSOLUTE, .px = 0},
+
+    .width = {.type = GUT_AUTO, .px = 0},
+    .height = {.type = GUT_AUTO, .px = 0}
+  };
+  add_gui_container(gui, c);
+  INFO2F("GUI: %u", gui->number_of_containers);
+
   // Init input
   reset_key_input();
   register_on_key_down_func(on_key_down);
@@ -73,6 +97,10 @@ int main() {
     // Render
     SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
     SDL_RenderClear(renderer);
+
+    // GUI
+    render_gui(gui);
+
     // Done
     SDL_RenderPresent(renderer);
     // Delay
