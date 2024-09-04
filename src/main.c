@@ -66,20 +66,45 @@ int main() {
   struct GUI *gui = create_gui(core);
   struct GUI_Container *c = calloc(1, sizeof(struct GUI_Container));
   *c = (struct GUI_Container) {
-    .top_distance = {.type = GUT_AUTO, .px = 10},
-    .top_anchor = {.type = GUT_ABSOLUTE, .px = 0},
 
-    .right_distance = {.type = GUT_ABSOLUTE, .px = 10},
-    .right_anchor = {.type = GUT_ABSOLUTE, .px = 0},
+    /* Full size
+    .top_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .top_anchor = {.type = GUT_ABSOLUTE, .px = 10},
+    .right_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .right_anchor = {.type = GUT_ABSOLUTE, .px = 10},
+    .bottom_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .bottom_anchor = {.type = GUT_ABSOLUTE, .px = 10},
+    .left_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .left_anchor = {.type = GUT_ABSOLUTE, .px = 10},
+    .width = {.type = GUT_AUTO, .px = 250},
+    .height = {.type = GUT_AUTO, .px = 250}
+    */
 
-    .bottom_distance = {.type = GUT_ABSOLUTE, .px = 10},
-    .bottom_anchor = {.type = GUT_ABSOLUTE, .px = 0},
-
-    .left_distance = {.type = GUT_AUTO, .px = 10},
-    .left_anchor = {.type = GUT_ABSOLUTE, .px = 0},
-
+    /* Bottom right */
+    .top_distance = {.type = GUT_AUTO},
+    .top_anchor = {.type = GUT_RELATIVE, .pct = 0},
+    .right_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .right_anchor = {.type = GUT_RELATIVE, .pct = 0},
+    .bottom_distance = {.type = GUT_ABSOLUTE, .px = 25},
+    .bottom_anchor = {.type = GUT_RELATIVE, .pct = 0},
+    .left_distance = {.type = GUT_AUTO},
+    .left_anchor = {.type = GUT_RELATIVE, .pct = 0},
     .width = {.type = GUT_ABSOLUTE, .px = 250},
     .height = {.type = GUT_ABSOLUTE, .px = 250}
+
+    /* Centered
+    .top_distance = {.type = GUT_AUTO},
+    .top_anchor = {.type = GUT_RELATIVE, .pct = .5},
+    .right_distance = {.type = GUT_RELATIVE, .pct = .5},
+    .right_anchor = {.type = GUT_RELATIVE, .pct = .5},
+    .bottom_distance = {.type = GUT_RELATIVE, .pct = .5},
+    .bottom_anchor = {.type = GUT_RELATIVE, .pct = .5},
+    .left_distance = {.type = GUT_AUTO},
+    .left_anchor = {.type = GUT_RELATIVE, .pct = .5},
+    .width = {.type = GUT_ABSOLUTE, .px = 250},
+    .height = {.type = GUT_ABSOLUTE, .px = 250}
+    */
+
   };
   add_gui_container(gui, c);
   INFO2F("GUI: %u", gui->number_of_containers);

@@ -24,15 +24,15 @@ void add_gui_container(struct GUI *gui, struct GUI_Container *container) {
 
 static int unit_to_px(struct GUI_Unit unit, int reference) {
   switch (unit.type) {
-    case GUT_AUTO:
-      ERR(1, "Attempt to measure auto GUI unit");
-    case GUT_ABSOLUTE:
-      return unit.px;
-    case GUT_RELATIVE:
-      return (int)round(unit.pct * reference);
-    default:
-      ERR(1, "Invalid GUI unit type");
-      return 0;
+  case GUT_AUTO:
+    ERR(1, "Attempt to measure auto GUI unit");
+  case GUT_ABSOLUTE:
+    return unit.px;
+  case GUT_RELATIVE:
+    return (int)round(unit.pct * reference);
+  default:
+    ERR(1, "Invalid GUI unit type");
+    return 0;
   }
 }
 
@@ -56,42 +56,31 @@ void render_gui(struct GUI *gui) {
       ERRF(1, "Invalid GUI types: %u %u %u", c->height.type,
            c->top_distance.type, c->bottom_distance.type);
 
-    // Width
-    int w = 0;
-    if (c->width.type)
-      w = unit_to_px(c->width, root_width);
-
-    // Height
-    int h = 0;
-    if (c->height.type)
-      h = unit_to_px(c->height, root_height);
-
     // Top
     int top = 0;
     if (c->top_distance.type)
       top = unit_to_px(c->top_distance, root_height);
-
-    // Left
-    int left = 0;
-    if (c->left_distance.type)
-      left = unit_to_px(c->left_distance, root_width);
-
-    // Bottom
-    int bottom = 0;
-    if (c->bottom_distance.type)
-      bottom = root_height - unit_to_px(c->bottom_distance, root_height);
 
     // Right
     int right = 0;
     if (c->right_distance.type)
       right = root_width - unit_to_px(c->right_distance, root_width);
 
+    // Bottom
+    int bottom = 0;
+    if (c->bottom_distance.type)
+      bottom = root_height - unit_to_px(c->bottom_distance, root_height);
+
+    // Left
+    int left = 0;
+    if (c->left_distance.type)
+      left = unit_to_px(c->left_distance, root_width);
+
     // Width
-    if (c->width.type == GUT_AUTO)
-      w = right - left;
+    int w = c->width.type ? unit_to_px(c->width, root_width) : right - left;
     // Height
-    if (c->height.type == GUT_AUTO)
-      h = bottom - top;
+    int h = c->height.type ? unit_to_px(c->height, root_height) : bottom - top;
+
     // Top
     if (c->top_distance.type == GUT_AUTO)
       top = bottom - h;
@@ -104,37 +93,55 @@ void render_gui(struct GUI *gui) {
     // Right
     if (c->right_distance.type == GUT_AUTO)
       right = left + w;
- 
-//INFO2F("w:%i h:%i right: %i left: %i", w, h, right, left);
 
     // Anchors
     int top_anchor = 0;
-    if (c->top_anchor.type == GUT_ABSOLUTE)
+    if (c->top_anchor.type)
       top_anchor = unit_to_px(c->top_anchor, h);
     else
       ERR(1, "Invalid anchor type");
-//    top -= top_anchor;
-    
+
+    if (c->top_distance.type) {
+      top -= top_anchor;
+      //      bottom -= top_anchor;
+    }
+
     int right_anchor = 0;
-    if (c->right_anchor.type == GUT_ABSOLUTE)
+    if (c->right_anchor.type)
       right_anchor = unit_to_px(c->right_anchor, w);
     else
       ERR(1, "Invalid anchor type");
-//    right += right_anchor;
+
+    if (c->right_distance.type) {
+      //      right += right_anchor;
+      left += right_anchor;
+    }
 
     int bottom_anchor = 0;
-    if (c->bottom_anchor.type == GUT_ABSOLUTE)
+    if (c->bottom_anchor.type)
       bottom_anchor = unit_to_px(c->bottom_anchor, h);
     else
       ERR(1, "Invalid anchor type");
-//    bottom += bottom_anchor;
+
+    if (c->bottom_distance.type) {
+      top += bottom_anchor;
+      //      bottom += bottom_anchor;
+    }
 
     int left_anchor = 0;
-    if (c->left_anchor.type == GUT_ABSOLUTE)
+    if (c->left_anchor.type)
       left_anchor = unit_to_px(c->left_anchor, w);
     else
       ERR(1, "Invalid anchor type");
-//    left -= left_anchor;
+
+    if (c->left_distance.type) {
+      //      right -= left_anchor;
+      left -= left_anchor;
+    }
+
+    //    INFO2F("w:%i h:%i top: %i right: %i bottom: %i left %i", w, h, top,
+    //    right,
+    //           bottom, left);
 
     SDL_Renderer *renderer = get_renderer(gui->core);
 
@@ -148,17 +155,20 @@ void render_gui(struct GUI *gui) {
 
     // Top anchor
     SDL_SetRenderDrawColor(renderer, 0xff, 0x00, 0x00, 0xff);
-    SDL_RenderDrawLine(renderer, left, top + top_anchor, right - 1,
+    SDL_RenderDrawLine(renderer, left, top + top_anchor, left + w,
                        top + top_anchor);
     // Left anchor
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xcc, 0x22, 0xff);
     SDL_RenderDrawLine(renderer, left + left_anchor, top, left + left_anchor,
-                       bottom - 1);
+                       top + h);
     // Bottom anchor
-    SDL_RenderDrawLine(renderer, left, bottom - bottom_anchor - 1, right,
-                       bottom - bottom_anchor - 1);
+    SDL_SetRenderDrawColor(renderer, 0x44, 0xff, 0x11, 0xff);
+    SDL_RenderDrawLine(renderer, left, top + h - bottom_anchor, left + w,
+                       top + h - bottom_anchor);
     // Right anchor
-    SDL_RenderDrawLine(renderer, right - right_anchor - 1, top,
-                       right - right_anchor - 1, bottom);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xff, 0xff);
+    SDL_RenderDrawLine(renderer, left + w - right_anchor, top,
+                       left + w - right_anchor, top + h);
 
     free(tmp);
   }
