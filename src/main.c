@@ -69,7 +69,7 @@ int main() {
   //  struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
 
   *c0 = (struct GUI_Container){
-      /* Centered (1/9) */
+      /* Centered (1/9)
       .top_distance = {.type = GUT_RELATIVE,
                        .pct = .5,
                        .ref_type = GUT_RELATIVE,
@@ -82,6 +82,16 @@ int main() {
                         .ref_pct = .5},
       .width = {.type = GUT_ABSOLUTE, .px = 250},
       .height = {.type = GUT_ABSOLUTE, .px = 250}
+      */
+
+      .top_distance = {.type = GUT_ABSOLUTE,
+                       .px = 5,
+                       .ref_type = GUT_ABSOLUTE},
+      .right_distance = {.type = GUT_AUTO},
+      .bottom_distance = {.type = GUT_RELATIVE, .pct = .5, .ref_type = GUT_ABSOLUTE, .ref_px = 100},
+      .left_distance = {.type = GUT_RELATIVE, .pct = .5, .ref_type = GUT_RELATIVE, .ref_pct = .5},
+      .width = {.type = GUT_ABSOLUTE, .px = 300},
+      .height = {.type = GUT_AUTO}
 
       /*
       .top_distance = {.type = GUT_ABSOLUTE, .px = 5},

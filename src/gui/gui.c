@@ -79,12 +79,12 @@ void render_gui(struct GUI *gui) {
     if (c->width.type + c->right_distance.type + c->left_distance.type <
             GUT_ABSOLUTE * 2 ||
         (c->width.type && c->right_distance.type && c->left_distance.type))
-      ERRF(1, "Invalid GUI types: %u %u %u", c->width.type,
+      ERRF(1, "Invalid GUI horizontal types: %u %u %u", c->width.type,
            c->right_distance.type, c->left_distance.type);
     if (c->height.type + c->top_distance.type + c->bottom_distance.type <
             GUT_ABSOLUTE * 2 ||
         (c->height.type && c->top_distance.type && c->bottom_distance.type))
-      ERRF(1, "Invalid GUI types: %u %u %u", c->height.type,
+      ERRF(1, "Invalid GUI vertical types: %u %u %u", c->height.type,
            c->top_distance.type, c->bottom_distance.type);
 
     int w = 0;
@@ -111,15 +111,12 @@ void render_gui(struct GUI *gui) {
         left = right - w;
 
     } else {
-      /*
       if (c->right_distance.ref_type != GUT_ABSOLUTE ||
           c->left_distance.ref_type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      // right = root_width - distance_to_px(c->right_distance, 0, root_width);
-      right = root_width - 10;
+      right = root_width - distance_to_px(c->right_distance, 0, root_width);
       left = distance_to_px(c->left_distance, 0, root_width);
       w = right - left;
-      */
     }
 
     // Height
@@ -138,15 +135,12 @@ void render_gui(struct GUI *gui) {
       if (!c->bottom_distance.type)
         bottom = top + h;
     } else {
-      /*
       if (c->top_distance.ref_type != GUT_ABSOLUTE ||
           c->bottom_distance.ref_type != GUT_ABSOLUTE)
         ERR(1, "Foo");
       top = distance_to_px(c->top_distance, 0, root_height);
-      // bottom = root_height - distance_to_px(c->bottom_distance, 0, root_height);
-      bottom = root_height - 10;
+      bottom = root_height - distance_to_px(c->bottom_distance, 0, root_height);
       h = bottom - top;
-      */
     }
 
     SDL_Renderer *renderer = get_renderer(gui->core);
