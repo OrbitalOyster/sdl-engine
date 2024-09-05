@@ -6,8 +6,8 @@
 enum GUI_Unit_Type {GUT_AUTO = 0, GUT_ABSOLUTE = 10, GUT_RELATIVE = 100};
 
 struct GUI_Distance {
-  enum GUI_Unit_Type l;
-  enum GUI_Unit_Type to;
+  enum GUI_Unit_Type type;
+  enum GUI_Unit_Type ref_type;
   union {
     int px;
     double pct;
@@ -27,16 +27,16 @@ struct GUI_Unit {
 };
 
 struct GUI_Container {
-  struct GUI_Unit top_distance;
+  struct GUI_Distance top_distance;
   struct GUI_Unit top_anchor;
 
-  struct GUI_Unit right_distance;
+  struct GUI_Distance right_distance;
   struct GUI_Unit right_anchor;
 
-  struct GUI_Unit bottom_distance;
+  struct GUI_Distance bottom_distance;
   struct GUI_Unit bottom_anchor;
 
-  struct GUI_Unit left_distance;
+  struct GUI_Distance left_distance;
   struct GUI_Unit left_anchor;
 
   struct GUI_Unit width;
