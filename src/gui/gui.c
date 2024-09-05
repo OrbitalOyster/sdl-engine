@@ -81,6 +81,31 @@ void render_gui(struct GUI *gui) {
     // Height
     int h = c->height.type ? unit_to_px(c->height, root_height) : bottom - top;
 
+    // Anchors
+    int top_anchor = 0;
+    if (c->top_anchor.type)
+      top_anchor = unit_to_px(c->top_anchor, h);
+    else
+      ERR(1, "Invalid anchor type");
+
+    int right_anchor = 0;
+    if (c->right_anchor.type)
+      right_anchor = unit_to_px(c->right_anchor, w);
+    else
+      ERR(1, "Invalid anchor type");
+
+    int bottom_anchor = 0;
+    if (c->bottom_anchor.type)
+      bottom_anchor = unit_to_px(c->bottom_anchor, h);
+    else
+      ERR(1, "Invalid anchor type");
+
+    int left_anchor = 0;
+    if (c->left_anchor.type)
+      left_anchor = unit_to_px(c->left_anchor, w);
+    else
+      ERR(1, "Invalid anchor type");
+
     // Top
     if (c->top_distance.type == GUT_AUTO)
       top = bottom - h;
@@ -94,54 +119,15 @@ void render_gui(struct GUI *gui) {
     if (c->right_distance.type == GUT_AUTO)
       right = left + w;
 
-    // Anchors
-    int top_anchor = 0;
-    if (c->top_anchor.type)
-      top_anchor = unit_to_px(c->top_anchor, h);
-    else
-      ERR(1, "Invalid anchor type");
-
-    if (c->top_distance.type) {
+    // Adjust coords
+    if (c->top_distance.type)
       top -= top_anchor;
-      //      bottom -= top_anchor;
-    }
-
-    int right_anchor = 0;
-    if (c->right_anchor.type)
-      right_anchor = unit_to_px(c->right_anchor, w);
-    else
-      ERR(1, "Invalid anchor type");
-
-    if (c->right_distance.type) {
-      //      right += right_anchor;
+    if (c->right_distance.type)
       left += right_anchor;
-    }
-
-    int bottom_anchor = 0;
-    if (c->bottom_anchor.type)
-      bottom_anchor = unit_to_px(c->bottom_anchor, h);
-    else
-      ERR(1, "Invalid anchor type");
-
-    if (c->bottom_distance.type) {
+    if (c->bottom_distance.type)
       top += bottom_anchor;
-      //      bottom += bottom_anchor;
-    }
-
-    int left_anchor = 0;
-    if (c->left_anchor.type)
-      left_anchor = unit_to_px(c->left_anchor, w);
-    else
-      ERR(1, "Invalid anchor type");
-
-    if (c->left_distance.type) {
-      //      right -= left_anchor;
+    if (c->left_distance.type)
       left -= left_anchor;
-    }
-
-    //    INFO2F("w:%i h:%i top: %i right: %i bottom: %i left %i", w, h, top,
-    //    right,
-    //           bottom, left);
 
     SDL_Renderer *renderer = get_renderer(gui->core);
 

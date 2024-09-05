@@ -5,6 +5,23 @@
 
 enum GUI_Unit_Type {GUT_AUTO = 0, GUT_ABSOLUTE = 10, GUT_RELATIVE = 100};
 
+enum GUI_Distance_Type {
+  DT_AUTO,
+  DT_ABS,
+  DT_REL,
+  DT_ABS_REF,
+  DT_REL_REF,
+};
+
+struct GUI_Distance {
+  enum GUI_Distance_Type type;
+  union {
+    int px;
+    double pct;
+  };
+  int ref;
+};
+
 struct GUI_Unit {
   enum GUI_Unit_Type type;
   union {
