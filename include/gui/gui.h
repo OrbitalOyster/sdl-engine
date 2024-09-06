@@ -26,20 +26,11 @@ struct GUI_Distance {
   };
 };
 
-
 struct GUI_Container {
-  struct GUI_Distance top_distance;
-  struct GUI_Unit top_anchor;
-
-  struct GUI_Distance right_distance;
-  struct GUI_Unit right_anchor;
-
-  struct GUI_Distance bottom_distance;
-  struct GUI_Unit bottom_anchor;
-
-  struct GUI_Distance left_distance;
-  struct GUI_Unit left_anchor;
-
+  struct GUI_Distance top;
+  struct GUI_Distance right;
+  struct GUI_Distance bottom;
+  struct GUI_Distance left;
   struct GUI_Unit width;
   struct GUI_Unit height;
 };

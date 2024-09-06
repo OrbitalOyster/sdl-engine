@@ -69,48 +69,41 @@ int main() {
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
 
   /* Centered (1/9) */
-  *c0 = (struct GUI_Container){.top_distance = {.type = GUT_RELATIVE,
+  *c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE,
                                                 .pct = .5,
                                                 .ref_type = GUT_RELATIVE,
                                                 .ref_pct = .5},
-                               .right_distance = {.type = GUT_AUTO},
-                               .bottom_distance = {.type = GUT_AUTO},
-                               .left_distance = {.type = GUT_RELATIVE,
+                               .left = {.type = GUT_RELATIVE,
                                                  .pct = .5,
                                                  .ref_type = GUT_RELATIVE,
                                                  .ref_pct = .5},
-                               .width = {.type = GUT_ABSOLUTE, .px = 250},
-                               .height = {.type = GUT_ABSOLUTE, .px = 250}};
+                               .width = {.type = GUT_RELATIVE, .pct = .333},
+                               .height = {.type = GUT_RELATIVE, .pct = .333}};
 
   /* Top banner */
   *c1 = (struct GUI_Container){
-      .top_distance = {.type = GUT_ABSOLUTE, .px = 5, .ref_type = GUT_ABSOLUTE},
-      .right_distance = {.type = GUT_ABSOLUTE,
+      .top = {.type = GUT_ABSOLUTE, .px = 5, .ref_type = GUT_ABSOLUTE},
+      .right = {.type = GUT_ABSOLUTE,
                          .px = 5,
                          .ref_type = GUT_ABSOLUTE},
-      .bottom_distance = {.type = GUT_AUTO},
-      .left_distance = {.type = GUT_ABSOLUTE,
+      .left = {.type = GUT_ABSOLUTE,
                         .px = 5,
                         .ref_type = GUT_ABSOLUTE},
-      .width = {.type = GUT_AUTO},
       .height = {.type = GUT_ABSOLUTE, .px = 150}};
 
   /* Bottom right */
-  *c2 = (struct GUI_Container){.top_distance = {.type = GUT_AUTO},
-                               .right_distance = {.type = GUT_ABSOLUTE,
+  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE,
                                                   .px = 25,
                                                   .ref_type = GUT_ABSOLUTE},
-                               .bottom_distance = {.type = GUT_ABSOLUTE,
+                               .bottom = {.type = GUT_ABSOLUTE,
                                                    .px = 25,
                                                    .ref_type = GUT_ABSOLUTE},
-                               .left_distance = {.type = GUT_AUTO},
                                .width = {.type = GUT_ABSOLUTE, .px = 250},
                                .height = {.type = GUT_ABSOLUTE, .px = 250}};
 
   add_gui_container(gui, c0);
   add_gui_container(gui, c1);
   add_gui_container(gui, c2);
-  INFO2F("GUI: %u", gui->number_of_containers);
 
   // Init input
   reset_key_input();

@@ -76,44 +76,37 @@ void render_gui(struct GUI *gui) {
     struct GUI_Container *c = gui->containers[i];
 
     // Check types
-    if (c->width.type + c->right_distance.type + c->left_distance.type <
-            GUT_ABSOLUTE * 2 ||
-        (c->width.type && c->right_distance.type && c->left_distance.type))
+    if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
+        (c->width.type && c->right.type && c->left.type))
       ERRF(1, "Invalid GUI horizontal types: %u %u %u", c->width.type,
-           c->right_distance.type, c->left_distance.type);
-    if (c->height.type + c->top_distance.type + c->bottom_distance.type <
-            GUT_ABSOLUTE * 2 ||
-        (c->height.type && c->top_distance.type && c->bottom_distance.type))
+           c->right.type, c->left.type);
+    if (c->height.type + c->top.type + c->bottom.type < GUT_ABSOLUTE * 2 ||
+        (c->height.type && c->top.type && c->bottom.type))
       ERRF(1, "Invalid GUI vertical types: %u %u %u", c->height.type,
-           c->top_distance.type, c->bottom_distance.type);
+           c->top.type, c->bottom.type);
 
-    int w = 0;
-    int h = 0;
-    int top = 0;
-    int right = 0;
-    int bottom = 0;
-    int left = 0;
+    int w = 0, h = 0;
+    int top = 0, right = 0, bottom = 0, left = 0;
 
     // Width
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
 
-      if (c->right_distance.type)
-        right = root_width - distance_to_px(c->right_distance, w, root_width);
-      if (c->left_distance.type)
-        left = distance_to_px(c->left_distance, w, root_width);
+      if (c->right.type)
+        right = root_width - distance_to_px(c->right, w, root_width);
+      if (c->left.type)
+        left = distance_to_px(c->left, w, root_width);
 
-      if (!c->right_distance.type)
+      if (!c->right.type)
         right = left + w;
-      if (!c->left_distance.type)
+      if (!c->left.type)
         left = right - w;
 
     } else {
-      if (c->right_distance.ref_type != GUT_ABSOLUTE ||
-          c->left_distance.ref_type != GUT_ABSOLUTE)
+      if (c->right.ref_type != GUT_ABSOLUTE || c->left.ref_type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      right = root_width - distance_to_px(c->right_distance, 0, root_width);
-      left = distance_to_px(c->left_distance, 0, root_width);
+      right = root_width - distance_to_px(c->right, 0, root_width);
+      left = distance_to_px(c->left, 0, root_width);
       w = right - left;
     }
 
@@ -121,22 +114,20 @@ void render_gui(struct GUI *gui) {
     if (c->height.type) {
       h = unit_to_px(c->height, root_height);
 
-      if (c->top_distance.type)
-        top = distance_to_px(c->top_distance, h, root_height);
-      if (c->bottom_distance.type)
-        bottom =
-            root_height - distance_to_px(c->bottom_distance, h, root_height);
+      if (c->top.type)
+        top = distance_to_px(c->top, h, root_height);
+      if (c->bottom.type)
+        bottom = root_height - distance_to_px(c->bottom, h, root_height);
 
-      if (!c->top_distance.type)
+      if (!c->top.type)
         top = bottom - h;
-      if (!c->bottom_distance.type)
+      if (!c->bottom.type)
         bottom = top + h;
     } else {
-      if (c->top_distance.ref_type != GUT_ABSOLUTE ||
-          c->bottom_distance.ref_type != GUT_ABSOLUTE)
+      if (c->top.ref_type != GUT_ABSOLUTE || c->bottom.ref_type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      top = distance_to_px(c->top_distance, 0, root_height);
-      bottom = root_height - distance_to_px(c->bottom_distance, 0, root_height);
+      top = distance_to_px(c->top, 0, root_height);
+      bottom = root_height - distance_to_px(c->bottom, 0, root_height);
       h = bottom - top;
     }
 
