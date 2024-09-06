@@ -98,10 +98,8 @@ void render_gui(struct GUI *gui) {
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
 
-//      INFO2F("Width %i", w);
-
       if (c->right_distance.type)
-        right = distance_to_px(c->right_distance, w, root_width);
+        right = root_width - distance_to_px(c->right_distance, w, root_width);
       if (c->left_distance.type)
         left = distance_to_px(c->left_distance, w, root_width);
 
@@ -123,12 +121,11 @@ void render_gui(struct GUI *gui) {
     if (c->height.type) {
       h = unit_to_px(c->height, root_height);
 
-//      INFO2F("Height %i", h);
-//
       if (c->top_distance.type)
         top = distance_to_px(c->top_distance, h, root_height);
       if (c->bottom_distance.type)
-        bottom = root_height - distance_to_px(c->bottom_distance, h, root_height);
+        bottom =
+            root_height - distance_to_px(c->bottom_distance, h, root_height);
 
       if (!c->top_distance.type)
         top = bottom - h;
