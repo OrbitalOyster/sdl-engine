@@ -89,21 +89,15 @@ void render_gui(struct GUI *gui) {
 
     int w = 0, h = 0;
     int top = 0, right = 0, bottom = 0, left = 0;
-    int top_p = 0, right_p = 0, bottom_p = 0, left_p = 0;
 
     // Width
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
-
-      if (c->right.type) {
-        right_p = unit_to_px(c->right_p, w);
-        right = root_width - unit_to_px(c->right, root_width) - right_p;
-      }
-      if (c->left.type) {
-        left_p = unit_to_px(c->left_p, w);
-        left = unit_to_px(c->left, root_width) - left_p;
-      }
-
+      if (c->right.type)
+        right = root_width - unit_to_px(c->right, root_width) -
+                unit_to_px(c->right_p, w);
+      if (c->left.type)
+        left = unit_to_px(c->left, root_width) - unit_to_px(c->left_p, w);
       if (!c->right.type)
         right = left + w;
       if (!c->left.type)
@@ -112,26 +106,20 @@ void render_gui(struct GUI *gui) {
     } else {
       if (c->right_p.type != GUT_ABSOLUTE || c->left_p.type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      right_p = unit_to_px(c->right_p, w);
-      right = root_width - unit_to_px(c->right, root_width) - right_p;
-      left_p = unit_to_px(c->left_p, w);
-      left = unit_to_px(c->left, root_width) - left_p;
+      right = root_width - unit_to_px(c->right, root_width) -
+              unit_to_px(c->right_p, w);
+      left = unit_to_px(c->left, root_width) - unit_to_px(c->left_p, w);
       w = right - left;
     }
 
     // Height
     if (c->height.type) {
       h = unit_to_px(c->height, root_height);
-
-      if (c->top.type) {
-        top_p = unit_to_px(c->top_p, h);
-        top = unit_to_px(c->top, root_height) - top_p;
-      }
-      if (c->bottom.type) {
-        bottom_p = unit_to_px(c->bottom_p, h);
-        bottom = root_height - unit_to_px(c->bottom, root_height) - bottom_p;
-      }
-
+      if (c->top.type)
+        top = unit_to_px(c->top, root_height) - unit_to_px(c->top_p, h);
+      if (c->bottom.type)
+        bottom = root_height - unit_to_px(c->bottom, root_height) -
+                 unit_to_px(c->bottom_p, h);
       if (!c->top.type)
         top = bottom - h;
       if (!c->bottom.type)
@@ -139,10 +127,9 @@ void render_gui(struct GUI *gui) {
     } else {
       if (c->top_p.type != GUT_ABSOLUTE || c->bottom_p.type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      top_p = unit_to_px(c->top_p, h);
-      top = unit_to_px(c->top, root_height) - top_p;
-      bottom_p = unit_to_px(c->bottom_p, h);
-      bottom = root_height - unit_to_px(c->bottom, root_height) - bottom_p;
+      top = unit_to_px(c->top, root_height) - unit_to_px(c->top_p, h);
+      bottom = root_height - unit_to_px(c->bottom, root_height) -
+               unit_to_px(c->bottom_p, h);
       h = bottom - top;
     }
 
