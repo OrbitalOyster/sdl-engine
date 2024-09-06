@@ -29,13 +29,14 @@ static int unit_to_px(struct GUI_Unit unit, int reference) {
   case GUT_ABSOLUTE:
     return unit.px;
   case GUT_RELATIVE:
-    return (int)round(unit.pct * reference);
+    return (int)round(unit.f * reference);
   default:
     ERR(1, "Invalid GUI unit type");
     return 0;
   }
 }
 
+/*
 static int distance_to_px(struct GUI_Distance d, int ref1, int ref2) {
   int ref_px = 0;
 
@@ -60,12 +61,13 @@ static int distance_to_px(struct GUI_Distance d, int ref1, int ref2) {
   case GUT_ABSOLUTE:
     return d.px - ref_px;
   case GUT_RELATIVE:
-    return (int)round(d.pct * ref2) - ref_px;
+    return (int)round(d.f * ref2) - ref_px;
   default:
     ERR(1, "Invalid GUI unit type");
     return 0;
   }
 }
+*/
 
 void render_gui(struct GUI *gui) {
   SDL_Window *window = get_window(gui->core);
@@ -87,15 +89,20 @@ void render_gui(struct GUI *gui) {
 
     int w = 0, h = 0;
     int top = 0, right = 0, bottom = 0, left = 0;
+    int top_p = 0, right_p = 0, bottom_p = 0, left_p = 0;
 
     // Width
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
 
-      if (c->right.type)
-        right = root_width - distance_to_px(c->right, w, root_width);
-      if (c->left.type)
-        left = distance_to_px(c->left, w, root_width);
+      if (c->right.type) {
+        right_p = unit_to_px(c->right_p, w);
+        right = root_width - unit_to_px(c->right, root_width) - right_p;
+      }
+      if (c->left.type) {
+        left_p = unit_to_px(c->left_p, w);
+        left = unit_to_px(c->left, root_width) - left_p;
+      }
 
       if (!c->right.type)
         right = left + w;
@@ -103,10 +110,12 @@ void render_gui(struct GUI *gui) {
         left = right - w;
 
     } else {
-      if (c->right.ref_type != GUT_ABSOLUTE || c->left.ref_type != GUT_ABSOLUTE)
+      if (c->right_p.type != GUT_ABSOLUTE || c->left_p.type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      right = root_width - distance_to_px(c->right, 0, root_width);
-      left = distance_to_px(c->left, 0, root_width);
+      right_p = unit_to_px(c->right_p, w);
+      right = root_width - unit_to_px(c->right, root_width) - right_p;
+      left_p = unit_to_px(c->left_p, w);
+      left = unit_to_px(c->left, root_width) - left_p;
       w = right - left;
     }
 
@@ -114,20 +123,26 @@ void render_gui(struct GUI *gui) {
     if (c->height.type) {
       h = unit_to_px(c->height, root_height);
 
-      if (c->top.type)
-        top = distance_to_px(c->top, h, root_height);
-      if (c->bottom.type)
-        bottom = root_height - distance_to_px(c->bottom, h, root_height);
+      if (c->top.type) {
+        top_p = unit_to_px(c->top_p, h);
+        top = unit_to_px(c->top, root_height) - top_p;
+      }
+      if (c->bottom.type) {
+        bottom_p = unit_to_px(c->bottom_p, h);
+        bottom = root_height - unit_to_px(c->bottom, root_height) - bottom_p;
+      }
 
       if (!c->top.type)
         top = bottom - h;
       if (!c->bottom.type)
         bottom = top + h;
     } else {
-      if (c->top.ref_type != GUT_ABSOLUTE || c->bottom.ref_type != GUT_ABSOLUTE)
+      if (c->top_p.type != GUT_ABSOLUTE || c->bottom_p.type != GUT_ABSOLUTE)
         ERR(1, "Foo");
-      top = distance_to_px(c->top, 0, root_height);
-      bottom = root_height - distance_to_px(c->bottom, 0, root_height);
+      top_p = unit_to_px(c->top_p, h);
+      top = unit_to_px(c->top, root_height) - top_p;
+      bottom_p = unit_to_px(c->bottom_p, h);
+      bottom = root_height - unit_to_px(c->bottom, root_height) - bottom_p;
       h = bottom - top;
     }
 

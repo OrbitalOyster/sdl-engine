@@ -69,35 +69,27 @@ int main() {
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
 
   /* Centered (1/9) */
-  *c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE,
-                                                .pct = .5,
-                                                .ref_type = GUT_RELATIVE,
-                                                .ref_pct = .5},
-                               .left = {.type = GUT_RELATIVE,
-                                                 .pct = .5,
-                                                 .ref_type = GUT_RELATIVE,
-                                                 .ref_pct = .5},
-                               .width = {.type = GUT_RELATIVE, .pct = .333},
-                               .height = {.type = GUT_RELATIVE, .pct = .333}};
+  *c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE, .f = .5},
+                               .top_p = {.type = GUT_RELATIVE, .f = .5},
+                               .left = {.type = GUT_RELATIVE, .f = .5},
+                               .left_p = {.type = GUT_RELATIVE, .f = .5},
+                               .width = {.type = GUT_RELATIVE, .f = .33},
+                               .height = {.type = GUT_RELATIVE, .f = .33}};
 
   /* Top banner */
-  *c1 = (struct GUI_Container){
-      .top = {.type = GUT_ABSOLUTE, .px = 5, .ref_type = GUT_ABSOLUTE},
-      .right = {.type = GUT_ABSOLUTE,
-                         .px = 5,
-                         .ref_type = GUT_ABSOLUTE},
-      .left = {.type = GUT_ABSOLUTE,
-                        .px = 5,
-                        .ref_type = GUT_ABSOLUTE},
-      .height = {.type = GUT_ABSOLUTE, .px = 150}};
+  *c1 = (struct GUI_Container){.top = {.type = GUT_ABSOLUTE, .px = 5},
+                               .top_p = {.type = GUT_ABSOLUTE},
+                               .right = {.type = GUT_ABSOLUTE, .px = 5},
+                               .right_p = {.type = GUT_ABSOLUTE},
+                               .left = {.type = GUT_ABSOLUTE, .px = 5},
+                               .left_p = {.type = GUT_ABSOLUTE},
+                               .height = {.type = GUT_ABSOLUTE, .px = 150}};
 
   /* Bottom right */
-  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE,
-                                                  .px = 25,
-                                                  .ref_type = GUT_ABSOLUTE},
-                               .bottom = {.type = GUT_ABSOLUTE,
-                                                   .px = 25,
-                                                   .ref_type = GUT_ABSOLUTE},
+  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE, .px = 25},
+                               .right_p = {.type = GUT_ABSOLUTE},
+                               .bottom = {.type = GUT_ABSOLUTE, .px = 25},
+                               .bottom_p = {.type = GUT_ABSOLUTE},
                                .width = {.type = GUT_ABSOLUTE, .px = 250},
                                .height = {.type = GUT_ABSOLUTE, .px = 250}};
 

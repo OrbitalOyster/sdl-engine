@@ -9,28 +9,19 @@ struct GUI_Unit {
   enum GUI_Unit_Type type;
   union {
     int px;
-    double pct;
-  };
-};
-
-struct GUI_Distance {
-  enum GUI_Unit_Type type;
-  union {
-    int px;
-    double pct;
-  };
-  enum GUI_Unit_Type ref_type;
-  union {
-    int ref_px;
-    double ref_pct;
+    double f;
   };
 };
 
 struct GUI_Container {
-  struct GUI_Distance top;
-  struct GUI_Distance right;
-  struct GUI_Distance bottom;
-  struct GUI_Distance left;
+  struct GUI_Unit top;
+  struct GUI_Unit top_p;
+  struct GUI_Unit right;
+  struct GUI_Unit right_p;
+  struct GUI_Unit bottom;
+  struct GUI_Unit bottom_p;
+  struct GUI_Unit left;
+  struct GUI_Unit left_p;
   struct GUI_Unit width;
   struct GUI_Unit height;
 };
