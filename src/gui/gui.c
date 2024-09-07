@@ -24,8 +24,8 @@ void add_gui_container(struct GUI *gui, struct GUI_Container *container) {
 
 static int unit_to_px(struct GUI_Unit unit, int reference) {
   switch (unit.type) {
-  case GUT_AUTO:
-    ERR(1, "Attempt to measure auto GUI unit");
+  case GUT_NONE:
+    return 0;
   case GUT_ABSOLUTE:
     return unit.px;
   case GUT_RELATIVE:
@@ -35,39 +35,6 @@ static int unit_to_px(struct GUI_Unit unit, int reference) {
     return 0;
   }
 }
-
-/*
-static int distance_to_px(struct GUI_Distance d, int ref1, int ref2) {
-  int ref_px = 0;
-
-  switch (d.ref_type) {
-  case GUT_AUTO:
-    ERRF(1, "Attempt to measure auto GUI unit %i %i", ref1, ref2);
-  case GUT_ABSOLUTE:
-    ref_px = d.ref_px;
-    break;
-  case GUT_RELATIVE:
-    ref_px = (int)round(d.ref_pct * ref1);
-    break;
-  default: {
-    ERR(1, "Invalid GUI unit type");
-    return 0;
-  }
-  }
-
-  switch (d.type) {
-  case GUT_AUTO:
-    ERR(1, "Attempt to measure auto GUI unit");
-  case GUT_ABSOLUTE:
-    return d.px - ref_px;
-  case GUT_RELATIVE:
-    return (int)round(d.f * ref2) - ref_px;
-  default:
-    ERR(1, "Invalid GUI unit type");
-    return 0;
-  }
-}
-*/
 
 void render_gui(struct GUI *gui) {
   SDL_Window *window = get_window(gui->core);
@@ -94,7 +61,7 @@ void render_gui(struct GUI *gui) {
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
       if (c->right.type)
-        right = root_width - unit_to_px(c->right, root_width) -
+        right = root_width - unit_to_px(c->right, root_width) +
                 unit_to_px(c->right_p, w);
       if (c->left.type)
         left = unit_to_px(c->left, root_width) - unit_to_px(c->left_p, w);
@@ -104,9 +71,9 @@ void render_gui(struct GUI *gui) {
         left = right - w;
 
     } else {
-      if (c->right_p.type != GUT_ABSOLUTE || c->left_p.type != GUT_ABSOLUTE)
-        ERR(1, "Foo");
-      right = root_width - unit_to_px(c->right, root_width) -
+      if (c->right_p.type == GUT_RELATIVE || c->left_p.type == GUT_RELATIVE)
+        ERR(1, "P-type relative");
+      right = root_width - unit_to_px(c->right, root_width) +
               unit_to_px(c->right_p, w);
       left = unit_to_px(c->left, root_width) - unit_to_px(c->left_p, w);
       w = right - left;
@@ -118,17 +85,17 @@ void render_gui(struct GUI *gui) {
       if (c->top.type)
         top = unit_to_px(c->top, root_height) - unit_to_px(c->top_p, h);
       if (c->bottom.type)
-        bottom = root_height - unit_to_px(c->bottom, root_height) -
+        bottom = root_height - unit_to_px(c->bottom, root_height) +
                  unit_to_px(c->bottom_p, h);
       if (!c->top.type)
         top = bottom - h;
       if (!c->bottom.type)
         bottom = top + h;
     } else {
-      if (c->top_p.type != GUT_ABSOLUTE || c->bottom_p.type != GUT_ABSOLUTE)
-        ERR(1, "Foo");
+      if (c->top_p.type == GUT_RELATIVE || c->bottom_p.type == GUT_RELATIVE)
+        ERR(1, "P-type relative");
       top = unit_to_px(c->top, root_height) - unit_to_px(c->top_p, h);
-      bottom = root_height - unit_to_px(c->bottom, root_height) -
+      bottom = root_height - unit_to_px(c->bottom, root_height) +
                unit_to_px(c->bottom_p, h);
       h = bottom - top;
     }
@@ -142,25 +109,6 @@ void render_gui(struct GUI *gui) {
 
     SDL_RenderDrawLine(renderer, left, top, right - 1, bottom - 1);
     SDL_RenderDrawLine(renderer, right, top, left, bottom - 1);
-
-    /*
-    // Top anchor
-    SDL_SetRenderDrawColor(renderer, 0xff, 0x00, 0x00, 0xff);
-    SDL_RenderDrawLine(renderer, left, top + top_anchor, left + w,
-                       top + top_anchor);
-    // Left anchor
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xcc, 0x22, 0xff);
-    SDL_RenderDrawLine(renderer, left + left_anchor, top, left + left_anchor,
-                       top + h);
-    // Bottom anchor
-    SDL_SetRenderDrawColor(renderer, 0x44, 0xff, 0x11, 0xff);
-    SDL_RenderDrawLine(renderer, left, top + h - bottom_anchor, left + w,
-                       top + h - bottom_anchor);
-    // Right anchor
-    SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xff, 0xff);
-    SDL_RenderDrawLine(renderer, left + w - right_anchor, top,
-                       left + w - right_anchor, top + h);
-                       */
 
     free(tmp);
   }

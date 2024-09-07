@@ -3,7 +3,7 @@
 
 #include "core.h"
 
-enum GUI_Unit_Type {GUT_AUTO = 0, GUT_ABSOLUTE = 10, GUT_RELATIVE = 100};
+enum GUI_Unit_Type { GUT_NONE = 0, GUT_ABSOLUTE = 10, GUT_RELATIVE = 100 };
 
 struct GUI_Unit {
   enum GUI_Unit_Type type;

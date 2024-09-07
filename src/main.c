@@ -78,18 +78,15 @@ int main() {
 
   /* Top banner */
   *c1 = (struct GUI_Container){.top = {.type = GUT_ABSOLUTE, .px = 5},
-                               .top_p = {.type = GUT_ABSOLUTE},
                                .right = {.type = GUT_ABSOLUTE, .px = 5},
-                               .right_p = {.type = GUT_ABSOLUTE},
                                .left = {.type = GUT_ABSOLUTE, .px = 5},
-                               .left_p = {.type = GUT_ABSOLUTE},
                                .height = {.type = GUT_ABSOLUTE, .px = 150}};
 
   /* Bottom right */
-  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE, .px = 25},
-                               .right_p = {.type = GUT_ABSOLUTE},
-                               .bottom = {.type = GUT_ABSOLUTE, .px = 25},
-                               .bottom_p = {.type = GUT_ABSOLUTE},
+  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE},
+                               .right_p = {.type = GUT_ABSOLUTE, .px = -25},
+                               .bottom = {.type = GUT_ABSOLUTE},
+                               .bottom_p = {.type = GUT_ABSOLUTE, .px = -25},
                                .width = {.type = GUT_ABSOLUTE, .px = 250},
                                .height = {.type = GUT_ABSOLUTE, .px = 250}};
 
