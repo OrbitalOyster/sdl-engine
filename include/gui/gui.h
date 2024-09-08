@@ -28,11 +28,12 @@ struct GUI_Container {
 
 struct GUI {
   struct Core *core;
+  SDL_Texture *skin;
   unsigned int number_of_containers;
   struct GUI_Container **containers;
 };
 
-struct GUI *create_gui(struct Core *core);
+struct GUI *create_gui(struct Core *core, char *skin);
 void add_gui_container(struct GUI *gui, struct GUI_Container *container);
 void render_gui(struct GUI *gui);
 

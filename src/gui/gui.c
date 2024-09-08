@@ -3,15 +3,15 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include <SDL2/SDL.h>
-
+#include "png.h"
 #include "utils/debug.h"
 
 #define MAX_GUI_CONTAINERS 255
 
-struct GUI *create_gui(struct Core *core) {
+struct GUI *create_gui(struct Core *core, char *skin) {
   struct GUI *result = calloc(1, sizeof(struct GUI));
   result->core = core;
+  result->skin = load_png(get_renderer(core), skin);
   result->number_of_containers = 0;
   result->containers =
       calloc(MAX_GUI_CONTAINERS, sizeof(struct GUI_Container *));
@@ -38,8 +38,13 @@ static int unit_to_px(struct GUI_Unit unit, int reference) {
 
 void render_gui(struct GUI *gui) {
   SDL_Window *window = get_window(gui->core);
+  SDL_Renderer *renderer = get_renderer(gui->core);
+
   int root_width, root_height;
   SDL_GetWindowSize(window, &root_width, &root_height);
+
+  SDL_Rect dstrect = {.x = 100, .y = 300, .w = 512, .h = 512};
+  SDL_RenderCopy(renderer, gui->skin, NULL, &dstrect);
 
   for (unsigned int i = 0; i < gui->number_of_containers; i++) {
     struct GUI_Container *c = gui->containers[i];
@@ -99,8 +104,6 @@ void render_gui(struct GUI *gui) {
                unit_to_px(c->bottom_p, h);
       h = bottom - top;
     }
-
-    SDL_Renderer *renderer = get_renderer(gui->core);
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
     SDL_Rect *tmp = calloc(1, sizeof(SDL_Rect));

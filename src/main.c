@@ -64,7 +64,7 @@ int main() {
     return 1;
   }
 
-  struct GUI *gui = create_gui(core);
+  struct GUI *gui = create_gui(core, "assets/gui/default.png");
   struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c1 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
@@ -102,10 +102,6 @@ int main() {
   // Renderer
   SDL_Renderer *renderer = get_renderer(core);
 
-  // New
-  SDL_Rect dstrect = {.x = 100, .y = 300, .w = 512, .h = 512};
-  SDL_Texture *texture = load_png(renderer, "assets/gui/default.png");
-
   // Main cycle
   while (!quit) {
     // Input
@@ -113,13 +109,8 @@ int main() {
     // Render
     SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
     SDL_RenderClear(renderer);
-
-    // SDL_RenderCopy(renderer, optimizedSurface, &src, &dst);
-    SDL_RenderCopy(renderer, texture, NULL, &dstrect);
-
     // GUI
     render_gui(gui);
-
     // Done
     SDL_RenderPresent(renderer);
     // Delay
