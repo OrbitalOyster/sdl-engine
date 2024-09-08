@@ -104,55 +104,106 @@ void render_gui(struct GUI *gui) {
     }
 
     // Render
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    SDL_Rect tmp = (SDL_Rect){.x = left, .y = top, .w = w, .h = h};
-    SDL_RenderDrawRect(renderer, &tmp);
-    SDL_RenderDrawLine(renderer, left, top, right - 1, bottom - 1);
-    SDL_RenderDrawLine(renderer, right, top, left, bottom - 1);
+    //    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    //    SDL_Rect tmp = (SDL_Rect){.x = left, .y = top, .w = w, .h = h};
+    //    SDL_RenderDrawRect(renderer, &tmp);
+    //    SDL_RenderDrawLine(renderer, left, top, right - 1, bottom - 1);
+    //    SDL_RenderDrawLine(renderer, right, top, left, bottom - 1);
 
     // Coords
-    int x_0 = 16, y_0 = 16;
-    int w_0 = 16, h_0 = 16;
+    SDL_Rect center_src = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16};
+    SDL_Rect top_left_src = (SDL_Rect){.x = 16, .y = 16, .w = 16, .h = 16};
+    SDL_Rect top_src = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16};
+    SDL_Rect top_right_src = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16};
+    SDL_Rect right_src = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16};
+    SDL_Rect bottom_right_src = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16};
+    SDL_Rect bottom_left_src = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16};
+    SDL_Rect bottom_src = (SDL_Rect){.x = 32, .y = 48, .w = 16, .h = 16};
+    SDL_Rect left_src = (SDL_Rect){.x = 16, .y = 32, .w = 16, .h = 16};
 
-    int x_top = 32, y_top = 16;
-    int w_top = 16, h_top = 16;
-
-    int x_1 = 48, y_1 = 16;
-    int w_1 = 16, h_1 = 16;
-
-    int x_2 = 48, y_2 = 48;
-    int w_2 = 16, h_2 = 16;
-
-    int x_3 = 16, y_3 = 48;
-    int w_3 = 16, h_3 = 16;
+    // Center
+    int cx = 0, cy = 0;
+    while (cy < h - top_src.h - bottom_src.h) {
+      while (cx < w - left_src.w - right_src.w) {
+        SDL_Rect dst_rect = {.x = left + left_src.x + cx,
+                             .y = top + top_src.y + cy,
+                             .w = center_src.w,
+                             .h = center_src.h};
+        SDL_RenderCopy(renderer, gui->skin, &center_src, &dst_rect);
+        cx += center_src.w;
+      }
+      cy += center_src.h;
+      cx = 0;
+    }
 
     // Top
-    int t = 0;
-    SDL_Rect src_rect_01 = {.x = x_top, .y = y_top, .w = w_top, .h = h_top};
-    while (t < w - w_0 - w_1) {
-      SDL_Rect dst_rect = {.x = left + x_0 + t, .y = top, .w = w_top, .h = h_top};
-      SDL_RenderCopy(renderer, gui->skin, &src_rect_01, &dst_rect);  
-      t += w_top;
+    int tl = 0;
+    while (tl < w - top_left_src.w - top_right_src.w) {
+      SDL_Rect dst_rect = {.x = left + top_left_src.x + tl,
+                           .y = top,
+                           .w = top_src.w,
+                           .h = top_src.h};
+      SDL_RenderCopy(renderer, gui->skin, &top_src, &dst_rect);
+      tl += top_src.w;
+    }
+
+    // Right
+    int rl = 0;
+    while (rl < h - top_right_src.h - bottom_right_src.h) {
+      SDL_Rect dst_rect = {.x = right - right_src.h,
+                           .y = top + top_right_src.h + rl,
+                           .w = right_src.w,
+                           .h = right_src.h};
+      SDL_RenderCopy(renderer, gui->skin, &right_src, &dst_rect);
+      rl += right_src.h;
+    }
+
+    // Bottom
+    int bl = 0;
+    while (bl < w - bottom_right_src.w - bottom_left_src.w) {
+      SDL_Rect dst_rect = {.x = left + bottom_left_src.x + bl,
+                           .y = bottom - bottom_src.h,
+                           .w = bottom_src.w,
+                           .h = bottom_src.h};
+      SDL_RenderCopy(renderer, gui->skin, &bottom_src, &dst_rect);
+      bl += bottom_src.w;
+    }
+
+    // Left
+    int ll = 0;
+    while (ll < h - top_left_src.h - bottom_left_src.h) {
+      SDL_Rect dst_rect = {.x = left,
+                           .y = top + top_left_src.h + ll,
+                           .w = left_src.w,
+                           .h = left_src.h};
+      SDL_RenderCopy(renderer, gui->skin, &left_src, &dst_rect);
+      ll += left_src.h;
     }
 
     // Top-left corner
-    SDL_Rect src_rect_0 = {.x = x_0, .y = y_0, .w = w_0, .h = h_0};
-    SDL_Rect dst_rect_0 = {.x = left, .y = top, .w = w_0, .h = h_0};
-    SDL_RenderCopy(renderer, gui->skin, &src_rect_0, &dst_rect_0);
+    SDL_Rect dst_rect_0 = {
+        .x = left, .y = top, .w = top_left_src.w, .h = top_left_src.h};
+    SDL_RenderCopy(renderer, gui->skin, &top_left_src, &dst_rect_0);
 
     // Top-right corner
-    SDL_Rect src_rect_1 = {.x = x_1, .y = y_1, .w = w_1, .h = h_1};
-    SDL_Rect dst_rect_1 = {.x = right - w_1, .y = top, .w = w_1, .h = h_1};
-    SDL_RenderCopy(renderer, gui->skin, &src_rect_1, &dst_rect_1);
+    SDL_Rect dst_rect_1 = {.x = right - top_right_src.w,
+                           .y = top,
+                           .w = top_right_src.w,
+                           .h = top_right_src.h};
+    SDL_RenderCopy(renderer, gui->skin, &top_right_src, &dst_rect_1);
 
     // Bottom-right corner
-    SDL_Rect src_rect_2 = {.x = x_2, .y = y_2, .w = w_2, .h = h_2};
-    SDL_Rect dst_rect_2 = {.x = right - w_1, .y = bottom - h_2, .w = w_2, .h = h_2};
-    SDL_RenderCopy(renderer, gui->skin, &src_rect_2, &dst_rect_2);
+    SDL_Rect dst_rect_2 = {.x = right - top_right_src.w,
+                           .y = bottom - bottom_right_src.h,
+                           .w = bottom_right_src.w,
+                           .h = bottom_right_src.h};
+    SDL_RenderCopy(renderer, gui->skin, &bottom_right_src, &dst_rect_2);
 
-    // Bottom-right corner
-    SDL_Rect src_rect_3 = {.x = x_3, .y = y_3, .w = w_3, .h = h_3};
-    SDL_Rect dst_rect_3 = {.x = left, .y = bottom - h_3, .w = w_3, .h = h_3};
-    SDL_RenderCopy(renderer, gui->skin, &src_rect_3, &dst_rect_3);
+    // Bottom-left corner
+    SDL_Rect dst_rect_3 = {.x = left,
+                           .y = bottom - bottom_left_src.h,
+                           .w = bottom_left_src.w,
+                           .h = bottom_left_src.h};
+    SDL_RenderCopy(renderer, gui->skin, &bottom_left_src, &dst_rect_3);
   }
 }
