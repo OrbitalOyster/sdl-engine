@@ -27,7 +27,8 @@ struct GUI_Container {
 };
 
 struct GUI {
-  struct Core *core;
+  SDL_Window *window;
+  SDL_Renderer * renderer;
   SDL_Texture *skin;
   unsigned int number_of_containers;
   struct GUI_Container **containers;
