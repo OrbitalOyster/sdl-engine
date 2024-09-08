@@ -7,6 +7,7 @@
 struct Core {
   SDL_Window *window;
   SDL_Renderer *renderer;
+  SDL_Surface *surface;
 };
 
 struct Core *create_core(int window_width, int window_height, char *title) {

@@ -3,11 +3,12 @@
 
 #include "config.h"
 #include "core.h"
+#include "gui/gui.h"
 #include "input.h"
 #include "utils/JSON/JSON.h"
 #include "utils/debug.h"
 
-#include "gui/gui.h"
+#include "png.h"
 
 int quit = 0;
 
@@ -100,6 +101,11 @@ int main() {
   register_on_key_up_func(on_key_up);
   // Renderer
   SDL_Renderer *renderer = get_renderer(core);
+
+  // New
+  SDL_Rect dstrect = {.x = 100, .y = 300, .w = 512, .h = 512};
+  SDL_Texture *texture = load_png(renderer, "assets/gui/default.png");
+
   // Main cycle
   while (!quit) {
     // Input
@@ -107,6 +113,9 @@ int main() {
     // Render
     SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
     SDL_RenderClear(renderer);
+
+    // SDL_RenderCopy(renderer, optimizedSurface, &src, &dst);
+    SDL_RenderCopy(renderer, texture, NULL, &dstrect);
 
     // GUI
     render_gui(gui);

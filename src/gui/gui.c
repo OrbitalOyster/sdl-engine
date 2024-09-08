@@ -57,7 +57,7 @@ void render_gui(struct GUI *gui) {
     int w = 0, h = 0;
     int top = 0, right = 0, bottom = 0, left = 0;
 
-    // Width
+    // Horizontal axis
     if (c->width.type) {
       w = unit_to_px(c->width, root_width);
       if (c->right.type)
@@ -79,7 +79,7 @@ void render_gui(struct GUI *gui) {
       w = right - left;
     }
 
-    // Height
+    // Vertical axis
     if (c->height.type) {
       h = unit_to_px(c->height, root_height);
       if (c->top.type)
