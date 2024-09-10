@@ -7,8 +7,10 @@
 struct Atlas *create_atlas(char *filename) {
   struct JSON *json = file_to_JSON(filename);
   check_JSON_token(json, "filename", String);
+  check_JSON_token(json, "rects", Array);
   struct Atlas *result = calloc(1, sizeof(struct Atlas));
-  WARNF("JSON err: %s", get_JSON_err(json));
+  if (get_JSON_err(json))
+    WARNF("JSON err: %s", get_JSON_err(json));
   destroy_JSON(json);
   return result;
 }

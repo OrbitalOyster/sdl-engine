@@ -52,10 +52,6 @@ void on_key_up(SDL_Scancode key) {
 }
 
 int main() {
-
-  struct Atlas *atlas = create_atlas("assets/atlas.json");
-  destroy_atlas(atlas);
-
   // Load config
   struct Config *config = load_config("config.json");
   // Init core
@@ -66,6 +62,9 @@ int main() {
     WARN("Unable to start engine");
     return 1;
   }
+
+  struct Atlas *atlas = create_atlas("assets/atlas.json");
+  destroy_atlas(atlas);
 
   struct GUI *gui = create_gui(core, "assets/gui/default.png");
   struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));
