@@ -49,6 +49,7 @@ struct JSON *create_JSON() {
   return json;
 }
 
+/* TODO: Variadic arguments  */
 void set_JSON_err(struct JSON *json, char *err) {
   if (json->err)
     free(json->err);
@@ -208,7 +209,7 @@ void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
     return;
 
   struct Token *token = get_token(json, key);
-  if (get_token_type(token) != type)
+  if (!json->err && get_token_type(token) != type)
     set_JSON_err(json, "Invalid token type");
 }
 

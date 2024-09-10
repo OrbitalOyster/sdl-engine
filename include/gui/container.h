@@ -21,6 +21,7 @@ struct GUI_Container {
   struct GUI_Container **containers;
 };
 
-void render_container(SDL_Renderer *renderer, struct GUI_Container *c, int root_width, int root_height, SDL_Texture *skin);
+void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
+                      int root_width, int root_height, SDL_Texture *skin);
 
 #endif /* CONTAINER_H */

@@ -1,9 +1,10 @@
 #include "gui/container.h"
 
-#include "utils/debug.h"
 #include "gui/unit.h"
+#include "utils/debug.h"
 
-void render_container(SDL_Renderer *renderer, struct GUI_Container *c, int root_width, int root_height, SDL_Texture *skin) {
+void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
+                      int root_width, int root_height, SDL_Texture *skin) {
   // Check types
   if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
       (c->width.type && c->right.type && c->left.type))
@@ -11,8 +12,8 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c, int root_
          c->right.type, c->left.type);
   if (c->height.type + c->top.type + c->bottom.type < GUT_ABSOLUTE * 2 ||
       (c->height.type && c->top.type && c->bottom.type))
-    ERRF(1, "Invalid GUI vertical types: %u %u %u", c->height.type,
-         c->top.type, c->bottom.type);
+    ERRF(1, "Invalid GUI vertical types: %u %u %u", c->height.type, c->top.type,
+         c->bottom.type);
 
   int w = 0, h = 0;
   int top = 0, right = 0, bottom = 0, left = 0;
@@ -69,14 +70,14 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c, int root_
 
   // Coords
   SDL_Rect center_src = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16};
-  SDL_Rect top_left_src = (SDL_Rect){.x = 16, .y = 16, .w = 16, .h = 16};
   SDL_Rect top_src = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16};
-  SDL_Rect top_right_src = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16};
   SDL_Rect right_src = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16};
-  SDL_Rect bottom_right_src = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16};
-  SDL_Rect bottom_left_src = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16};
   SDL_Rect bottom_src = (SDL_Rect){.x = 32, .y = 48, .w = 16, .h = 16};
   SDL_Rect left_src = (SDL_Rect){.x = 16, .y = 32, .w = 16, .h = 16};
+  SDL_Rect top_left_src = (SDL_Rect){.x = 16, .y = 16, .w = 16, .h = 16};
+  SDL_Rect top_right_src = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16};
+  SDL_Rect bottom_right_src = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16};
+  SDL_Rect bottom_left_src = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16};
 
   // Center
   int cx = 0, cy = 0;

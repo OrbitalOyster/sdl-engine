@@ -8,6 +8,14 @@
 
 #define MAX_GUI_CONTAINERS 255
 
+struct GUI {
+  SDL_Window *window;
+  SDL_Renderer *renderer;
+  SDL_Texture *skin;
+  unsigned int number_of_containers;
+  struct GUI_Container **containers;
+};
+
 struct GUI *create_gui(struct Core *core, char *skin) {
   struct GUI *result = calloc(1, sizeof(struct GUI));
   result->window = get_window(core);
@@ -31,5 +39,6 @@ void render_gui(struct GUI *gui) {
   SDL_GetWindowSize(window, &root_width, &root_height);
 
   for (unsigned int i = 0; i < gui->number_of_containers; i++)
-    render_container(renderer, gui->containers[i], root_width, root_height, gui->skin);
+    render_container(renderer, gui->containers[i], root_width, root_height,
+                     gui->skin);
 }

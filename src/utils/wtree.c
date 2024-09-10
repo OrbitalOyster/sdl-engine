@@ -94,7 +94,7 @@ static struct WTreeNode *get_child(struct WTreeNode *node, char c) {
     WARN("Attempt to access NULL node");
     return NULL;
   }
-  INFOF("Searching node %s, size %lu for %c(%i)", node->chunk, node->size, c,
+  INFOF("Searching node %s, size %lu for %i [%c]", node->chunk, node->size, c,
         c);
 
   // Edge case - empty node

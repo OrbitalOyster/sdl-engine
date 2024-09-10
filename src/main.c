@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "atlas.h"
 #include "config.h"
 #include "core.h"
 #include "gui/gui.h"
 #include "input.h"
 #include "utils/JSON/JSON.h"
 #include "utils/debug.h"
-
-#include "png.h"
 
 int quit = 0;
 
@@ -53,6 +52,10 @@ void on_key_up(SDL_Scancode key) {
 }
 
 int main() {
+
+  struct Atlas *atlas = create_atlas("assets/atlas.json");
+  destroy_atlas(atlas);
+
   // Load config
   struct Config *config = load_config("config.json");
   // Init core
