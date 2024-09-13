@@ -14,6 +14,9 @@ struct Token {
   union TokenValue value;
 };
 
+const char *token_types_str[] = {"Undefined", "Object",  "Array", "Number",
+                                 "String",    "Boolean", "Null"};
+
 struct Token *create_token(enum TokenType type, union TokenValue value) {
   struct Token *result = calloc(1, sizeof(struct Token));
   if (!result)
@@ -24,12 +27,13 @@ struct Token *create_token(enum TokenType type, union TokenValue value) {
 
 enum TokenType get_token_type(struct Token *token) { return token->type; }
 
+const char *token_type_to_string(int t) { return token_types_str[t]; }
+
 union TokenValue get_token_value(struct Token *token) {
   return token->value;
 }
 
 // Helper functions
-
 struct Token *create_undefined_token() {
   struct Token *result = calloc(1, sizeof(struct Token));
   if (!result)

@@ -12,7 +12,8 @@
 #include "utils/JSON/token.h"
 #include "utils/debug.h"
 
-#define MAX_JSON_ERR_LENGTH 64
+#define MAX_JSON_KEY_LENGTH (63 + 1)
+#define MAX_JSON_ERR_LENGTH (63 + 1)
 #define CHUNK_LENGTH 4096
 
 // 2 ** 64 + '\0'
@@ -51,14 +52,16 @@ struct JSON *create_JSON() {
 }
 
 void set_JSON_err(struct JSON *json, char *err, ...) {
-  // Alreadt having issues
+  // Already having issues
   if (json->err)
     free(json->err);
   // Magic
   char *err_s = calloc(MAX_JSON_ERR_LENGTH, sizeof(char));
   va_list args;
   va_start(args, err);
-  vsnprintf(err_s, MAX_JSON_ERR_LENGTH, err, args);
+  int chars = vsnprintf(err_s, MAX_JSON_ERR_LENGTH, err, args);
+  if (chars >= MAX_JSON_ERR_LENGTH)
+    WARNF("JSON error too large (%i)", chars);
   va_end(args);
   // Copy to JSON err
   json->err = calloc(strlen(err_s) + 1, sizeof(char));
@@ -124,14 +127,14 @@ struct JSON *file_to_JSON(char *filename) {
   // Try to open file
   FILE *f = fopen(filename, "r");
   if (!f) {
-    set_JSON_err(json, "Unable to open file");
+    set_JSON_err(json, "Unable to open file \"%s\"", filename);
     return json;
   }
   json->source = f;
 
   const size_t fread_res = fread(json->chunk, sizeof(char), CHUNK_LENGTH, f);
   if (fread_res != CHUNK_LENGTH && ferror(f))
-    set_JSON_err(json, "Error reading file");
+    set_JSON_err(json, "Error reading file \"%s\"", filename);
 
   // Skip trailing whitespaces
   get_next_char_F(json, 1);
@@ -165,7 +168,7 @@ struct JSON *string_to_JSON(char *s) {
 
 char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 
-struct Token *get_token(struct JSON *json, char *key) {
+static struct Token *get_token_static(struct JSON *json, char *key) {
   // Make a copy of key
   size_t l = strlen(key) + 1;
   char *key_copy = calloc(l, sizeof(char));
@@ -195,7 +198,7 @@ struct Token *get_token(struct JSON *json, char *key) {
     case Array: {
       size_t n = (size_t)atoi(next_key);
       if (n >= get_token_array_size(value.array)) {
-        set_JSON_err(json, "Array prop out of bounds");
+        set_JSON_err(json, "Array prop out of bounds (%i)", n);
         return NULL;
       }
       current_token = get_token_array_element(value.array, n);
@@ -211,6 +214,18 @@ struct Token *get_token(struct JSON *json, char *key) {
   return current_token;
 }
 
+static struct Token *get_token(struct JSON *json, char *key, ...) {
+  // Magic
+  char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
+  va_list args;
+  va_start(args, key);
+  int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
+  if (chars >= MAX_JSON_KEY_LENGTH)
+    WARNF("JSON key too large (%i)", chars);
+  va_end(args);
+  return get_token_static(json, key_s);
+}
+
 void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
   // Already having issues
   if (json->err)
@@ -218,7 +233,8 @@ void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
 
   struct Token *token = get_token(json, key);
   if (!json->err && get_token_type(token) != type)
-    set_JSON_err(json, "Invalid token type");
+    set_JSON_err(json, "Invalid token type (\"%s\" must be %s)", key,
+                 token_type_to_string(type));
 }
 
 int JSON_object_has_prop(struct JSON *json, char *prop) {
@@ -270,8 +286,7 @@ struct TokenArray *JSON_get_array_token(struct JSON *json, char *prop) {
   return value.array;
 }
 
-struct Token *JSON_get_array_element(struct JSON *json, char *prop,
-                                          size_t n) {
+struct Token *JSON_get_array_element(struct JSON *json, char *prop, size_t n) {
   struct Token *token = get_token(json, prop);
   char *err = get_JSON_err(json);
   if (err)
@@ -279,8 +294,11 @@ struct Token *JSON_get_array_element(struct JSON *json, char *prop,
   if (get_token_type(token) != Array)
     ERRF(1, "Type mismatch for prop %s (not an array)", prop)
   union TokenValue value = get_token_value(token);
+
+  if (n >= get_token_array_size(value.array))
+    ERRF(1, "Array %s out of bounds (%lu)", prop, n);
+
   return get_token_array_element(value.array, n);
-  ;
 }
 
 // Helper functions

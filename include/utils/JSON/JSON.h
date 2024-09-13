@@ -36,8 +36,7 @@ int JSON_get_number_prop(struct JSON *json, char *prop);
 char *JSON_get_string_prop(struct JSON *json, char *prop);
 size_t JSON_get_array_size(struct JSON *json, char *prop);
 struct TokenArray *JSON_get_array_token(struct JSON *json, char *prop);
-struct Token *JSON_get_array_element(struct JSON *json, char *prop,
-                                     size_t n);
+struct Token *JSON_get_array_element(struct JSON *json, char *prop, size_t n);
 
 // Helper functions
 int JSON_is_undefined(struct JSON *json);

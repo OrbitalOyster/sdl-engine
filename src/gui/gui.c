@@ -38,7 +38,10 @@ struct GUI_Skin *load_gui_skin(char *filename) {
   struct TokenArray *atlas = JSON_get_array_token(json, "atlas");
   INFO2F("Size: %lu", get_token_array_size(atlas));
 
-  struct Token *token = JSON_get_array_element(json, "foo", 2);
+  struct Token *token = JSON_get_array_element(json, "foo", 1);
+  if (get_JSON_err(json)) {
+    WARNF("JSON err: %s", get_JSON_err(json));
+  }
   INFO2F("Token: %i", get_token_value(token).number);
 
   result->atlas_size = 0;

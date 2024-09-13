@@ -1,5 +1,5 @@
 {
-  "Filename": "assets/gui/default.png",
+  "filename": "assets/gui/default.png",
   "foo": [10, 20, 30, 40],
   "atlas": [
     {
