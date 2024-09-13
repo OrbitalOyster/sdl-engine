@@ -28,8 +28,8 @@ struct GUI_Skin {
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
   struct JSON *json = file_to_JSON(filename);
-  check_JSON_token(json, "filename", String);
-  check_JSON_token(json, "atlas", Array);
+  check_JSON_token(json, String, "filename");
+  check_JSON_token(json, Array, "atlas");
   if (get_JSON_err(json)) {
     WARNF("JSON err: %s", get_JSON_err(json));
     return NULL;

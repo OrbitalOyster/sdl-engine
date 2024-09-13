@@ -226,12 +226,21 @@ static struct Token *get_token(struct JSON *json, char *key, ...) {
   return get_token_static(json, key_s);
 }
 
-void check_JSON_token(struct JSON *json, char *key, enum TokenType type) {
+void check_JSON_token(struct JSON *json, enum TokenType type, char *key, ...) {
   // Already having issues
   if (json->err)
     return;
 
-  struct Token *token = get_token(json, key);
+  // Magic
+  char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
+  va_list args;
+  va_start(args, key);
+  int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
+  if (chars >= MAX_JSON_KEY_LENGTH)
+    WARNF("JSON key too large (%i)", chars);
+  va_end(args);
+  struct Token *token = get_token_static(json, key_s);
+
   if (!json->err && get_token_type(token) != type)
     set_JSON_err(json, "Invalid token type (\"%s\" must be %s)", key,
                  token_type_to_string(type));

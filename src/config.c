@@ -12,9 +12,11 @@ struct Config *load_config(char *filename) {
   if (get_JSON_err(config_json))
     ERR(1, get_JSON_err(config_json));
   // Check window props
-  check_JSON_token(config_json, "window/width", Number);
-  check_JSON_token(config_json, "window/height", Number);
-  check_JSON_token(config_json, "window/title", String);
+  check_JSON_token(config_json, Object, "");
+  check_JSON_token(config_json, Number, "window/width");
+  check_JSON_token(config_json, Number, "window/height");
+  // check_JSON_token(config_json, String, "window/title");
+  check_JSON_token(config_json, String, "window/%s", "title");
   if (get_JSON_err(config_json))
     ERRF(1, "Invalid config: %s", get_JSON_err(config_json));
   // Create and read config

@@ -27,7 +27,8 @@ char *JSON_to_string(struct JSON *json);
 struct JSON *string_to_JSON(char *s);
 
 // Checks if token is present and has corresponding type, else sets the error
-void check_JSON_token(struct JSON *json, char *key, enum TokenType type);
+// void check_JSON_token(struct JSON *json, char *key, enum TokenType type);
+void check_JSON_token(struct JSON *json, enum TokenType type, char *key, ...);
 
 int JSON_object_has_prop(struct JSON *json, char *prop);
 
