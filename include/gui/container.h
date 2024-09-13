@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "gui/container_foo.h"
 #include "gui/unit.h"
 
 struct GUI_Container {
@@ -22,6 +23,7 @@ struct GUI_Container {
 };
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
-                      int root_width, int root_height, SDL_Texture *skin);
+                      int root_width, int root_height, SDL_Texture *skin,
+                      struct Container_Foo *foo);
 
 #endif /* CONTAINER_H */

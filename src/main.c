@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "atlas.h"
 #include "config.h"
 #include "core.h"
 #include "gui/gui.h"
 #include "input.h"
 #include "utils/JSON/JSON.h"
 #include "utils/debug.h"
+
+#include "gui/container_foo.h"
 
 int quit = 0;
 
@@ -63,8 +64,19 @@ int main() {
     return 1;
   }
 
-  struct Atlas *atlas = create_atlas("assets/atlas.json");
-  destroy_atlas(atlas);
+  /*
+  struct Container_Foo foo = (struct Container_Foo) {
+    .center = (SDL_Rect) {.x = 32, .y = 32, .w = 16, .h = 16},
+    .top = (SDL_Rect) {.x = 32, .y = 16, .w = 16, .h = 16},
+    .right = (SDL_Rect) {.x = 48, .y = 32, .w = 16, .h = 16},
+    .bottom = (SDL_Rect) {.x = 32, .y = 48, .w = 16, .h = 16},
+    .left = (SDL_Rect) {.x = 16, .y = 32, .w = 16, .h = 16},
+    .top_left = (SDL_Rect) {.x = 16, .y = 16, .w = 16, .h = 16},
+    .top_right = (SDL_Rect) {.x = 48, .y = 16, .w = 16, .h = 16},
+    .bottom_right = (SDL_Rect) {.x = 48, .y = 48, .w = 16, .h = 16},
+    .bottom_left = (SDL_Rect) {.x = 16, .y = 48, .w = 16, .h = 16}
+  };
+  */
 
   struct GUI *gui = create_gui(core, "assets/gui/default.png");
   struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));

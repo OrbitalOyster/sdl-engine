@@ -15,6 +15,4 @@ struct Atlas *create_atlas(char *filename) {
   return result;
 }
 
-void destroy_atlas(struct Atlas *atlas) {
-  SDL_DestroyTexture(atlas->texture);
-}
+void destroy_atlas(struct Atlas *atlas) { SDL_DestroyTexture(atlas->texture); }

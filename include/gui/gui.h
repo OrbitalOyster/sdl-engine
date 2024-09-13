@@ -6,7 +6,7 @@
 
 struct GUI;
 
-struct GUI *create_gui(struct Core *core, char *skin);
+struct GUI *create_gui(struct Core *core, char *png_filename);
 void add_gui_container(struct GUI *gui, struct GUI_Container *container);
 void render_gui(struct GUI *gui);
 

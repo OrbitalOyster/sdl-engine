@@ -5,6 +5,8 @@
 #ifndef JSON_H
 #define JSON_H
 
+#include <stddef.h>
+
 #include "utils/JSON/token.h"
 
 struct JSON;
@@ -12,7 +14,7 @@ struct JSON;
 struct JSON *create_JSON();
 
 // Error handling
-void set_JSON_err(struct JSON *json, char *err);
+void set_JSON_err(struct JSON *json, char *err, ...);
 char *get_JSON_err(struct JSON *json);
 
 // For parsing
@@ -29,12 +31,13 @@ void check_JSON_token(struct JSON *json, char *key, enum TokenType type);
 
 int JSON_object_has_prop(struct JSON *json, char *prop);
 
-int JSON_prop_is_number(struct JSON *json, char *prop);
-int JSON_prop_is_string(struct JSON *json, char *prop);
-
 // Getters
 int JSON_get_number_prop(struct JSON *json, char *prop);
 char *JSON_get_string_prop(struct JSON *json, char *prop);
+size_t JSON_get_array_size(struct JSON *json, char *prop);
+struct TokenArray *JSON_get_array_token(struct JSON *json, char *prop);
+struct Token *JSON_get_array_element(struct JSON *json, char *prop,
+                                     size_t n);
 
 // Helper functions
 int JSON_is_undefined(struct JSON *json);

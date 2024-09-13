@@ -3,7 +3,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "gui/container_foo.h"
 #include "png.h"
+#include "utils/JSON/JSON.h"
+#include "utils/JSON/token-array.h"
 #include "utils/debug.h"
 
 #define MAX_GUI_CONTAINERS 255
@@ -11,16 +14,45 @@
 struct GUI {
   SDL_Window *window;
   SDL_Renderer *renderer;
-  SDL_Texture *skin;
+  SDL_Texture *texture;
   unsigned int number_of_containers;
   struct GUI_Container **containers;
 };
 
-struct GUI *create_gui(struct Core *core, char *skin) {
+struct GUI_Skin {
+  SDL_Texture *texture;
+  unsigned int atlas_size;
+  struct Container_Foo *atlas;
+};
+
+struct GUI_Skin *load_gui_skin(char *filename) {
+  struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
+  struct JSON *json = file_to_JSON(filename);
+  check_JSON_token(json, "filename", String);
+  check_JSON_token(json, "atlas", Array);
+  if (get_JSON_err(json)) {
+    WARNF("JSON err: %s", get_JSON_err(json));
+    return NULL;
+  }
+  INFO2F("N: %i", JSON_get_number_prop(json, "atlas/0/bottomLeft/1"));
+  struct TokenArray *atlas = JSON_get_array_token(json, "atlas");
+  INFO2F("Size: %lu", get_token_array_size(atlas));
+
+  struct Token *token = JSON_get_array_element(json, "foo", 2);
+  INFO2F("Token: %i", get_token_value(token).number);
+
+  result->atlas_size = 0;
+  return result;
+}
+
+struct GUI *create_gui(struct Core *core, char *png_filename) {
   struct GUI *result = calloc(1, sizeof(struct GUI));
   result->window = get_window(core);
   result->renderer = get_renderer(core);
-  result->skin = load_png(get_renderer(core), skin);
+
+  load_gui_skin("assets/gui/skin.json");
+
+  result->texture = load_png(get_renderer(core), png_filename);
   result->number_of_containers = 0;
   result->containers =
       calloc(MAX_GUI_CONTAINERS, sizeof(struct GUI_Container *));
@@ -38,7 +70,18 @@ void render_gui(struct GUI *gui) {
   int root_width, root_height;
   SDL_GetWindowSize(window, &root_width, &root_height);
 
+  struct Container_Foo foo = (struct Container_Foo){
+      .center = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16},
+      .top = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16},
+      .right = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16},
+      .bottom = (SDL_Rect){.x = 32, .y = 48, .w = 16, .h = 16},
+      .left = (SDL_Rect){.x = 16, .y = 32, .w = 16, .h = 16},
+      .top_left = (SDL_Rect){.x = 16, .y = 16, .w = 16, .h = 16},
+      .top_right = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16},
+      .bottom_right = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16},
+      .bottom_left = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16}};
+
   for (unsigned int i = 0; i < gui->number_of_containers; i++)
     render_container(renderer, gui->containers[i], root_width, root_height,
-                     gui->skin);
+                     gui->texture, &foo);
 }

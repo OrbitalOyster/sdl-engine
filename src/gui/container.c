@@ -4,7 +4,8 @@
 #include "utils/debug.h"
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
-                      int root_width, int root_height, SDL_Texture *skin) {
+                      int root_width, int root_height, SDL_Texture *skin,
+                      struct Container_Foo *foo) {
   // Check types
   if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
       (c->width.type && c->right.type && c->left.type))
@@ -69,6 +70,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
   //    SDL_RenderDrawLine(renderer, right, top, left, bottom - 1);
 
   // Coords
+  /*
   SDL_Rect center_src = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16};
   SDL_Rect top_src = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16};
   SDL_Rect right_src = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16};
@@ -78,89 +80,90 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
   SDL_Rect top_right_src = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16};
   SDL_Rect bottom_right_src = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16};
   SDL_Rect bottom_left_src = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16};
+  */
 
   // Center
   int cx = 0, cy = 0;
-  while (cy < h - top_src.h - bottom_src.h) {
-    while (cx < w - left_src.w - right_src.w) {
-      SDL_Rect dst_rect = {.x = left + left_src.x + cx,
-                           .y = top + top_src.y + cy,
-                           .w = center_src.w,
-                           .h = center_src.h};
-      SDL_RenderCopy(renderer, skin, &center_src, &dst_rect);
-      cx += center_src.w;
+  while (cy < h - foo->top.h - foo->bottom.h) {
+    while (cx < w - foo->left.w - foo->right.w) {
+      SDL_Rect dst_rect = {.x = left + foo->left.x + cx,
+                           .y = top + foo->top.y + cy,
+                           .w = foo->center.w,
+                           .h = foo->center.h};
+      SDL_RenderCopy(renderer, skin, &foo->center, &dst_rect);
+      cx += foo->center.w;
     }
-    cy += center_src.h;
+    cy += foo->center.h;
     cx = 0;
   }
 
   // Top
   int tl = 0;
-  while (tl < w - top_left_src.w - top_right_src.w) {
-    SDL_Rect dst_rect = {.x = left + top_left_src.x + tl,
+  while (tl < w - foo->top_left.w - foo->top_right.w) {
+    SDL_Rect dst_rect = {.x = left + foo->top_left.x + tl,
                          .y = top,
-                         .w = top_src.w,
-                         .h = top_src.h};
-    SDL_RenderCopy(renderer, skin, &top_src, &dst_rect);
-    tl += top_src.w;
+                         .w = foo->top.w,
+                         .h = foo->top.h};
+    SDL_RenderCopy(renderer, skin, &foo->top, &dst_rect);
+    tl += foo->top.w;
   }
 
   // Right
   int rl = 0;
-  while (rl < h - top_right_src.h - bottom_right_src.h) {
-    SDL_Rect dst_rect = {.x = right - right_src.h,
-                         .y = top + top_right_src.h + rl,
-                         .w = right_src.w,
-                         .h = right_src.h};
-    SDL_RenderCopy(renderer, skin, &right_src, &dst_rect);
-    rl += right_src.h;
+  while (rl < h - foo->top_right.h - foo->bottom_right.h) {
+    SDL_Rect dst_rect = {.x = right - foo->right.h,
+                         .y = top + foo->top_right.h + rl,
+                         .w = foo->right.w,
+                         .h = foo->right.h};
+    SDL_RenderCopy(renderer, skin, &foo->right, &dst_rect);
+    rl += foo->right.h;
   }
 
   // Bottom
   int bl = 0;
-  while (bl < w - bottom_right_src.w - bottom_left_src.w) {
-    SDL_Rect dst_rect = {.x = left + bottom_left_src.x + bl,
-                         .y = bottom - bottom_src.h,
-                         .w = bottom_src.w,
-                         .h = bottom_src.h};
-    SDL_RenderCopy(renderer, skin, &bottom_src, &dst_rect);
-    bl += bottom_src.w;
+  while (bl < w - foo->bottom_right.w - foo->bottom_left.w) {
+    SDL_Rect dst_rect = {.x = left + foo->bottom_left.x + bl,
+                         .y = bottom - foo->bottom.h,
+                         .w = foo->bottom.w,
+                         .h = foo->bottom.h};
+    SDL_RenderCopy(renderer, skin, &foo->bottom, &dst_rect);
+    bl += foo->bottom.w;
   }
 
   // Left
   int ll = 0;
-  while (ll < h - top_left_src.h - bottom_left_src.h) {
+  while (ll < h - foo->top_left.h - foo->bottom_left.h) {
     SDL_Rect dst_rect = {.x = left,
-                         .y = top + top_left_src.h + ll,
-                         .w = left_src.w,
-                         .h = left_src.h};
-    SDL_RenderCopy(renderer, skin, &left_src, &dst_rect);
-    ll += left_src.h;
+                         .y = top + foo->top_left.h + ll,
+                         .w = foo->left.w,
+                         .h = foo->left.h};
+    SDL_RenderCopy(renderer, skin, &foo->left, &dst_rect);
+    ll += foo->left.h;
   }
 
   // Top-left corner
   SDL_Rect dst_rect_0 = {
-      .x = left, .y = top, .w = top_left_src.w, .h = top_left_src.h};
-  SDL_RenderCopy(renderer, skin, &top_left_src, &dst_rect_0);
+      .x = left, .y = top, .w = foo->top_left.w, .h = foo->top_left.h};
+  SDL_RenderCopy(renderer, skin, &foo->top_left, &dst_rect_0);
 
   // Top-right corner
-  SDL_Rect dst_rect_1 = {.x = right - top_right_src.w,
+  SDL_Rect dst_rect_1 = {.x = right - foo->top_right.w,
                          .y = top,
-                         .w = top_right_src.w,
-                         .h = top_right_src.h};
-  SDL_RenderCopy(renderer, skin, &top_right_src, &dst_rect_1);
+                         .w = foo->top_right.w,
+                         .h = foo->top_right.h};
+  SDL_RenderCopy(renderer, skin, &foo->top_right, &dst_rect_1);
 
   // Bottom-right corner
-  SDL_Rect dst_rect_2 = {.x = right - top_right_src.w,
-                         .y = bottom - bottom_right_src.h,
-                         .w = bottom_right_src.w,
-                         .h = bottom_right_src.h};
-  SDL_RenderCopy(renderer, skin, &bottom_right_src, &dst_rect_2);
+  SDL_Rect dst_rect_2 = {.x = right - foo->top_right.w,
+                         .y = bottom - foo->bottom_right.h,
+                         .w = foo->bottom_right.w,
+                         .h = foo->bottom_right.h};
+  SDL_RenderCopy(renderer, skin, &foo->bottom_right, &dst_rect_2);
 
   // Bottom-left corner
   SDL_Rect dst_rect_3 = {.x = left,
-                         .y = bottom - bottom_left_src.h,
-                         .w = bottom_left_src.w,
-                         .h = bottom_left_src.h};
-  SDL_RenderCopy(renderer, skin, &bottom_left_src, &dst_rect_3);
+                         .y = bottom - foo->bottom_left.h,
+                         .w = foo->bottom_left.w,
+                         .h = foo->bottom_left.h};
+  SDL_RenderCopy(renderer, skin, &foo->bottom_left, &dst_rect_3);
 }

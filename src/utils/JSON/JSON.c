@@ -1,5 +1,6 @@
 #include "utils/JSON/JSON.h"
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,12 +50,19 @@ struct JSON *create_JSON() {
   return json;
 }
 
-/* TODO: Variadic arguments  */
-void set_JSON_err(struct JSON *json, char *err) {
+void set_JSON_err(struct JSON *json, char *err, ...) {
+  // Alreadt having issues
   if (json->err)
     free(json->err);
-  json->err = calloc(strlen(err) + 1, sizeof(char));
-  strcpy(json->err, err);
+  // Magic
+  char *err_s = calloc(MAX_JSON_ERR_LENGTH, sizeof(char));
+  va_list args;
+  va_start(args, err);
+  vsnprintf(err_s, MAX_JSON_ERR_LENGTH, err, args);
+  va_end(args);
+  // Copy to JSON err
+  json->err = calloc(strlen(err_s) + 1, sizeof(char));
+  strcpy(json->err, err_s);
 }
 
 char *get_JSON_err(struct JSON *json) { return json->err; }
@@ -180,7 +188,7 @@ struct Token *get_token(struct JSON *json, char *key) {
       if (check_token_map_has_key(value.map, next_key)) {
         current_token = get_token_map_element(value.map, next_key);
       } else {
-        set_JSON_err(json, "Undefined prop");
+        set_JSON_err(json, "Undefined prop: %s", next_key);
         return NULL;
       }
       break;
@@ -219,18 +227,6 @@ int JSON_object_has_prop(struct JSON *json, char *prop) {
   return check_token_map_has_key(map, prop);
 }
 
-int JSON_prop_is_number(struct JSON *json, char *prop) {
-  struct Token *token = get_token(json, prop);
-  enum TokenType type = get_token_type(token);
-  return type == Number;
-}
-
-int JSON_prop_is_string(struct JSON *json, char *prop) {
-  struct Token *token = get_token(json, prop);
-  enum TokenType type = get_token_type(token);
-  return type == String;
-}
-
 // Getters
 int JSON_get_number_prop(struct JSON *json, char *prop) {
   struct Token *token = get_token(json, prop);
@@ -250,6 +246,41 @@ char *JSON_get_string_prop(struct JSON *json, char *prop) {
   if (get_token_type(token) != String)
     ERRF(1, "Type mismatch for prop %s (not a string)", prop)
   return get_token_value(token).string;
+}
+
+size_t JSON_get_array_size(struct JSON *json, char *prop) {
+  struct Token *token = get_token(json, prop);
+  char *err = get_JSON_err(json);
+  if (err)
+    ERRF(1, "%s", err);
+  if (get_token_type(token) != Array)
+    ERRF(1, "Type mismatch for prop %s (not an array)", prop)
+  union TokenValue value = get_token_value(token);
+  return get_token_array_size(value.array);
+}
+
+struct TokenArray *JSON_get_array_token(struct JSON *json, char *prop) {
+  struct Token *token = get_token(json, prop);
+  char *err = get_JSON_err(json);
+  if (err)
+    ERRF(1, "%s", err);
+  if (get_token_type(token) != Array)
+    ERRF(1, "Type mismatch for prop %s (not an array)", prop)
+  union TokenValue value = get_token_value(token);
+  return value.array;
+}
+
+struct Token *JSON_get_array_element(struct JSON *json, char *prop,
+                                          size_t n) {
+  struct Token *token = get_token(json, prop);
+  char *err = get_JSON_err(json);
+  if (err)
+    ERRF(1, "%s", err);
+  if (get_token_type(token) != Array)
+    ERRF(1, "Type mismatch for prop %s (not an array)", prop)
+  union TokenValue value = get_token_value(token);
+  return get_token_array_element(value.array, n);
+  ;
 }
 
 // Helper functions
