@@ -55,6 +55,9 @@ void on_key_up(SDL_Scancode key) {
 int main() {
   // Load config
   struct Config *config = load_config("config.json");
+  if (!config) {
+    ERR(1, "Failed to load config");
+  }
   // Init core
   struct Core *core = create_core(config->window_width, config->window_height,
                                   config->window_title);
