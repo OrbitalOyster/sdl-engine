@@ -168,64 +168,6 @@ struct JSON *string_to_JSON(char *s) {
 
 char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
 
-static struct Token *get_token_static(struct JSON *json, char *key) {
-  // Make a copy of key
-  size_t l = strlen(key) + 1;
-  char *key_copy = calloc(l, sizeof(char));
-  memcpy(key_copy, key, l);
-  INFO2F("Reading deep token: %s", key);
-  char *next_key = NULL;
-  struct Token *current_token = json->root;
-  while (1) {
-    if (!next_key) // First run
-      next_key = strtok(key_copy, TOKEN_DELIMITERS);
-    else
-      next_key = strtok(NULL, TOKEN_DELIMITERS);
-    INFO2F("Next key: %s", next_key);
-    if (next_key == NULL)
-      break;
-    enum TokenType type = get_token_type(current_token);
-    union TokenValue value = get_token_value(current_token);
-    switch (type) {
-    case Object:
-      if (check_token_map_has_key(value.map, next_key)) {
-        current_token = get_token_map_element(value.map, next_key);
-      } else {
-        set_JSON_err(json, "Undefined prop: %s", next_key);
-        return NULL;
-      }
-      break;
-    case Array: {
-      size_t n = (size_t)atoi(next_key);
-      if (n >= get_token_array_size(value.array)) {
-        set_JSON_err(json, "Array prop out of bounds (%i)", n);
-        return NULL;
-      }
-      current_token = get_token_array_element(value.array, n);
-      break;
-    }
-    default: {
-      set_JSON_err(json, "Array prop out of bounds");
-      return NULL;
-    }
-    }
-  }
-  free(key_copy);
-  return current_token;
-}
-
-static struct Token *get_token(struct JSON *json, char *key, ...) {
-  // Magic
-  char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
-  va_list args;
-  va_start(args, key);
-  int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
-  if (chars >= MAX_JSON_KEY_LENGTH)
-    WARNF("JSON key too large (%i)", chars);
-  va_end(args);
-  return get_token_static(json, key_s);
-}
-
 static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
                                   char *key, va_list args) {
   // Magic
@@ -311,56 +253,11 @@ char *get_JSON_foo_string(struct JSON *json, char *key, ...) {
   return get_token_value(token).string;
 }
 
-/*
-void check_JSON_token(struct JSON *json, enum TokenType type, char *key, ...) {
-  // Already having issues
-  if (json->err)
-    return;
-
-  // Magic
-  char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
-  va_list args;
-  va_start(args, key);
-  int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
-  if (chars >= MAX_JSON_KEY_LENGTH)
-    WARNF("JSON key too large (%i)", chars);
-  va_end(args);
-  struct Token *token = get_token_static(json, key_s);
-
-  if (!json->err && get_token_type(token) != type)
-    set_JSON_err(json, "Invalid token type (\"%s\" must be %s)", key,
-                 token_type_to_string(type));
-}
-*/
-
 int JSON_object_has_prop(struct JSON *json, char *prop) {
   union TokenValue value = get_token_value(json->root);
   struct TokenMap *map = value.map;
   return check_token_map_has_key(map, prop);
 }
-
-// Getters
-/*
-int JSON_get_number_prop(struct JSON *json, char *prop) {
-  struct Token *token = get_token(json, prop);
-  char *err = get_JSON_err(json);
-  if (err)
-    ERRF(1, "%s", err);
-  if (get_token_type(token) != Number)
-    ERRF(1, "Type mismatch for prop %s (not a number)", prop);
-  return get_token_value(token).number;
-}
-
-char *JSON_get_string_prop(struct JSON *json, char *prop) {
-  struct Token *token = get_token(json, prop);
-  char *err = get_JSON_err(json);
-  if (err)
-    ERRF(1, "%s", err);
-  if (get_token_type(token) != String)
-    ERRF(1, "Type mismatch for prop %s (not a string)", prop)
-  return get_token_value(token).string;
-}
-*/
 
 size_t JSON_get_array_size(struct JSON *json, char *key, ...) {
   va_list args;
@@ -373,65 +270,6 @@ size_t JSON_get_array_size(struct JSON *json, char *key, ...) {
   union TokenValue value = get_token_value(token);
   return get_token_array_size(value.array);
 }
-
-/*
-struct TokenArray *JSON_get_array_token(struct JSON *json, char *prop) {
-  struct Token *token = get_token(json, prop);
-  char *err = get_JSON_err(json);
-  if (err)
-    ERRF(1, "%s", err);
-  if (get_token_type(token) != Array)
-    ERRF(1, "Type mismatch for prop %s (not an array)", prop)
-  union TokenValue value = get_token_value(token);
-  return value.array;
-}
-*/
-
-struct Token *JSON_get_array_element(struct JSON *json, char *prop, size_t n) {
-  struct Token *token = get_token(json, prop);
-  char *err = get_JSON_err(json);
-  if (err)
-    ERRF(1, "%s", err);
-  if (get_token_type(token) != Array)
-    ERRF(1, "Type mismatch for prop %s (not an array)", prop)
-  union TokenValue value = get_token_value(token);
-
-  if (n >= get_token_array_size(value.array))
-    ERRF(1, "Array %s out of bounds (%lu)", prop, n);
-
-  return get_token_array_element(value.array, n);
-}
-
-// Helper functions
-/*
-int JSON_is_undefined(struct JSON *json) {
-  return get_token_type(json->root) == Undefined;
-}
-
-int JSON_is_object(struct JSON *json) {
-  return get_token_type(json->root) == Object;
-}
-
-int JSON_is_array(struct JSON *json) {
-  return get_token_type(json->root) == Array;
-}
-
-int JSON_is_number(struct JSON *json) {
-  return get_token_type(json->root) == Number;
-}
-
-int JSON_is_string(struct JSON *json) {
-  return get_token_type(json->root) == String;
-}
-
-int JSON_is_boolean(struct JSON *json) {
-  return get_token_type(json->root) == Boolean;
-}
-
-int JSON_is_null(struct JSON *json) {
-  return get_token_type(json->root) == Null;
-}
-*/
 
 // Destructor
 void destroy_JSON(struct JSON *json) {
