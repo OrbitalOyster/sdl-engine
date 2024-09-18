@@ -178,16 +178,12 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
     return NULL;
   }
 
-  // Make a copy of key
-  size_t l = strlen(key_s) + 1;
-  char *key_copy = calloc(l, sizeof(char));
-  memcpy(key_copy, key, l);
-  INFO2F("Reading deep token: %s", key_copy);
+  INFO2F("Reading deep token: %s", key_s);
   char *next_key = NULL;
   struct Token *current_token = json->root;
   while (1) {
     if (!next_key) // First run
-      next_key = strtok(key_copy, TOKEN_DELIMITERS);
+      next_key = strtok(key_s, TOKEN_DELIMITERS);
     else
       next_key = strtok(NULL, TOKEN_DELIMITERS);
     INFO2F("Next key: %s", next_key);
@@ -219,7 +215,7 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
     }
     }
   }
-  free(key_copy);
+  free(key_s);
 
   // Check if types match
   enum TokenType result_type = get_token_type(current_token);
