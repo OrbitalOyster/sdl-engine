@@ -29,9 +29,7 @@ enum TokenType get_token_type(struct Token *token) { return token->type; }
 
 const char *token_type_to_string(int t) { return token_types_str[t]; }
 
-union TokenValue get_token_value(struct Token *token) {
-  return token->value;
-}
+union TokenValue get_token_value(struct Token *token) { return token->value; }
 
 // Helper functions
 struct Token *create_undefined_token() {

@@ -28,16 +28,16 @@ struct GUI_Skin {
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
   struct JSON *json = file_to_JSON(filename);
-//  check_JSON_token(json, String, "filename");
-//  check_JSON_token(json, Array, "atlas");
-//  if (get_JSON_err(json)) {
-//    WARNF("JSON err: %s", get_JSON_err(json));
-//    return NULL;
-//  }
+  //  check_JSON_token(json, String, "filename");
+  //  check_JSON_token(json, Array, "atlas");
+  //  if (get_JSON_err(json)) {
+  //    WARNF("JSON err: %s", get_JSON_err(json));
+  //    return NULL;
+  //  }
   INFO2F("N: %i", get_JSON_foo_number(json, "atlas/0/bottomLeft/1"));
 
-//  struct TokenArray *atlas = get_JSON_get_array_token(json, "atlas");
-//  INFO2F("Size: %lu", get_token_array_size(atlas));
+  //  struct TokenArray *atlas = get_JSON_get_array_token(json, "atlas");
+  //  INFO2F("Size: %lu", get_token_array_size(atlas));
 
   int n = get_JSON_foo_number(json, "foo/%i", 2);
   if (get_JSON_err(json)) {
