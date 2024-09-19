@@ -4,10 +4,7 @@
 #include <stdlib.h>
 
 #include <utils/debug.h>
-
-#include "utils/JSON/token.h"
-#include "utils/JSON/parser.h"
-#include "utils/JSON/stringify.h"
+#include "utils/JSON/JSON.h"
 
 int main() {
   DTEST_UNIT_START("JSON parser");

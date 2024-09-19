@@ -1,9 +1,9 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef FOO_PARSER_H
+#define FOO_PARSER_H
 
-#include "JSON.h"
+#include "token.h"
 
-//struct Token *parse_next_token(struct JSON *json,
-//                               int (*get_next_char)(struct JSON *, int));
+struct Token *parse_JSON_file(char *filename);
+struct Token *parse_JSON_string(char *s);
 
-#endif /* PARSER_H */
+#endif /* FOO_PARSER_H */
