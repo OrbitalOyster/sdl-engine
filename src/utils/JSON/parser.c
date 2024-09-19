@@ -12,8 +12,11 @@
 // 2 ** 64 + '\0'
 #define MAX_NUMBER_STR_LENGTH 21
 
-#define MAX_JSON_ERR_LENGTH (255 + 1)
-#define MAX_JSON_KEY_LENGTH (63 + 1)
+// #define MAX_JSON_ERR_LENGTH (255 + 1)
+// #define MAX_JSON_KEY_LENGTH (63 + 1)
+
+#define MAX_PARSER_ERR_LENGTH (255 + 1)
+
 #define CHUNK_LENGTH 4096
 
 #define TRUE_STRING "true"
@@ -69,11 +72,11 @@ void set_parser_err(struct JSON_Parser *parser, char *err, ...) {
   if (parser->err)
     free(parser->err);
   // Magic
-  char *err_s = calloc(MAX_JSON_ERR_LENGTH, sizeof(char));
+  char *err_s = calloc(MAX_PARSER_ERR_LENGTH, sizeof(char));
   va_list args;
   va_start(args, err);
-  int chars = vsnprintf(err_s, MAX_JSON_ERR_LENGTH, err, args);
-  if (chars >= MAX_JSON_ERR_LENGTH)
+  int chars = vsnprintf(err_s, MAX_PARSER_ERR_LENGTH, err, args);
+  if (chars >= MAX_PARSER_ERR_LENGTH)
     WARNF("Parser error too large (%i)", chars);
   va_end(args);
   // Copy to err

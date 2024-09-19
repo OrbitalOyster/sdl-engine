@@ -13,23 +13,24 @@
 
 #include "utils/debug.h"
 
-#define MAX_JSON_KEY_LENGTH (63 + 1)
-#define MAX_JSON_ERR_LENGTH (255 + 1)
+// #define MAX_JSON_ERR_LENGTH (255 + 1)
 
 // JSON tokens delimeters
 const char *TOKEN_DELIMITERS = "/";
 
 struct JSON {
   struct Token *root;
-  char *err;
+//  char *err;
 };
 
 struct JSON *create_JSON() {
   struct JSON *json = calloc(1, sizeof(struct JSON));
-  *json = (struct JSON){.root = NULL, .err = NULL};
+  // *json = (struct JSON){.root = NULL, .err = NULL};
+  *json = (struct JSON){.root = NULL};
   return json;
 }
 
+/*
 void set_JSON_err(struct JSON *json, char *err, ...) {
   // Already having issues
   if (json->err)
@@ -46,24 +47,27 @@ void set_JSON_err(struct JSON *json, char *err, ...) {
   json->err = calloc(strlen(err_s) + 1, sizeof(char));
   strcpy(json->err, err_s);
 }
+*/
 
-char *get_JSON_err(struct JSON *json) { return json->err; }
+// char *get_JSON_err(struct JSON *json) { return json->err; }
 
-struct JSON *file_to_JSON(char *filename) {
-  struct JSON *json = create_JSON();
-  json->root = parse_JSON_file(filename);
-  return json;
+struct Token *file_to_JSON(char *filename) {
+  // struct JSON *json = create_JSON();
+  // json->root = parse_JSON_file(filename);
+  // return json;
+  return parse_JSON_file(filename);
 }
 
-struct JSON *string_to_JSON(char *s) {
-  struct JSON *json = create_JSON();
-  json->root = parse_JSON_string(s);
-  return json;
+struct Token *string_to_JSON(char *s) {
+//  struct JSON *json = create_JSON();
+//  json->root = parse_JSON_string(s);
+//  return json;
+  return parse_JSON_string(s);
 }
 
-char *JSON_to_string(struct JSON *json) { return token_to_string(json->root); }
+char *JSON_to_string(struct Token *json) { return token_to_string(json); }
 
-static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
+static struct Token *get_JSON_foo(struct Token *json, enum TokenType token_type,
                                   char *key, va_list args) {
   // Magic
   char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
@@ -75,7 +79,7 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
 
   INFO2F("Reading deep token: %s", key_s);
   char *next_key = NULL;
-  struct Token *current_token = json->root;
+  struct Token *current_token = json;
   while (1) {
     if (!next_key) // First run
       next_key = strtok(key_s, TOKEN_DELIMITERS);
@@ -91,21 +95,24 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
       if (check_token_map_has_key(value.map, next_key)) {
         current_token = get_token_map_element(value.map, next_key);
       } else {
-        set_JSON_err(json, "Undefined prop: %s", next_key);
+        // set_JSON_err(json, "Undefined prop: %s", next_key);
+        ERRF(1, "Undefined prop: %s", next_key);
         return NULL;
       }
       break;
     case Array: {
       size_t n = (size_t)atoi(next_key);
       if (n >= get_token_array_size(value.array)) {
-        set_JSON_err(json, "Array prop out of bounds (%i)", n);
+        // set_JSON_err(json, "Array prop out of bounds (%i)", n);
+        ERRF(1, "Array prop out of bounds (%lu)", n);
         return NULL;
       }
       current_token = get_token_array_element(value.array, n);
       break;
     }
     default: {
-      set_JSON_err(json, "Array prop out of bounds");
+      // set_JSON_err(json, "Array prop out of bounds");
+      ERRF(1, "Array prop out of bounds (%s)", next_key);
       return NULL;
     }
     }
@@ -115,7 +122,12 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
   // Check if types match
   enum TokenType result_type = get_token_type(current_token);
   if (result_type != token_type) {
+    /*
     set_JSON_err(json, "Type mismatch for token \"%s\" (expected %s, got %s)",
+                 key, token_type_to_string(token_type),
+                 token_type_to_string(result_type));
+                 */
+    ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)",
                  key, token_type_to_string(token_type),
                  token_type_to_string(result_type));
     return NULL;
@@ -124,38 +136,39 @@ static struct Token *get_JSON_foo(struct JSON *json, enum TokenType token_type,
   return current_token;
 }
 
-int get_JSON_foo_number(struct JSON *json, char *key, ...) {
+int get_JSON_foo_number(struct Token *json, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *token = get_JSON_foo(json, Number, key, args);
-  if (json->err)
-    return 0;
+//  if (json->err)
+//    return 0;
   va_end(args);
   return get_token_value(token).number;
 }
 
-char *get_JSON_foo_string(struct JSON *json, char *key, ...) {
+char *get_JSON_foo_string(struct Token *json, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *token = get_JSON_foo(json, String, key, args);
-  if (json->err)
-    return "";
+//  if (json->err)
+//    return "";
   va_end(args);
   return get_token_value(token).string;
 }
 
-int JSON_object_has_prop(struct JSON *json, char *prop) {
-  union TokenValue value = get_token_value(json->root);
+int JSON_object_has_prop(struct Token *json, char *prop) {
+  // union TokenValue value = get_token_value(json->root);
+  union TokenValue value = get_token_value(json);
   struct TokenMap *map = value.map;
   return check_token_map_has_key(map, prop);
 }
 
-size_t JSON_get_array_size(struct JSON *json, char *key, ...) {
+size_t JSON_get_array_size(struct Token *json, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *token = get_JSON_foo(json, Array, key, args);
-  if (json->err)
-    return 0;
+//  if (json->err)
+//    return 0;
   va_end(args);
 
   union TokenValue value = get_token_value(token);

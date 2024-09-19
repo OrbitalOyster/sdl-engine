@@ -4,6 +4,7 @@
 #include "utils/JSON/JSON.h"
 #include "utils/debug.h"
 
+/*
 struct Atlas *create_atlas(char *filename) {
   struct JSON *json = file_to_JSON(filename);
   //  check_JSON_token(json, String, "filename");
@@ -14,5 +15,6 @@ struct Atlas *create_atlas(char *filename) {
   destroy_JSON(json);
   return result;
 }
+*/
 
 void destroy_atlas(struct Atlas *atlas) { SDL_DestroyTexture(atlas->texture); }

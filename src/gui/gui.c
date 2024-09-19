@@ -27,7 +27,7 @@ struct GUI_Skin {
 
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
-  struct JSON *json = file_to_JSON(filename);
+  struct Token *json = file_to_JSON(filename);
   //  check_JSON_token(json, String, "filename");
   //  check_JSON_token(json, Array, "atlas");
   //  if (get_JSON_err(json)) {
@@ -40,9 +40,9 @@ struct GUI_Skin *load_gui_skin(char *filename) {
   //  INFO2F("Size: %lu", get_token_array_size(atlas));
 
   int n = get_JSON_foo_number(json, "foo/%i", 2);
-  if (get_JSON_err(json)) {
-    WARNF("JSON err: %s", get_JSON_err(json));
-  }
+  // if (get_JSON_err(json)) {
+  //   WARNF("JSON err: %s", get_JSON_err(json));
+  // }
   INFO2F("Token: %i", n);
 
   result->atlas_size = 0;
