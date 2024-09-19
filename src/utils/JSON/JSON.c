@@ -12,6 +12,8 @@
 #include "utils/JSON/token.h"
 #include "utils/debug.h"
 
+#include "utils/JSON/foo_parser.h"
+
 #define MAX_JSON_KEY_LENGTH (63 + 1)
 #define MAX_JSON_ERR_LENGTH (255 + 1)
 #define CHUNK_LENGTH 4096
@@ -24,30 +26,37 @@ const char *TOKEN_DELIMITERS = "/";
 
 struct JSON {
   struct Token *root;
+  /*
   int c;
   size_t char_num;
   size_t line_num;
   size_t col_num;
+  */
   char *err;
+  /*
   void *source;
   char *chunk;
   size_t chunk_read;
   char *number_str;
+  */
 };
 
 struct JSON *create_JSON() {
   struct JSON *json = calloc(1, sizeof(struct JSON));
   *json =
       (struct JSON){.root = NULL,
+        /*
                     .c = '\n',
                     .char_num = 0,
                     .line_num = 0,
                     .col_num = 0,
+                    */
                     .err = NULL,
+                    /*
                     .source = NULL,
                     .chunk = calloc(CHUNK_LENGTH, sizeof(char)),
                     .chunk_read = 0,
-                    .number_str = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char))};
+                    .number_str = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char))*/};
   return json;
 }
 
@@ -70,12 +79,13 @@ void set_JSON_err(struct JSON *json, char *err, ...) {
 
 char *get_JSON_err(struct JSON *json) { return json->err; }
 
-static int is_whitespace(int c) { return c == ' ' || c == '\t' || c == '\n'; }
+// static int is_whitespace(int c) { return c == ' ' || c == '\t' || c == '\n'; }
 
-int get_JSON_char(struct JSON *json) { return json->c; }
+// int get_JSON_char(struct JSON *json) { return json->c; }
 
-char *get_JSON_number_str(struct JSON *json) { return json->number_str; }
+// char *get_JSON_number_str(struct JSON *json) { return json->number_str; }
 
+/*
 static int get_next_char_F(struct JSON *json, int skip_whitespaces) {
   FILE *f = (FILE *)json->source;
   do {
@@ -120,11 +130,13 @@ static int get_next_char_S(struct JSON *json, int skip_whitespaces) {
 
   return json->c;
 }
+*/
 
 struct JSON *file_to_JSON(char *filename) {
   struct JSON *json = create_JSON();
 
   // Try to open file
+  /*
   FILE *f = fopen(filename, "r");
   if (!f) {
     set_JSON_err(json, "Unable to open file \"%s\"", filename);
@@ -146,12 +158,16 @@ struct JSON *file_to_JSON(char *filename) {
 
   json->root = root;
   fclose(f);
+  */
+
+  json->root = parse_JSON_file(filename);
 
   return json;
 }
 
 struct JSON *string_to_JSON(char *s) {
   struct JSON *json = create_JSON();
+  /*
   json->source = (void *)s;
 
   // Skip trailing whitespaces
@@ -163,6 +179,10 @@ struct JSON *string_to_JSON(char *s) {
            get_JSON_err(json), json->line_num, json->col_num, json->c, json->c);
 
   json->root = root;
+  */
+
+  json->root = parse_JSON_string(s);
+
   return json;
 }
 
@@ -272,7 +292,7 @@ void destroy_JSON(struct JSON *json) {
   if (json == NULL)
     ERR(1, "Attempt to destroy NULL JSON");
   destroy_token(json->root);
-  free(json->chunk);
-  free(json->number_str);
+  // free(json->chunk);
+  // free(json->number_str);
   free(json);
 }

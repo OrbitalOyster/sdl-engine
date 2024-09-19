@@ -10,6 +10,8 @@
 
 #include "gui/container_foo.h"
 
+#include "utils/JSON/foo_parser.h"
+
 int quit = 0;
 
 void on_key_down(SDL_Scancode key) {

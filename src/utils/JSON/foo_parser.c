@@ -43,7 +43,8 @@ struct Foo_parser {
 };
 
 static struct Token *parse_next_token(struct Foo_parser *parser,
-                               int (*get_next_char)(struct Foo_parser *, int));
+                                      int (*get_next_char)(struct Foo_parser *,
+                                                           int));
 
 struct Foo_parser *create_JSON_parser() {
   struct Foo_parser *parser = calloc(1, sizeof(struct Foo_parser));
@@ -125,12 +126,12 @@ static int get_next_char_S(struct Foo_parser *parser, int skip_whitespaces) {
   return parser->c;
 }
 
-static char *read_string(struct Foo_parser *parser) {
+static char *read_string(struct Foo_parser *parser, int (*get_next_char)(struct Foo_parser *, int)) {
   size_t l = INITIAL_STRING_LENGTH, n = 0;
   char *string = calloc(l, sizeof(char));
   int esc = 0, c, done = 0;
   do {
-    c = parser->c;
+    c = get_next_char(parser, 0);
     switch (c) {
     // No unexpected EOF
     case EOF:
@@ -159,6 +160,9 @@ static char *read_string(struct Foo_parser *parser) {
     }
   } while (!done);
   string[n] = '\0';
+  if (parser->err)
+    WARNF("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
+           parser->line_num, parser->col_num, parser->c, parser->c);
   INFOF("Read string: %s", string);
   return string;
 }
@@ -262,7 +266,7 @@ static struct TokenMap *parse_object(struct Foo_parser *parser,
       set_parser_err(parser, "Expected key");
       return result;
     }
-    char *key = read_string(parser);
+    char *key = read_string(parser, get_next_char);
     INFOF("Key: %s", key);
 
     if (parser->err)
@@ -315,7 +319,8 @@ static struct TokenArray *parse_array(struct Foo_parser *parser,
 }
 
 static struct Token *parse_next_token(struct Foo_parser *parser,
-                               int (*get_next_char)(struct Foo_parser *, int)) {
+                                      int (*get_next_char)(struct Foo_parser *,
+                                                           int)) {
   INFO("Parsing next token...");
   enum TokenType type = Undefined;
   union TokenValue value;
@@ -349,7 +354,7 @@ static struct Token *parse_next_token(struct Foo_parser *parser,
   case '\"':
     INFO("Processing String...");
     type = String;
-    value.string = read_string(parser);
+    value.string = read_string(parser, get_next_char);
     get_next_char(parser, 1);
     break;
   case TRUE_STRING_0:
@@ -400,7 +405,7 @@ struct Token *parse_JSON_file(char *filename) {
   struct Token *result = parse_next_token(parser, get_next_char_F);
 
   if (parser->err)
-    INFO2F("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
+    WARNF("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
            parser->line_num, parser->col_num, parser->c, parser->c);
 
   fclose(f);
