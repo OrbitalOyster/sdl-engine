@@ -20,6 +20,7 @@ static char *object_token_to_string(struct TokenMap *map) {
   return result;
 }
 
+// TODO: Don't need it
 static char *array_token_to_string(struct TokenArray *array) {
   char *s = token_array_to_string(array);
   char *result = calloc(2 + strlen(s) + 1, sizeof(char));

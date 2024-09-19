@@ -10,14 +10,11 @@
 #include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
 #include "utils/JSON/token.h"
+
 #include "utils/debug.h"
 
 #define MAX_JSON_KEY_LENGTH (63 + 1)
 #define MAX_JSON_ERR_LENGTH (255 + 1)
-#define CHUNK_LENGTH 4096
-
-// 2 ** 64 + '\0'
-#define MAX_NUMBER_STR_LENGTH 21
 
 // JSON tokens delimeters
 const char *TOKEN_DELIMITERS = "/";

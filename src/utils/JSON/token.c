@@ -31,52 +31,6 @@ const char *token_type_to_string(int t) { return token_types_str[t]; }
 
 union TokenValue get_token_value(struct Token *token) { return token->value; }
 
-// Helper functions
-struct Token *create_undefined_token() {
-  struct Token *result = calloc(1, sizeof(struct Token));
-  if (!result)
-    ERR(1, "Out of memory");
-  *result = (struct Token){.type = Undefined};
-  return result;
-}
-
-struct Token *create_object_token() {
-  struct TokenMap *map = create_token_map();
-  struct Token *result = create_token(Object, (union TokenValue){.map = map});
-  return result;
-}
-
-struct Token *create_array_token() {
-  struct TokenArray *array = create_token_array();
-  struct Token *result =
-      create_token(Array, (union TokenValue){.array = array});
-  return result;
-}
-
-struct Token *create_number_token(int n) {
-  struct Token *result = create_token(Number, (union TokenValue){.number = n});
-  return result;
-}
-
-struct Token *create_string_token(char *s) {
-  struct Token *result = create_token(String, (union TokenValue){.string = s});
-  return result;
-}
-
-struct Token *create_boolean_token(int b) {
-  struct Token *result =
-      create_token(Boolean, (union TokenValue){.boolean = !!b});
-  return result;
-}
-
-struct Token *create_null_token() {
-  struct Token *result = calloc(1, sizeof(struct Token));
-  if (!result)
-    ERR(1, "Out of memory");
-  *result = (struct Token){.type = Null};
-  return result;
-}
-
 // Destructor
 void destroy_token(struct Token *token) {
   if (token == NULL)
