@@ -4,10 +4,11 @@
 #include <string.h>
 
 #include "utils/JSON/JSON.h"
+#include "utils/JSON/parser.h"
 #include "utils/debug.h"
 
 struct Config *load_config(char *filename) {
-  struct Token *config_json = file_to_JSON(filename);
+  struct Token *config_json = parse_JSON_file(filename);
   // Check if config is parsed ok
   // if (get_JSON_err(config_json))
   //  ERR(1, get_JSON_err(config_json));

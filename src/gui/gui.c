@@ -6,6 +6,7 @@
 #include "gui/container_foo.h"
 #include "png.h"
 #include "utils/JSON/JSON.h"
+#include "utils/JSON/parser.h"
 #include "utils/JSON/token-array.h"
 #include "utils/debug.h"
 
@@ -27,7 +28,7 @@ struct GUI_Skin {
 
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
-  struct Token *json = file_to_JSON(filename);
+  struct Token *json = parse_JSON_file(filename);
   //  check_JSON_token(json, String, "filename");
   //  check_JSON_token(json, Array, "atlas");
   //  if (get_JSON_err(json)) {

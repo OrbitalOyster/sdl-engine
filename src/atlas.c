@@ -6,7 +6,7 @@
 
 /*
 struct Atlas *create_atlas(char *filename) {
-  struct JSON *json = file_to_JSON(filename);
+  struct JSON *json = parse_JSON_file(filename);
   //  check_JSON_token(json, String, "filename");
   //  check_JSON_token(json, Array, "rects");
   struct Atlas *result = calloc(1, sizeof(struct Atlas));
