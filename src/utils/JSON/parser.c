@@ -381,43 +381,41 @@ static struct Token *parse_next_token(struct JSON_Parser *parser,
 }
 
 struct Token *parse_JSON_file(struct JSON_Parser *parser, char *filename) {
-
   // Try to open file
   FILE *f = fopen(filename, "r");
   if (!f) {
     set_parser_err(parser, "Unable to open file \"%s\"", filename);
     return NULL;
   }
+  // Set source
   parser->source = f;
-
+  // Read bytes
   const size_t fread_res = fread(parser->chunk, sizeof(char), CHUNK_LENGTH, f);
   if (fread_res != CHUNK_LENGTH && ferror(f))
     set_parser_err(parser, "Error reading file \"%s\"", filename);
-
   // Skip trailing whitespaces
   get_next_char_F(parser, 1);
   struct Token *result = parse_next_token(parser, get_next_char_F);
-
+  // Check for errors
   if (parser->err)
     WARNF("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
           parser->line_num, parser->col_num, parser->c, parser->c);
-
+  // Done
   fclose(f);
-
   return result;
 }
 
 struct Token *parse_JSON_string(struct JSON_Parser *parser, char *s) {
+  // Set source
   parser->source = (void *)s;
-
   // Skip trailing whitespaces
   get_next_char_S(parser, 1);
   struct Token *result = parse_next_token(parser, get_next_char_S);
-
+  // Check for errors
   if (parser->err)
     WARNF("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
           parser->line_num, parser->col_num, parser->c, parser->c);
-
+  // Done
   return result;
 }
 
@@ -425,6 +423,7 @@ char *get_JSON_parser_err(struct JSON_Parser *parser) { return parser->err; }
 
 void destroy_JSON_parser(struct JSON_Parser *parser) {
   free(parser->err);
+  // TODO
   // free(parser->source);
   free(parser->chunk);
   free(parser->number_str);

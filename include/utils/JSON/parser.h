@@ -1,5 +1,5 @@
-#ifndef FOO_PARSER_H
-#define FOO_PARSER_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include "token.h"
 
@@ -11,4 +11,4 @@ struct Token *parse_JSON_string(struct JSON_Parser *parser, char *s);
 char *get_JSON_parser_err(struct JSON_Parser *parser);
 void destroy_JSON_parser(struct JSON_Parser *parser);
 
-#endif /* FOO_PARSER_H */
+#endif /* PARSER_H */

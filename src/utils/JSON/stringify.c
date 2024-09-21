@@ -4,11 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/JSON/token.h"
 #include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
-#include "utils/JSON/token.h"
 
-static char *token_array_to_string(struct TokenArray *array);
 static char *token_map_to_string(struct TokenMap *map, int keys);
 
 static char *object_token_to_string(struct TokenMap *map) {
@@ -21,32 +20,29 @@ static char *object_token_to_string(struct TokenMap *map) {
   return result;
 }
 
-// TODO: Don't need it
 static char *array_token_to_string(struct TokenArray *array) {
-  char *s = token_array_to_string(array);
+  // Actual values
+  size_t size = 1;
+  char *s = calloc(size, sizeof(char));
+  for (size_t i = 0; i < get_token_array_size(array); i++) {
+    char *value = token_to_string(get_token_array_element(array, i));
+    if (i) { // ", "
+      size += (2 + strlen(value)) * sizeof(char);
+      s = realloc(s, size);
+      strcat(s, ", ");
+    }
+    size += strlen(value) * sizeof(char);
+    s = realloc(s, size);
+    strcat(s, value);
+    free(value);
+  }
+  // Brackets
   char *result = calloc(2 + strlen(s) + 1, sizeof(char));
   strcat(result, "[");
   strcat(result, s);
   strcat(result, "]");
   free(s);
-  return result;
-}
-
-static char *token_array_to_string(struct TokenArray *array) {
-  size_t size = 1;
-  char *result = calloc(size, sizeof(char));
-  for (size_t i = 0; i < get_token_array_size(array); i++) {
-    char *value = token_to_string(get_token_array_element(array, i));
-    if (i) { // ", "
-      size += (2 + strlen(value)) * sizeof(char);
-      result = realloc(result, size);
-      strcat(result, ", ");
-    }
-    size += strlen(value) * sizeof(char);
-    result = realloc(result, size);
-    strcat(result, value);
-    free(value);
-  }
+  // Done
   return result;
 }
 
