@@ -13,15 +13,7 @@ struct Config *load_config(char *filename) {
   char *parser_err = get_JSON_parser_err(parser);
   if (parser_err)
     ERRF(1, "Failed to parse config: %s", parser_err);
-  // Check window props
-  //  check_JSON_token(config_json, Object, "");
-  //  check_JSON_token(config_json, Number, "window/width");
-  //  check_JSON_token(config_json, Number, "window/height");
-  // check_JSON_token(config_json, String, "window/title");
-  //  check_JSON_token(config_json, String, "window/%s", "title");
-  // if (get_JSON_err(config_json))
-  //  ERRF(1, "Invalid config: %s", get_JSON_err(config_json));
-  // Create and read config
+
   struct Config *result = calloc(1, sizeof(struct Config));
   result->window_width = read_token_number(config_json, "window/width");
   result->window_height = read_token_number(config_json, "window/height");
@@ -36,7 +28,11 @@ struct Config *load_config(char *filename) {
 
   result->window_title = calloc(strlen(title) + 1, sizeof(char));
   strcpy(result->window_title, title);
-  // destroy_JSON(config_json);
+
+  // Cleanup
+  destroy_token(config_json);
+  destroy_JSON_parser(parser);
+
   return result;
 }
 

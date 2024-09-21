@@ -33,7 +33,9 @@ enum TokenType get_token_type(struct Token *token) { return token->type; }
 
 const char *token_type_to_string(int t) { return token_types_str[t]; }
 
-union TokenValue get_token_value(struct Token *token) { return token->value; }
+union TokenValue get_token_value(struct Token *token) {
+  return token->value;
+}
 
 void set_token_err(struct Token *token, char *err, ...) {
   // Magic
@@ -80,7 +82,6 @@ static struct Token *read_token(struct Token *token, enum TokenType token_type,
         current_token = get_token_map_element(value.map, next_key);
       } else {
         set_token_err(token, "Undefined prop: %s", next_key);
-        // ERRF(1, "Undefined prop: %s", next_key);
         return NULL;
       }
       break;
@@ -88,7 +89,6 @@ static struct Token *read_token(struct Token *token, enum TokenType token_type,
       size_t n = (size_t)atoi(next_key);
       if (n >= get_token_array_size(value.array)) {
         set_token_err(token, "Array prop out of bounds (%i)", n);
-        // ERRF(1, "Array prop out of bounds (%lu)", n);
         return NULL;
       }
       current_token = get_token_array_element(value.array, n);
@@ -96,7 +96,6 @@ static struct Token *read_token(struct Token *token, enum TokenType token_type,
     }
     default: {
       set_token_err(token, "Array prop out of bounds");
-      // ERRF(1, "Array prop out of bounds (%s)", next_key);
       return NULL;
     }
     }
@@ -109,9 +108,6 @@ static struct Token *read_token(struct Token *token, enum TokenType token_type,
     set_token_err(token, "Type mismatch for token \"%s\" (expected %s, got %s)",
                   key, token_type_to_string(token_type),
                   token_type_to_string(result_type));
-    // ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)", key,
-    //      token_type_to_string(token_type),
-    //      token_type_to_string(result_type));
     return NULL;
   }
 

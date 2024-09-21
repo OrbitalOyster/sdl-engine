@@ -3,22 +3,33 @@
 
 #include <stdlib.h>
 
+#include "utils/JSON/token.h"
+
+#include "utils/JSON/parser.h"
+#include "utils/JSON/stringify.h"
+
 #include <utils/debug.h>
-#include "utils/JSON/JSON.h"
 
 int main() {
   DTEST_UNIT_START("JSON parser");
-  struct JSON *json1 = file_to_JSON("assets/sample.json");
-  char *s1 = JSON_to_string(json1);
-  struct JSON *json2 = string_to_JSON(s1);
-  char *s2 = JSON_to_string(json2);
+
+  struct JSON_Parser *parser1 = create_JSON_parser();
+  struct Token *json1 = parse_JSON_file(parser1, "assets/sample.json");
+  char *s1 = token_to_string(json1);
+
+  struct JSON_Parser *parser2 = create_JSON_parser();
+  struct Token *json2 = parse_JSON_string(parser2, s1);
+  char *s2 = token_to_string(json2);
 
   // strcmp returns 0 on equal strings
   DTEST_EXPECT_FALSE(strcmp(s1, s2));
 
-  destroy_JSON(json1);
+  destroy_JSON_parser(parser1);
+  destroy_JSON_parser(parser2);
+
+  destroy_token(json1);
   free(s1);
-  destroy_JSON(json2);
+  destroy_token(json2);
   free(s2);
 
   DTEST_UNIT_END;

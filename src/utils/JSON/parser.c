@@ -62,9 +62,6 @@ static int is_whitespace(int c) { return c == ' ' || c == '\t' || c == '\n'; }
 static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
 static void set_parser_err(struct JSON_Parser *parser, char *err, ...) {
-  // Already having issues
-  if (parser->err)
-    free(parser->err);
   // Magic
   char *err_s = calloc(MAX_PARSER_ERR_LENGTH, sizeof(char));
   va_list args;
@@ -424,13 +421,11 @@ struct Token *parse_JSON_string(struct JSON_Parser *parser, char *s) {
   return result;
 }
 
-char *get_JSON_parser_err(struct JSON_Parser *parser) {
-  return parser->err;
-}
+char *get_JSON_parser_err(struct JSON_Parser *parser) { return parser->err; }
 
 void destroy_JSON_parser(struct JSON_Parser *parser) {
   free(parser->err);
-  free(parser->source);
+  // free(parser->source);
   free(parser->chunk);
   free(parser->number_str);
   free(parser);

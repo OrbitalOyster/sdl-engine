@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/token.h"
 #include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
+#include "utils/JSON/token.h"
 
 static char *token_array_to_string(struct TokenArray *array);
 static char *token_map_to_string(struct TokenMap *map, int keys);

@@ -57,6 +57,7 @@ int main() {
   if (!config) {
     ERR(1, "Failed to load config");
   }
+
   // Init core
   struct Core *core = create_core(config->window_width, config->window_height,
                                   config->window_title);
