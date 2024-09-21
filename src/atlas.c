@@ -1,7 +1,6 @@
 #include "atlas.h"
 
 #include "png.h"
-#include "utils/JSON/JSON.h"
 #include "utils/debug.h"
 
 /*

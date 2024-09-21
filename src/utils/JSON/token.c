@@ -34,9 +34,9 @@ const char *token_type_to_string(int t) { return token_types_str[t]; }
 
 union TokenValue get_token_value(struct Token *token) { return token->value; }
 
-
-static struct Token *get_JSON_foo(struct Token *token, enum TokenType token_type,
-                                  char *key, va_list args) {
+static struct Token *read_token(struct Token *token,
+                                  enum TokenType token_type, char *key,
+                                  va_list args) {
   // Magic
   char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
   int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
@@ -95,31 +95,30 @@ static struct Token *get_JSON_foo(struct Token *token, enum TokenType token_type
                  key, token_type_to_string(token_type),
                  token_type_to_string(result_type));
                  */
-    ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)",
-                 key, token_type_to_string(token_type),
-                 token_type_to_string(result_type));
+    ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)", key,
+         token_type_to_string(token_type), token_type_to_string(result_type));
     return NULL;
   }
 
   return current_token;
 }
 
-int get_JSON_foo_number(struct Token *token, char *key, ...) {
+int read_token_number(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
-  struct Token *number_token = get_JSON_foo(token, Number, key, args);
-//  if (json->err)
-//    return 0;
+  struct Token *number_token = read_token(token, Number, key, args);
+  //  if (json->err)
+  //    return 0;
   va_end(args);
   return get_token_value(number_token).number;
 }
 
-char *get_JSON_foo_string(struct Token *token, char *key, ...) {
+char *rea_token_string(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
-  struct Token *string_token = get_JSON_foo(token, String, key, args);
-//  if (json->err)
-//    return "";
+  struct Token *string_token = read_token(token, String, key, args);
+  //  if (json->err)
+  //    return "";
   va_end(args);
   return get_token_value(string_token).string;
 }
@@ -127,9 +126,9 @@ char *get_JSON_foo_string(struct Token *token, char *key, ...) {
 size_t JSON_get_array_size(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
-  struct Token *array_token = get_JSON_foo(token, Array, key, args);
-//  if (json->err)
-//    return 0;
+  struct Token *array_token = read_token(token, Array, key, args);
+  //  if (json->err)
+  //    return 0;
   va_end(args);
 
   union TokenValue value = get_token_value(array_token);

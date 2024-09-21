@@ -5,7 +5,6 @@
 
 #include "gui/container_foo.h"
 #include "png.h"
-#include "utils/JSON/JSON.h"
 #include "utils/JSON/parser.h"
 #include "utils/JSON/token-array.h"
 #include "utils/debug.h"
@@ -35,12 +34,12 @@ struct GUI_Skin *load_gui_skin(char *filename) {
   //    WARNF("JSON err: %s", get_JSON_err(json));
   //    return NULL;
   //  }
-  INFO2F("N: %i", get_JSON_foo_number(json, "atlas/0/bottomLeft/1"));
+  INFO2F("N: %i", read_token_number(json, "atlas/0/bottomLeft/1"));
 
   //  struct TokenArray *atlas = get_JSON_get_array_token(json, "atlas");
   //  INFO2F("Size: %lu", get_token_array_size(atlas));
 
-  int n = get_JSON_foo_number(json, "foo/%i", 2);
+  int n = read_token_number(json, "foo/%i", 2);
   // if (get_JSON_err(json)) {
   //   WARNF("JSON err: %s", get_JSON_err(json));
   // }

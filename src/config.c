@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/JSON.h"
 #include "utils/JSON/parser.h"
 #include "utils/debug.h"
 
@@ -22,9 +21,9 @@ struct Config *load_config(char *filename) {
   //  ERRF(1, "Invalid config: %s", get_JSON_err(config_json));
   // Create and read config
   struct Config *result = calloc(1, sizeof(struct Config));
-  result->window_width = get_JSON_foo_number(config_json, "window/width");
-  result->window_height = get_JSON_foo_number(config_json, "window/height");
-  char *title = get_JSON_foo_string(config_json, "window/title");
+  result->window_width = read_token_number(config_json, "window/width");
+  result->window_height = read_token_number(config_json, "window/height");
+  char *title = rea_token_string(config_json, "window/title");
 
   /*
   char *err = get_JSON_err(config_json);

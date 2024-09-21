@@ -23,8 +23,8 @@ enum TokenType get_token_type(struct Token *token);
 const char *token_type_to_string(int t);
 union TokenValue get_token_value(struct Token *token);
 
-int get_JSON_foo_number(struct Token *token, char *key, ...);
-char *get_JSON_foo_string(struct Token *token, char *key, ...);
+int read_token_number(struct Token *token, char *key, ...);
+char *rea_token_string(struct Token *token, char *key, ...);
 size_t JSON_get_array_size(struct Token *token, char *key, ...);
 
 void destroy_token(struct Token *token);
