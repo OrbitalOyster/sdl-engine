@@ -9,12 +9,6 @@
 #include "utils/JSON/token-map.h"
 #include "utils/debug.h"
 
-// 2 ** 64 + '\0'
-#define MAX_NUMBER_STR_LENGTH 21
-
-// #define MAX_JSON_ERR_LENGTH (255 + 1)
-// #define MAX_JSON_KEY_LENGTH (63 + 1)
-
 #define MAX_PARSER_ERR_LENGTH (255 + 1)
 
 #define CHUNK_LENGTH 4096
@@ -67,7 +61,7 @@ struct JSON_Parser *create_JSON_parser() {
 static int is_whitespace(int c) { return c == ' ' || c == '\t' || c == '\n'; }
 static int is_digit(int c) { return (c >= '0' && c <= '9'); }
 
-void set_parser_err(struct JSON_Parser *parser, char *err, ...) {
+static void set_parser_err(struct JSON_Parser *parser, char *err, ...) {
   // Already having issues
   if (parser->err)
     free(parser->err);
@@ -389,8 +383,7 @@ static struct Token *parse_next_token(struct JSON_Parser *parser,
   return result;
 }
 
-struct Token *parse_JSON_file(char *filename) {
-  struct JSON_Parser *parser = create_JSON_parser();
+struct Token *parse_JSON_file(struct JSON_Parser *parser, char *filename) {
 
   // Try to open file
   FILE *f = fopen(filename, "r");
@@ -417,8 +410,7 @@ struct Token *parse_JSON_file(char *filename) {
   return result;
 }
 
-struct Token *parse_JSON_string(char *s) {
-  struct JSON_Parser *parser = create_JSON_parser();
+struct Token *parse_JSON_string(struct JSON_Parser *parser, char *s) {
   parser->source = (void *)s;
 
   // Skip trailing whitespaces
@@ -426,8 +418,20 @@ struct Token *parse_JSON_string(char *s) {
   struct Token *result = parse_next_token(parser, get_next_char_S);
 
   if (parser->err)
-    INFO2F("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
-           parser->line_num, parser->col_num, parser->c, parser->c);
+    WARNF("JSON error: %s, line: %lu, col: %lu, char: %i [%c]", parser->err,
+          parser->line_num, parser->col_num, parser->c, parser->c);
 
   return result;
+}
+
+char *get_JSON_parser_err(struct JSON_Parser *parser) {
+  return parser->err;
+}
+
+void destroy_JSON_parser(struct JSON_Parser *parser) {
+  free(parser->err);
+  free(parser->source);
+  free(parser->chunk);
+  free(parser->number_str);
+  free(parser);
 }

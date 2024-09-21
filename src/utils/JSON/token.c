@@ -15,6 +15,7 @@ const char *TOKEN_DELIMITERS = "/";
 struct Token {
   enum TokenType type;
   union TokenValue value;
+  char *err;
 };
 
 const char *token_types_str[] = {"Undefined", "Object",  "Array", "Number",
@@ -34,9 +35,24 @@ const char *token_type_to_string(int t) { return token_types_str[t]; }
 
 union TokenValue get_token_value(struct Token *token) { return token->value; }
 
-static struct Token *read_token(struct Token *token,
-                                  enum TokenType token_type, char *key,
-                                  va_list args) {
+void set_token_err(struct Token *token, char *err, ...) {
+  // Magic
+  char *err_s = calloc(MAX_TOKEN_ERR_LENGTH, sizeof(char));
+  va_list args;
+  va_start(args, err);
+  int chars = vsnprintf(err_s, MAX_TOKEN_ERR_LENGTH, err, args);
+  if (chars >= MAX_TOKEN_ERR_LENGTH)
+    WARNF("JSON error too large (%i)", chars);
+  va_end(args);
+  // Copy to JSON err
+  token->err = calloc(strlen(err_s) + 1, sizeof(char));
+  strcpy(token->err, err_s);
+}
+
+char *get_token_err(struct Token *token) { return token->err; }
+
+static struct Token *read_token(struct Token *token, enum TokenType token_type,
+                                char *key, va_list args) {
   // Magic
   char *key_s = calloc(MAX_JSON_KEY_LENGTH, sizeof(char));
   int chars = vsnprintf(key_s, MAX_JSON_KEY_LENGTH, key, args);
@@ -63,24 +79,24 @@ static struct Token *read_token(struct Token *token,
       if (check_token_map_has_key(value.map, next_key)) {
         current_token = get_token_map_element(value.map, next_key);
       } else {
-        // set_JSON_err(json, "Undefined prop: %s", next_key);
-        ERRF(1, "Undefined prop: %s", next_key);
+        set_token_err(token, "Undefined prop: %s", next_key);
+        // ERRF(1, "Undefined prop: %s", next_key);
         return NULL;
       }
       break;
     case Array: {
       size_t n = (size_t)atoi(next_key);
       if (n >= get_token_array_size(value.array)) {
-        // set_JSON_err(json, "Array prop out of bounds (%i)", n);
-        ERRF(1, "Array prop out of bounds (%lu)", n);
+        set_token_err(token, "Array prop out of bounds (%i)", n);
+        // ERRF(1, "Array prop out of bounds (%lu)", n);
         return NULL;
       }
       current_token = get_token_array_element(value.array, n);
       break;
     }
     default: {
-      // set_JSON_err(json, "Array prop out of bounds");
-      ERRF(1, "Array prop out of bounds (%s)", next_key);
+      set_token_err(token, "Array prop out of bounds");
+      // ERRF(1, "Array prop out of bounds (%s)", next_key);
       return NULL;
     }
     }
@@ -90,13 +106,12 @@ static struct Token *read_token(struct Token *token,
   // Check if types match
   enum TokenType result_type = get_token_type(current_token);
   if (result_type != token_type) {
-    /*
-    set_JSON_err(json, "Type mismatch for token \"%s\" (expected %s, got %s)",
-                 key, token_type_to_string(token_type),
-                 token_type_to_string(result_type));
-                 */
-    ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)", key,
-         token_type_to_string(token_type), token_type_to_string(result_type));
+    set_token_err(token, "Type mismatch for token \"%s\" (expected %s, got %s)",
+                  key, token_type_to_string(token_type),
+                  token_type_to_string(result_type));
+    // ERRF(1, "Type mismatch for token \"%s\" (expected %s, got %s)", key,
+    //      token_type_to_string(token_type),
+    //      token_type_to_string(result_type));
     return NULL;
   }
 
@@ -107,8 +122,8 @@ int read_token_number(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *number_token = read_token(token, Number, key, args);
-  //  if (json->err)
-  //    return 0;
+  if (token->err)
+    return 0;
   va_end(args);
   return get_token_value(number_token).number;
 }
@@ -117,8 +132,8 @@ char *rea_token_string(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *string_token = read_token(token, String, key, args);
-  //  if (json->err)
-  //    return "";
+  if (token->err)
+    return "";
   va_end(args);
   return get_token_value(string_token).string;
 }
@@ -127,8 +142,8 @@ size_t JSON_get_array_size(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *array_token = read_token(token, Array, key, args);
-  //  if (json->err)
-  //    return 0;
+  if (token->err)
+    return 0;
   va_end(args);
 
   union TokenValue value = get_token_value(array_token);

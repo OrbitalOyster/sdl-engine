@@ -27,7 +27,8 @@ struct GUI_Skin {
 
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
-  struct Token *json = parse_JSON_file(filename);
+  struct JSON_Parser *parser = create_JSON_parser();
+  struct Token *json = parse_JSON_file(parser, filename);
   //  check_JSON_token(json, String, "filename");
   //  check_JSON_token(json, Array, "atlas");
   //  if (get_JSON_err(json)) {

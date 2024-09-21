@@ -7,10 +7,12 @@
 #include "utils/debug.h"
 
 struct Config *load_config(char *filename) {
-  struct Token *config_json = parse_JSON_file(filename);
+  struct JSON_Parser *parser = create_JSON_parser();
+  struct Token *config_json = parse_JSON_file(parser, filename);
   // Check if config is parsed ok
-  // if (get_JSON_err(config_json))
-  //  ERR(1, get_JSON_err(config_json));
+  char *parser_err = get_JSON_parser_err(parser);
+  if (parser_err)
+    ERRF(1, "Failed to parse config: %s", parser_err);
   // Check window props
   //  check_JSON_token(config_json, Object, "");
   //  check_JSON_token(config_json, Number, "window/width");
@@ -25,14 +27,12 @@ struct Config *load_config(char *filename) {
   result->window_height = read_token_number(config_json, "window/height");
   char *title = rea_token_string(config_json, "window/title");
 
-  /*
-  char *err = get_JSON_err(config_json);
+  char *err = get_token_err(config_json);
   if (err) {
     WARNF("Invalid config: %s", err);
-    destroy_JSON(config_json);
+    destroy_token(config_json);
     return NULL;
   }
-  */
 
   result->window_title = calloc(strlen(title) + 1, sizeof(char));
   strcpy(result->window_title, title);

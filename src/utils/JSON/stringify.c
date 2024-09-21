@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/JSON/token.h"
 #include "utils/JSON/token-array.h"
 #include "utils/JSON/token-map.h"
 
@@ -95,8 +96,8 @@ char *token_to_string(struct Token *token) {
     result = array_token_to_string(value.array);
     break;
   case Number:
-    result = calloc(MAX_NUMBER_LENGTH, sizeof(char));
-    snprintf(result, MAX_NUMBER_LENGTH, "%i", value.number);
+    result = calloc(MAX_NUMBER_STR_LENGTH, sizeof(char));
+    snprintf(result, MAX_NUMBER_STR_LENGTH, "%i", value.number);
     break;
   case String:;
     size_t max = strlen(value.string) + 3;
