@@ -8,7 +8,15 @@
 #define MAX_TOKEN_ERR_LENGTH (255 + 1)
 
 struct Token;
-union TokenValue;
+enum TokenType { Undefined, Object, Array, Number, String, Boolean, Null };
+
+union TokenValue {
+  int number, boolean;
+  char *string;
+  struct TokenMap *map;
+  struct TokenArray *array;
+};
+
 struct TokenArray;
 struct TokenMap;
 struct JSON_Parser;

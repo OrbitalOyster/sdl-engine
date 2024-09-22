@@ -5,15 +5,6 @@
 
 #include "JSON/JSON.h"
 
-enum TokenType { Undefined, Object, Array, Number, String, Boolean, Null };
-
-union TokenValue {
-  int number, boolean;
-  char *string;
-  struct TokenMap *map;
-  struct TokenArray *array;
-};
-
 struct Token *create_token(enum TokenType type, union TokenValue value);
 
 enum TokenType get_token_type(struct Token *token);

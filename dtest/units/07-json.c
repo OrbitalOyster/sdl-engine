@@ -3,10 +3,9 @@
 
 #include <stdlib.h>
 
-#include "utils/JSON/token.h"
-
-#include "utils/JSON/parser.h"
-#include "utils/JSON/stringify.h"
+#include "JSON/token.h"
+#include "JSON/parser.h"
+#include "JSON/stringify.h"
 
 #include <utils/debug.h>
 
