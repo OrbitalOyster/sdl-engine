@@ -1,9 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "token.h"
-
-struct JSON_Parser;
+#include "JSON/JSON.h"
 
 struct JSON_Parser *create_JSON_parser();
 struct Token *parse_JSON_file(struct JSON_Parser *parser, char *filename);

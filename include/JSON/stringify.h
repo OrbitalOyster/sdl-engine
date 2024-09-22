@@ -1,7 +1,7 @@
 #ifndef STRINGIFY_H
 #define STRINGIFY_H
 
-#include "token.h"
+#include "JSON/JSON.h"
 
 char *token_to_string(struct Token *token);
 

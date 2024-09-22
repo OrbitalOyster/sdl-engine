@@ -1,12 +1,12 @@
-#include "utils/JSON/stringify.h"
+#include "JSON/stringify.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/token.h"
-#include "utils/JSON/token-array.h"
-#include "utils/JSON/token-map.h"
+#include "JSON/token-array.h"
+#include "JSON/token-map.h"
+#include "JSON/token.h"
 
 static char *token_map_to_string(struct TokenMap *map, int keys);
 

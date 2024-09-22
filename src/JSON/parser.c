@@ -1,12 +1,14 @@
-#include "utils/JSON/parser.h"
+#include "JSON/parser.h"
 
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "utils/JSON/token-array.h"
-#include "utils/JSON/token-map.h"
+#include "JSON/token-array.h"
+#include "JSON/token-map.h"
+#include "JSON/token.h"
+
 #include "utils/debug.h"
 
 #define MAX_PARSER_ERR_LENGTH (255 + 1)

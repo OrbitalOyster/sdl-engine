@@ -3,9 +3,7 @@
 
 #include <stddef.h>
 
-#include "token.h"
-
-struct TokenMap;
+#include "JSON/JSON.h"
 
 struct TokenMap *create_token_map();
 size_t get_token_map_size(struct TokenMap *map);

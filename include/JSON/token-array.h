@@ -3,9 +3,7 @@
 
 #include <stddef.h>
 
-#include "token.h"
-
-struct TokenArray;
+#include "JSON/JSON.h"
 
 struct TokenArray *create_token_array();
 size_t get_token_array_size(struct TokenArray *arr);

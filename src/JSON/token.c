@@ -1,12 +1,12 @@
-#include "utils/JSON/token.h"
+#include "JSON/token.h"
 
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/token-array.h"
-#include "utils/JSON/token-map.h"
+#include "JSON/token-array.h"
+#include "JSON/token-map.h"
 
 #include "utils/debug.h"
 
@@ -124,7 +124,7 @@ int read_token_number(struct Token *token, char *key, ...) {
   return get_token_value(number_token).number;
 }
 
-char *rea_token_string(struct Token *token, char *key, ...) {
+char *read_token_string(struct Token *token, char *key, ...) {
   va_list args;
   va_start(args, key);
   struct Token *string_token = read_token(token, String, key, args);

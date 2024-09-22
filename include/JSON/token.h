@@ -3,13 +3,7 @@
 
 #include <stddef.h>
 
-#define MAX_JSON_KEY_LENGTH (63 + 1)
-// 2 ** 64 + '\0'
-#define MAX_NUMBER_STR_LENGTH 21
-
-#define MAX_TOKEN_ERR_LENGTH (255 + 1)
-
-struct Token;
+#include "JSON/JSON.h"
 
 enum TokenType { Undefined, Object, Array, Number, String, Boolean, Null };
 
@@ -29,7 +23,7 @@ union TokenValue get_token_value(struct Token *token);
 char *get_token_err(struct Token *token);
 
 int read_token_number(struct Token *token, char *key, ...);
-char *rea_token_string(struct Token *token, char *key, ...);
+char *read_token_string(struct Token *token, char *key, ...);
 size_t JSON_get_array_size(struct Token *token, char *key, ...);
 
 void destroy_token(struct Token *token);

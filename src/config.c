@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils/JSON/parser.h"
+#include "JSON/parser.h"
+#include "JSON/token.h"
 #include "utils/debug.h"
 
 struct Config *load_config(char *filename) {
@@ -17,7 +18,7 @@ struct Config *load_config(char *filename) {
   struct Config *result = calloc(1, sizeof(struct Config));
   result->window_width = read_token_number(config_json, "window/width");
   result->window_height = read_token_number(config_json, "window/height");
-  char *title = rea_token_string(config_json, "window/title");
+  char *title = read_token_string(config_json, "window/title");
 
   char *err = get_token_err(config_json);
   if (err) {

@@ -1,8 +1,9 @@
-#include "utils/JSON/token-map.h"
+#include "JSON/token-map.h"
 
 #include <stdlib.h>
 #include <string.h>
 
+#include "JSON/token.h"
 #include "utils/wtree.h"
 
 struct TokenMap {
