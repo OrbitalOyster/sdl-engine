@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "JSON/token.h"
 #include "utils/wtree.h"
+#include "JSON/token.h"
 
 struct TokenMap {
   size_t size;

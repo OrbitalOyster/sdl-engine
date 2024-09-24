@@ -5,9 +5,9 @@
 
 #include "gui/container_foo.h"
 #include "png.h"
+#include "utils/debug.h"
 #include "JSON/parser.h"
 #include "JSON/token.h"
-#include "utils/debug.h"
 
 #define MAX_GUI_CONTAINERS 255
 

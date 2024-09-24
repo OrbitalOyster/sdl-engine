@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils/debug.h"
 #include "JSON/parser.h"
 #include "JSON/token.h"
-#include "utils/debug.h"
 
 struct Config *load_config(char *filename) {
   struct JSON_Parser *parser = create_JSON_parser();
