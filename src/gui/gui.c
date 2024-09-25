@@ -5,9 +5,10 @@
 
 #include "gui/container_foo.h"
 #include "png.h"
-#include "utils/debug.h"
 #include "JSON/parser.h"
 #include "JSON/token.h"
+
+#include "utils/debug.h"
 
 #define MAX_GUI_CONTAINERS 255
 
@@ -28,24 +29,25 @@ struct GUI_Skin {
 struct GUI_Skin *load_gui_skin(char *filename) {
   struct GUI_Skin *result = calloc(1, sizeof(struct GUI_Skin));
   struct JSON_Parser *parser = create_JSON_parser();
-  struct Token *json = parse_JSON_file(parser, filename);
+  struct Token *skin_json = parse_JSON_file(parser, filename);
+  char *err = get_JSON_parser_err(parser);
+  if (err) {
+    WARNF("JSON err: %s", err);
+    return NULL;
+  }
+  destroy_JSON_parser(parser);
+
   //  check_JSON_token(json, String, "filename");
   //  check_JSON_token(json, Array, "atlas");
   //  if (get_JSON_err(json)) {
   //    WARNF("JSON err: %s", get_JSON_err(json));
   //    return NULL;
   //  }
-  INFO2F("N: %i", read_token_number(json, "atlas/0/bottomLeft/1"));
 
   //  struct TokenArray *atlas = get_JSON_get_array_token(json, "atlas");
   //  INFO2F("Size: %lu", get_token_array_size(atlas));
 
-  int n = read_token_number(json, "foo/%i", 2);
-  // if (get_JSON_err(json)) {
-  //   WARNF("JSON err: %s", get_JSON_err(json));
-  // }
-  INFO2F("Token: %i", n);
-
+  destroy_token(skin_json);
   result->atlas_size = 0;
   return result;
 }

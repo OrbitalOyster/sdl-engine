@@ -1,8 +1,6 @@
 {
   "filename": "assets/gui/default.png",
-  "foo": [10, 20, 30, 40],
-  "atlas": [
-    {
+  "window": {
       "center": [ 32, 32, 16, 16 ],
       "top": [ 32, 16, 16, 16 ],
       "right": [ 48, 32, 16, 16 ],
@@ -12,8 +10,8 @@
       "topRight": [ 48, 16, 16, 16 ],
       "bottomRight": [ 48, 48, 16, 16 ],
       "bottomLeft": [ 16, 48, 16, 16 ]
-    },
-    {
+  },
+  "button": {
       "center": [ 32, 32, 16, 16 ],
       "top": [ 32, 16, 16, 16 ],
       "right": [ 48, 32, 16, 16 ],
@@ -23,6 +21,5 @@
       "topRight": [ 48, 16, 16, 16 ],
       "bottomRight": [ 48, 48, 16, 16 ],
       "bottomLeft": [ 16, 48, 16, 16 ]
-    }
-  ]
+  }
 }
