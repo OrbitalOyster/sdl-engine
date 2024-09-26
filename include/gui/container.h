@@ -3,8 +3,8 @@
 
 #include <SDL2/SDL.h>
 
-#include "stretchable.h"
 #include "gui/unit.h"
+#include "stretchable.h"
 
 struct GUI_Container {
   struct GUI_Unit top;

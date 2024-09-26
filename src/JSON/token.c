@@ -30,7 +30,9 @@ struct Token *create_token(enum TokenType type, union TokenValue value) {
 
 enum TokenType get_token_type(struct Token *token) { return token->type; }
 
-const char *token_type_to_string(enum TokenType t) { return token_types_str[t]; }
+const char *token_type_to_string(enum TokenType t) {
+  return token_types_str[t];
+}
 
 union TokenValue get_token_value(struct Token *token) { return token->value; }
 
@@ -127,6 +129,17 @@ char *read_token_string(struct Token *token, char *key, ...) {
     return "";
   va_end(args);
   return get_token_value(string_token).string;
+}
+
+struct Token *read_token_token(struct Token *token, char *key, ...) {
+  va_list args;
+  va_start(args, key);
+  // TODO: Not always object type
+  struct Token *result = read_token(token, Object, key, args);
+  if (token->err)
+    return NULL;
+  va_end(args);
+  return result;
 }
 
 /*size_t JSON_get_array_size(struct Token *token, char *key, ...) {*/

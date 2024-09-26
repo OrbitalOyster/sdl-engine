@@ -12,6 +12,7 @@ union TokenValue get_token_value(struct Token *token);
 char *get_token_err(struct Token *token);
 int read_token_number(struct Token *token, char *key, ...);
 char *read_token_string(struct Token *token, char *key, ...);
+struct Token *read_token_token(struct Token *token, char *key, ...);
 /*size_t JSON_get_array_size(struct Token *token, char *key, ...);*/
 void destroy_token(struct Token *token);
 

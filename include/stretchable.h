@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "JSON/token.h"
+
 struct Stretchable {
   SDL_Rect center;
   SDL_Rect top;
@@ -14,5 +16,7 @@ struct Stretchable {
   SDL_Rect bottom_right;
   SDL_Rect bottom_left;
 };
+
+struct Stretchable *create_stretchable_from_token(struct Token *token);
 
 #endif /* STRETCHABLE_H */

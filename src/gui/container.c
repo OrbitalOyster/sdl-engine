@@ -62,32 +62,12 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
     h = bottom - top;
   }
 
-  // Render
-  //    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-  //    SDL_Rect tmp = (SDL_Rect){.x = left, .y = top, .w = w, .h = h};
-  //    SDL_RenderDrawRect(renderer, &tmp);
-  //    SDL_RenderDrawLine(renderer, left, top, right - 1, bottom - 1);
-  //    SDL_RenderDrawLine(renderer, right, top, left, bottom - 1);
-
-  // Coords
-  /*
-  SDL_Rect center_src = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16};
-  SDL_Rect top_src = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16};
-  SDL_Rect right_src = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16};
-  SDL_Rect bottom_src = (SDL_Rect){.x = 32, .y = 48, .w = 16, .h = 16};
-  SDL_Rect left_src = (SDL_Rect){.x = 16, .y = 32, .w = 16, .h = 16};
-  SDL_Rect top_left_src = (SDL_Rect){.x = 16, .y = 16, .w = 16, .h = 16};
-  SDL_Rect top_right_src = (SDL_Rect){.x = 48, .y = 16, .w = 16, .h = 16};
-  SDL_Rect bottom_right_src = (SDL_Rect){.x = 48, .y = 48, .w = 16, .h = 16};
-  SDL_Rect bottom_left_src = (SDL_Rect){.x = 16, .y = 48, .w = 16, .h = 16};
-  */
-
   // Center
   int cx = 0, cy = 0;
   while (cy < h - foo->top.h - foo->bottom.h) {
     while (cx < w - foo->left.w - foo->right.w) {
-      SDL_Rect dst_rect = {.x = left + foo->left.x + cx,
-                           .y = top + foo->top.y + cy,
+      SDL_Rect dst_rect = {.x = left + foo->top_left.w + cx,
+                           .y = top + foo->top_left.h + cy,
                            .w = foo->center.w,
                            .h = foo->center.h};
       SDL_RenderCopy(renderer, skin, &foo->center, &dst_rect);
@@ -100,7 +80,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
   // Top
   int tl = 0;
   while (tl < w - foo->top_left.w - foo->top_right.w) {
-    SDL_Rect dst_rect = {.x = left + foo->top_left.x + tl,
+    SDL_Rect dst_rect = {.x = left + foo->top_left.w + tl,
                          .y = top,
                          .w = foo->top.w,
                          .h = foo->top.h};
@@ -122,7 +102,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
   // Bottom
   int bl = 0;
   while (bl < w - foo->bottom_right.w - foo->bottom_left.w) {
-    SDL_Rect dst_rect = {.x = left + foo->bottom_left.x + bl,
+    SDL_Rect dst_rect = {.x = left + foo->bottom_left.h + bl,
                          .y = bottom - foo->bottom.h,
                          .w = foo->bottom.w,
                          .h = foo->bottom.h};
