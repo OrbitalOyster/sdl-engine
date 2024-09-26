@@ -5,7 +5,7 @@
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                       int root_width, int root_height, SDL_Texture *skin,
-                      struct Container_Foo *foo) {
+                      struct Stretchable *foo) {
   // Check types
   if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
       (c->width.type && c->right.type && c->left.type))

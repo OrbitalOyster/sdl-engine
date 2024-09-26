@@ -1,9 +1,9 @@
-#ifndef CONTAINER_FOO_H
-#define CONTAINER_FOO_H
+#ifndef STRETCHABLE_H
+#define STRETCHABLE_H
 
 #include <SDL2/SDL.h>
 
-struct Container_Foo {
+struct Stretchable {
   SDL_Rect center;
   SDL_Rect top;
   SDL_Rect right;
@@ -15,4 +15,4 @@ struct Container_Foo {
   SDL_Rect bottom_left;
 };
 
-#endif
+#endif /* STRETCHABLE_H */

@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "gui/container_foo.h"
+#include "stretchable.h"
 #include "png.h"
 #include "JSON/parser.h"
 #include "JSON/token.h"
@@ -22,8 +22,7 @@ struct GUI {
 
 struct GUI_Skin {
   SDL_Texture *texture;
-  unsigned int atlas_size;
-  struct Container_Foo *atlas;
+  struct Stretchable *window_skin;
 };
 
 struct GUI_Skin *load_gui_skin(char *filename) {
@@ -48,7 +47,6 @@ struct GUI_Skin *load_gui_skin(char *filename) {
   //  INFO2F("Size: %lu", get_token_array_size(atlas));
 
   destroy_token(skin_json);
-  result->atlas_size = 0;
   return result;
 }
 
@@ -77,7 +75,7 @@ void render_gui(struct GUI *gui) {
   int root_width, root_height;
   SDL_GetWindowSize(window, &root_width, &root_height);
 
-  struct Container_Foo foo = (struct Container_Foo){
+  struct Stretchable foo = (struct Stretchable){
       .center = (SDL_Rect){.x = 32, .y = 32, .w = 16, .h = 16},
       .top = (SDL_Rect){.x = 32, .y = 16, .w = 16, .h = 16},
       .right = (SDL_Rect){.x = 48, .y = 32, .w = 16, .h = 16},

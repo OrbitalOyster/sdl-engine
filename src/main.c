@@ -7,8 +7,6 @@
 #include "input.h"
 #include "utils/debug.h"
 
-#include "gui/container_foo.h"
-
 int quit = 0;
 
 void on_key_down(SDL_Scancode key) {
