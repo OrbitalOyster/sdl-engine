@@ -65,21 +65,7 @@ int main() {
     return 1;
   }
 
-  /*
-  struct Container_Foo foo = (struct Container_Foo) {
-    .center = (SDL_Rect) {.x = 32, .y = 32, .w = 16, .h = 16},
-    .top = (SDL_Rect) {.x = 32, .y = 16, .w = 16, .h = 16},
-    .right = (SDL_Rect) {.x = 48, .y = 32, .w = 16, .h = 16},
-    .bottom = (SDL_Rect) {.x = 32, .y = 48, .w = 16, .h = 16},
-    .left = (SDL_Rect) {.x = 16, .y = 32, .w = 16, .h = 16},
-    .top_left = (SDL_Rect) {.x = 16, .y = 16, .w = 16, .h = 16},
-    .top_right = (SDL_Rect) {.x = 48, .y = 16, .w = 16, .h = 16},
-    .bottom_right = (SDL_Rect) {.x = 48, .y = 48, .w = 16, .h = 16},
-    .bottom_left = (SDL_Rect) {.x = 16, .y = 48, .w = 16, .h = 16}
-  };
-  */
-
-  struct GUI *gui = create_gui(core, "assets/gui/default.png");
+  struct GUI *gui = create_gui(core, "assets/gui/skin.json");
   struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c1 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));

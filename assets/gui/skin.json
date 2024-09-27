@@ -1,5 +1,5 @@
 {
-  "filename": "assets/gui/default.png",
+  "texture": "assets/gui/default.png",
   "window": {
       "center": [ 32, 32, 16, 16 ],
       "top": [ 32, 16, 16, 16 ],
