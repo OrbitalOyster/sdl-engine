@@ -7,7 +7,8 @@
 struct GUI;
 
 struct GUI *create_gui(struct Core *core, char *skin_filename);
-void add_gui_container(struct GUI *gui, struct GUI_Container *container);
+void add_gui_window(struct GUI *gui, struct GUI_Window *window);
+void add_gui_button(struct GUI *gui, struct GUI_Button *button);
 void render_gui(struct GUI *gui);
 
 #endif /* GUI_H */

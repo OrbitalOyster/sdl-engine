@@ -66,35 +66,41 @@ int main() {
   }
 
   struct GUI *gui = create_gui(core, "assets/gui/skin.json");
-  struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));
+  /*struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));*/
   struct GUI_Container *c1 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
 
   /* Centered (1/9) */
-  *c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE, .f = .5},
-                               .top_p = {.type = GUT_RELATIVE, .f = .5},
-                               .left = {.type = GUT_RELATIVE, .f = .5},
-                               .left_p = {.type = GUT_RELATIVE, .f = .5},
-                               .width = {.type = GUT_RELATIVE, .f = .33},
-                               .height = {.type = GUT_RELATIVE, .f = .33}};
-
-  /* Top banner */
-  *c1 = (struct GUI_Container){.top = {.type = GUT_ABSOLUTE, .px = 5},
-                               .right = {.type = GUT_ABSOLUTE, .px = 5},
-                               .left = {.type = GUT_ABSOLUTE, .px = 5},
-                               .height = {.type = GUT_ABSOLUTE, .px = 150}};
+  /**c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE, .f = .5},*/
+  /*                             .top_p = {.type = GUT_RELATIVE, .f = .5},*/
+  /*                             .left = {.type = GUT_RELATIVE, .f = .5},*/
+  /*                             .left_p = {.type = GUT_RELATIVE, .f = .5},*/
+  /*                             .width = {.type = GUT_RELATIVE, .f = .33},*/
+  /*                             .height = {.type = GUT_RELATIVE, .f = .33}};*/
 
   /* Bottom right */
   *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE},
                                .right_p = {.type = GUT_ABSOLUTE, .px = -25},
                                .bottom = {.type = GUT_ABSOLUTE},
                                .bottom_p = {.type = GUT_ABSOLUTE, .px = -25},
-                               .width = {.type = GUT_ABSOLUTE, .px = 250},
-                               .height = {.type = GUT_ABSOLUTE, .px = 250}};
+                               .width = {.type = GUT_ABSOLUTE, .px = 100},
+                               .height = {.type = GUT_ABSOLUTE, .px = 50}};
+  struct GUI_Button b2 = (struct GUI_Button){.container = c2};
 
-  add_gui_container(gui, c0);
-  add_gui_container(gui, c1);
-  add_gui_container(gui, c2);
+  /* Top banner */
+  *c1 = (struct GUI_Container){.top = {.type = GUT_ABSOLUTE, .px = 5},
+                               .right = {.type = GUT_ABSOLUTE, .px = 5},
+                               .left = {.type = GUT_ABSOLUTE, .px = 5},
+                               .height = {.type = GUT_ABSOLUTE, .px = 150},
+                               .number_of_containers = 1,
+                               .containers =
+                                   calloc(1, sizeof(struct GUI_Container *))};
+  c1->containers[0] = b2.container;
+  struct GUI_Window w1 = (struct GUI_Window){.container = c1};
+
+  /*add_gui_container(gui, c0);*/
+  add_gui_window(gui, &w1);
+  /*add_gui_button(gui, &b2);*/
 
   // Init input
   reset_key_input();

@@ -6,6 +6,14 @@
 #include "gui/unit.h"
 #include "stretchable.h"
 
+struct GUI_Window {
+  struct GUI_Container *container;
+};
+
+struct GUI_Button {
+  struct GUI_Container *container;
+};
+
 struct GUI_Container {
   struct GUI_Unit top;
   struct GUI_Unit top_p;
@@ -24,6 +32,6 @@ struct GUI_Container {
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                       int root_width, int root_height, SDL_Texture *skin,
-                      struct Stretchable *foo);
+                      struct Stretchable *stretchable);
 
 #endif /* CONTAINER_H */

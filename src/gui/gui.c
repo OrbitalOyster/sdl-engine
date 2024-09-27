@@ -10,7 +10,8 @@
 
 #include "utils/debug.h"
 
-#define MAX_GUI_CONTAINERS 255
+#define MAX_GUI_WINDOWS 255
+#define MAX_GUI_BUTTONS 255
 
 struct GUI_Skin {
   SDL_Texture *texture;
@@ -19,12 +20,16 @@ struct GUI_Skin {
 };
 
 struct GUI {
-  SDL_Window *window;
+  SDL_Window *core_window;
   SDL_Renderer *renderer;
   SDL_Texture *texture;
   struct GUI_Skin *skin;
-  unsigned int number_of_containers;
-  struct GUI_Container **containers;
+
+  unsigned int number_of_windows;
+  struct GUI_Window **windows;
+
+  unsigned int number_of_buttons;
+  struct GUI_Button **buttons;
 };
 
 struct GUI_Skin *load_gui_skin(struct Core *core, char *filename) {
@@ -55,27 +60,40 @@ struct GUI_Skin *load_gui_skin(struct Core *core, char *filename) {
 
 struct GUI *create_gui(struct Core *core, char *skin_filename) {
   struct GUI *result = calloc(1, sizeof(struct GUI));
-  result->window = get_window(core);
+  result->core_window = get_window(core);
   result->renderer = get_renderer(core);
-  result->number_of_containers = 0;
-  result->containers =
-      calloc(MAX_GUI_CONTAINERS, sizeof(struct GUI_Container *));
+  result->number_of_windows = 0;
+  result->number_of_buttons = 0;
+  result->windows = calloc(MAX_GUI_WINDOWS, sizeof(struct GUI_Window *));
+  result->buttons = calloc(MAX_GUI_BUTTONS, sizeof(struct GUI_Button *));
   result->skin = load_gui_skin(core, skin_filename);
   return result;
 }
 
-void add_gui_container(struct GUI *gui, struct GUI_Container *container) {
-  gui->containers[gui->number_of_containers++] = container;
+/*void add_gui_container(struct GUI *gui, struct GUI_Container *container) {*/
+/*  gui->containers[gui->number_of_containers++] = container;*/
+/*}*/
+
+void add_gui_window(struct GUI *gui, struct GUI_Window *window) {
+  gui->windows[gui->number_of_windows++] = window;
+}
+
+void add_gui_button(struct GUI *gui, struct GUI_Button *button) {
+  gui->buttons[gui->number_of_buttons++] = button;
 }
 
 void render_gui(struct GUI *gui) {
-  SDL_Window *window = gui->window;
   SDL_Renderer *renderer = gui->renderer;
 
   int root_width, root_height;
-  SDL_GetWindowSize(window, &root_width, &root_height);
+  SDL_GetWindowSize(gui->core_window, &root_width, &root_height);
 
-  for (unsigned int i = 0; i < gui->number_of_containers; i++)
-    render_container(renderer, gui->containers[i], root_width, root_height,
-                     gui->skin->texture, gui->skin->window_skin);
+  // Windows
+  for (unsigned int i = 0; i < gui->number_of_windows; i++)
+    render_container(renderer, gui->windows[i]->container, root_width,
+                     root_height, gui->skin->texture, gui->skin->window_skin);
+  // Buttons
+  for (unsigned int i = 0; i < gui->number_of_buttons; i++)
+    render_container(renderer, gui->buttons[i]->container, root_width,
+                     root_height, gui->skin->texture, gui->skin->button_skin);
 }
