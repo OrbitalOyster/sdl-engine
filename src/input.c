@@ -6,9 +6,11 @@ int key_map[NUMBER_OF_KEYS];
 
 void (*on_key_down_func)(SDL_Scancode key) = NULL;
 void (*on_key_up_func)(SDL_Scancode key) = NULL;
+void (*on_window_resize_func)(int width, int height) = NULL;
 
 void register_on_key_down_func(void (*func)()) { on_key_down_func = func; }
 void register_on_key_up_func(void (*func)()) { on_key_up_func = func; }
+void register_on_window_resize_func(void (*func)()) { on_window_resize_func = func; }
 
 void reset_key_input() {
   for (int i = 0; i < NUMBER_OF_KEYS; i++)
@@ -57,8 +59,8 @@ void process_input(int *quit) {
     case SDL_WINDOWEVENT: {
       switch (event.window.event) {
       case SDL_WINDOWEVENT_RESIZED:
-        INFO2F("Window resize (%i x %i)", event.window.data1,
-               event.window.data2);
+        if (on_window_resize_func)
+          on_window_resize_func(event.window.data1, event.window.data2);
         break;
       case SDL_WINDOWEVENT_SIZE_CHANGED:
         INFO2("Window size changed");

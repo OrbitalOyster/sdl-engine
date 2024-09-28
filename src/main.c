@@ -9,6 +9,11 @@
 
 int quit = 0;
 
+// Renderer
+SDL_Renderer *renderer = NULL;
+// GUI
+struct GUI *gui = NULL;
+
 void on_key_down(SDL_Scancode key) {
   INFOF("Key pressed: %c [%u]", SDL_GetKeyFromScancode(key), key);
   switch (key) {
@@ -49,6 +54,20 @@ void on_key_up(SDL_Scancode key) {
   }
 }
 
+void render() {
+  // Render
+  SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
+  SDL_RenderClear(renderer);
+  // GUI
+  render_gui(gui);
+  // Done
+  SDL_RenderPresent(renderer);
+}
+
+void on_window_resize(int width, int height) {
+  INFO2F("Window resize (%i x %i)", width, height);
+}
+
 int main() {
   // Load config
   struct Config *config = load_config("config.json");
@@ -65,7 +84,7 @@ int main() {
     return 1;
   }
 
-  struct GUI *gui = create_gui(core, "assets/gui/skin.json");
+  gui = create_gui(core, "assets/gui/skin.json");
   /*struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));*/
   struct GUI_Container *c1 = calloc(1, sizeof(struct GUI_Container));
   struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
@@ -107,22 +126,19 @@ int main() {
   reset_key_input();
   register_on_key_down_func(on_key_down);
   register_on_key_up_func(on_key_up);
+  register_on_window_resize_func(on_window_resize);
+
   // Renderer
-  SDL_Renderer *renderer = get_renderer(core);
+  renderer = get_renderer(core);
 
   // Main cycle
   while (!quit) {
     // Input
     process_input(&quit);
     // Render
-    SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
-    SDL_RenderClear(renderer);
-    // GUI
-    render_gui(gui);
-    // Done
-    SDL_RenderPresent(renderer);
+    render();
     // Delay
-    SDL_Delay(50);
+    SDL_Delay(10);
   }
   // Cleanup
   destroy_core(core);

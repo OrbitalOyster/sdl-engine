@@ -7,6 +7,7 @@
 
 void register_on_key_down_func(void (*func)());
 void register_on_key_up_func(void (*func)());
+void register_on_window_resize_func(void (*func)());
 void reset_key_input();
 void process_input(int *quit);
 
