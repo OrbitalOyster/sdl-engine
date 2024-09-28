@@ -15,6 +15,8 @@ struct GUI_Button {
 };
 
 struct GUI_Container {
+  SDL_Texture *texture;
+  struct Stretchable *stretchable;
   struct GUI_Unit top;
   struct GUI_Unit top_p;
   struct GUI_Unit right;
@@ -26,12 +28,12 @@ struct GUI_Container {
   struct GUI_Unit width;
   struct GUI_Unit height;
 
+  struct GUI_Container *parent;
   unsigned int number_of_containers;
   struct GUI_Container **containers;
 };
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
-                      int root_width, int root_height, SDL_Texture *skin,
-                      struct Stretchable *stretchable);
+                      int root_width, int root_height);
 
 #endif /* CONTAINER_H */

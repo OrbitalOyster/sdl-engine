@@ -4,8 +4,10 @@
 #include "utils/debug.h"
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
-                      int root_width, int root_height, SDL_Texture *skin,
-                      struct Stretchable *stretchable) {
+                      int root_width, int root_height) {
+
+  struct Stretchable *stretchable = c->stretchable;
+
   // Check types
   if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
       (c->width.type && c->right.type && c->left.type))
@@ -43,7 +45,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
 
   // Vertical axis
   if (c->height.type) {
-   height = unit_to_px(c->height, root_height);
+    height = unit_to_px(c->height, root_height);
     if (c->top.type)
       top = unit_to_px(c->top, root_height) - unit_to_px(c->top_p, height);
     if (c->bottom.type)
@@ -70,7 +72,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                            .y = top + stretchable->top_left.h + cy,
                            .w = stretchable->center.w,
                            .h = stretchable->center.h};
-      SDL_RenderCopy(renderer, skin, &stretchable->center, &dst_rect);
+      SDL_RenderCopy(renderer, c->texture, &stretchable->center, &dst_rect);
       cx += stretchable->center.w;
     }
     cy += stretchable->center.h;
@@ -84,7 +86,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                          .y = top,
                          .w = stretchable->top.w,
                          .h = stretchable->top.h};
-    SDL_RenderCopy(renderer, skin, &stretchable->top, &dst_rect);
+    SDL_RenderCopy(renderer, c->texture, &stretchable->top, &dst_rect);
     tl += stretchable->top.w;
   }
 
@@ -95,18 +97,19 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                          .y = top + stretchable->top_right.h + rl,
                          .w = stretchable->right.w,
                          .h = stretchable->right.h};
-    SDL_RenderCopy(renderer, skin, &stretchable->right, &dst_rect);
+    SDL_RenderCopy(renderer, c->texture, &stretchable->right, &dst_rect);
     rl += stretchable->right.h;
   }
 
   // Bottom
   int bl = 0;
-  while (bl < width - stretchable->bottom_right.w - stretchable->bottom_left.w) {
+  while (bl <
+         width - stretchable->bottom_right.w - stretchable->bottom_left.w) {
     SDL_Rect dst_rect = {.x = left + stretchable->bottom_left.h + bl,
                          .y = bottom - stretchable->bottom.h,
                          .w = stretchable->bottom.w,
                          .h = stretchable->bottom.h};
-    SDL_RenderCopy(renderer, skin, &stretchable->bottom, &dst_rect);
+    SDL_RenderCopy(renderer, c->texture, &stretchable->bottom, &dst_rect);
     bl += stretchable->bottom.w;
   }
 
@@ -117,7 +120,7 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                          .y = top + stretchable->top_left.h + ll,
                          .w = stretchable->left.w,
                          .h = stretchable->left.h};
-    SDL_RenderCopy(renderer, skin, &stretchable->left, &dst_rect);
+    SDL_RenderCopy(renderer, c->texture, &stretchable->left, &dst_rect);
     ll += stretchable->left.h;
   }
 
@@ -126,29 +129,29 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                          .y = top,
                          .w = stretchable->top_left.w,
                          .h = stretchable->top_left.h};
-  SDL_RenderCopy(renderer, skin, &stretchable->top_left, &dst_rect_0);
+  SDL_RenderCopy(renderer, c->texture, &stretchable->top_left, &dst_rect_0);
 
   // Top-right corner
   SDL_Rect dst_rect_1 = {.x = right - stretchable->top_right.w,
                          .y = top,
                          .w = stretchable->top_right.w,
                          .h = stretchable->top_right.h};
-  SDL_RenderCopy(renderer, skin, &stretchable->top_right, &dst_rect_1);
+  SDL_RenderCopy(renderer, c->texture, &stretchable->top_right, &dst_rect_1);
 
   // Bottom-right corner
   SDL_Rect dst_rect_2 = {.x = right - stretchable->top_right.w,
                          .y = bottom - stretchable->bottom_right.h,
                          .w = stretchable->bottom_right.w,
                          .h = stretchable->bottom_right.h};
-  SDL_RenderCopy(renderer, skin, &stretchable->bottom_right, &dst_rect_2);
+  SDL_RenderCopy(renderer, c->texture, &stretchable->bottom_right, &dst_rect_2);
 
   // Bottom-left corner
   SDL_Rect dst_rect_3 = {.x = left,
                          .y = bottom - stretchable->bottom_left.h,
                          .w = stretchable->bottom_left.w,
                          .h = stretchable->bottom_left.h};
-  SDL_RenderCopy(renderer, skin, &stretchable->bottom_left, &dst_rect_3);
+  SDL_RenderCopy(renderer, c->texture, &stretchable->bottom_left, &dst_rect_3);
 
-  for (unsigned int i = 0;i < c -> number_of_containers;i++)
-    render_container(renderer, c->containers[i], width, height, skin, stretchable);
+  for (unsigned int i = 0; i < c->number_of_containers; i++)
+    render_container(renderer, c->containers[i], width, height);
 }

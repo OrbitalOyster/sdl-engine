@@ -80,9 +80,9 @@ int main() {
 
   /* Bottom right */
   *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE},
-                               .right_p = {.type = GUT_ABSOLUTE, .px = -25},
+                               .right_p = {.type = GUT_ABSOLUTE, .px = -5},
                                .bottom = {.type = GUT_ABSOLUTE},
-                               .bottom_p = {.type = GUT_ABSOLUTE, .px = -25},
+                               .bottom_p = {.type = GUT_ABSOLUTE, .px = -5},
                                .width = {.type = GUT_ABSOLUTE, .px = 100},
                                .height = {.type = GUT_ABSOLUTE, .px = 50}};
   struct GUI_Button b2 = (struct GUI_Button){.container = c2};
@@ -92,15 +92,16 @@ int main() {
                                .right = {.type = GUT_ABSOLUTE, .px = 5},
                                .left = {.type = GUT_ABSOLUTE, .px = 5},
                                .height = {.type = GUT_ABSOLUTE, .px = 150},
-                               .number_of_containers = 1,
+                               /*.number_of_containers = 1,*/
+                               .number_of_containers = 0,
                                .containers =
                                    calloc(1, sizeof(struct GUI_Container *))};
-  c1->containers[0] = b2.container;
+  /*c1->containers[0] = b2.container;*/
   struct GUI_Window w1 = (struct GUI_Window){.container = c1};
 
   /*add_gui_container(gui, c0);*/
-  add_gui_window(gui, &w1);
-  /*add_gui_button(gui, &b2);*/
+  add_gui_window(gui, NULL, &w1);
+  add_gui_button(gui, c1, &b2);
 
   // Init input
   reset_key_input();

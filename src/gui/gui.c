@@ -22,7 +22,7 @@ struct GUI_Skin {
 struct GUI {
   SDL_Window *core_window;
   SDL_Renderer *renderer;
-  SDL_Texture *texture;
+  /*SDL_Texture *texture;*/
   struct GUI_Skin *skin;
 
   unsigned int number_of_windows;
@@ -70,15 +70,19 @@ struct GUI *create_gui(struct Core *core, char *skin_filename) {
   return result;
 }
 
-/*void add_gui_container(struct GUI *gui, struct GUI_Container *container) {*/
-/*  gui->containers[gui->number_of_containers++] = container;*/
-/*}*/
-
-void add_gui_window(struct GUI *gui, struct GUI_Window *window) {
+void add_gui_window(struct GUI *gui, struct GUI_Container *parent, struct GUI_Window *window) {
+  window->container->texture = gui->skin->texture;
+  window->container->stretchable = gui->skin->window_skin;
+  if (parent)
+    parent->containers[parent->number_of_containers++] = window->container;
   gui->windows[gui->number_of_windows++] = window;
 }
 
-void add_gui_button(struct GUI *gui, struct GUI_Button *button) {
+void add_gui_button(struct GUI *gui, struct GUI_Container *parent, struct GUI_Button *button) {
+  button->container->texture = gui->skin->texture;
+  button->container->stretchable = gui->skin->button_skin;
+  if (parent)
+    parent->containers[parent->number_of_containers++] = button->container;
   gui->buttons[gui->number_of_buttons++] = button;
 }
 
@@ -91,9 +95,9 @@ void render_gui(struct GUI *gui) {
   // Windows
   for (unsigned int i = 0; i < gui->number_of_windows; i++)
     render_container(renderer, gui->windows[i]->container, root_width,
-                     root_height, gui->skin->texture, gui->skin->window_skin);
+                     root_height);
   // Buttons
-  for (unsigned int i = 0; i < gui->number_of_buttons; i++)
-    render_container(renderer, gui->buttons[i]->container, root_width,
-                     root_height, gui->skin->texture, gui->skin->button_skin);
+  /*for (unsigned int i = 0; i < gui->number_of_buttons; i++)*/
+  /*  render_container(renderer, gui->buttons[i]->container, root_width,*/
+  /*                   root_height);*/
 }
