@@ -1,7 +1,5 @@
 #include "gui/caption.h"
 
-#include <stdlib.h>
-
 #include "utils/debug.h"
 
 SDL_Texture *create_caption_texture(SDL_Renderer *renderer, TTF_Font *font,

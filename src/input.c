@@ -10,7 +10,9 @@ void (*on_window_resize_func)(int width, int height) = NULL;
 
 void register_on_key_down_func(void (*func)()) { on_key_down_func = func; }
 void register_on_key_up_func(void (*func)()) { on_key_up_func = func; }
-void register_on_window_resize_func(void (*func)()) { on_window_resize_func = func; }
+void register_on_window_resize_func(void (*func)()) {
+  on_window_resize_func = func;
+}
 
 void reset_key_input() {
   for (int i = 0; i < NUMBER_OF_KEYS; i++)

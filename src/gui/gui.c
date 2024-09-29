@@ -70,7 +70,8 @@ struct GUI *create_gui(struct Core *core, char *skin_filename) {
   return result;
 }
 
-void add_gui_window(struct GUI *gui, struct GUI_Container *parent, struct GUI_Window *window) {
+void add_gui_window(struct GUI *gui, struct GUI_Container *parent,
+                    struct GUI_Window *window) {
   window->container->texture = gui->skin->texture;
   window->container->stretchable = gui->skin->window_skin;
   if (parent)
@@ -78,7 +79,8 @@ void add_gui_window(struct GUI *gui, struct GUI_Container *parent, struct GUI_Wi
   gui->windows[gui->number_of_windows++] = window;
 }
 
-void add_gui_button(struct GUI *gui, struct GUI_Container *parent, struct GUI_Button *button) {
+void add_gui_button(struct GUI *gui, struct GUI_Container *parent,
+                    struct GUI_Button *button) {
   button->container->texture = gui->skin->texture;
   button->container->stretchable = gui->skin->button_skin;
   if (parent)
