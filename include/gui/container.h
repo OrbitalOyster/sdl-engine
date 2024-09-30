@@ -6,6 +6,11 @@
 #include "gui/unit.h"
 #include "stretchable.h"
 
+struct GUI_Caption {
+  struct GUI_Container *container;
+  char *text;
+};
+
 struct GUI_Window {
   struct GUI_Container *container;
 };
@@ -32,6 +37,15 @@ struct GUI_Container {
   unsigned int number_of_containers;
   struct GUI_Container **containers;
 };
+
+enum GUI_Component_Type {GCT_Window, GCT_Button};
+
+struct GUI_Component {
+  enum GUI_Component_Type type;
+  struct GUI_Container *container;
+};
+
+struct GUI_Component *create_component(enum GUI_Component_Type type);
 
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                       int root_width, int root_height);

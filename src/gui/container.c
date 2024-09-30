@@ -3,6 +3,12 @@
 #include "gui/unit.h"
 #include "utils/debug.h"
 
+struct GUI_Component *create_component(enum GUI_Component_Type type) {
+  struct GUI_Component *result = calloc(1, sizeof(struct GUI_Component));
+  result->type = type;
+  return result;
+}
+
 void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
                       int root_width, int root_height) {
 

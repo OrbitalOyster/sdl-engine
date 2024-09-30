@@ -10,6 +10,7 @@
 
 #include "utils/debug.h"
 
+#define MAX_GUI_CAPTIONS 255
 #define MAX_GUI_WINDOWS 255
 #define MAX_GUI_BUTTONS 255
 
@@ -24,6 +25,9 @@ struct GUI {
   SDL_Renderer *renderer;
   /*SDL_Texture *texture;*/
   struct GUI_Skin *skin;
+
+  unsigned int number_of_captions;
+  struct GUI_Caption **captions;
 
   unsigned int number_of_windows;
   struct GUI_Window **windows;
@@ -62,12 +66,20 @@ struct GUI *create_gui(struct Core *core, char *skin_filename) {
   struct GUI *result = calloc(1, sizeof(struct GUI));
   result->core_window = get_window(core);
   result->renderer = get_renderer(core);
+  result->number_of_captions = 0;
   result->number_of_windows = 0;
   result->number_of_buttons = 0;
   result->windows = calloc(MAX_GUI_WINDOWS, sizeof(struct GUI_Window *));
   result->buttons = calloc(MAX_GUI_BUTTONS, sizeof(struct GUI_Button *));
   result->skin = load_gui_skin(core, skin_filename);
   return result;
+}
+
+void add_gui_caption(struct GUI *gui, struct GUI_Container *parent,
+                    struct GUI_Caption *caption) {
+  if (parent)
+    parent->containers[parent->number_of_containers++] = caption->container;
+  gui->captions[gui->number_of_captions++] = caption;
 }
 
 void add_gui_window(struct GUI *gui, struct GUI_Container *parent,
