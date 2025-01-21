@@ -14,7 +14,15 @@ void render_container(SDL_Renderer *renderer, struct GUI_Container *c,
 
   struct Stretchable *stretchable = c->stretchable;
 
-  // Check types
+  /**
+    * Check types: sum of horizontal/vertical types must be more than GUT_ABSOLUTE * 2 (20)
+    * and at least one type must be GUT_NONE (0) i.e.:
+    * - All GUT_NONE: wrong, not enough information
+    * - All GUT_ABSOLUTE or GUT_RELATIVE: wrong, might be conflicting
+    * - One GUT_ABSOLUTE: wrong
+    * - One GUT_RELATIVE: Ok
+    * - Two GUT_RELATIVE or GUT_ABSOLUTE: Ok
+    */
   if (c->width.type + c->right.type + c->left.type < GUT_ABSOLUTE * 2 ||
       (c->width.type && c->right.type && c->left.type))
     ERRF(1, "Invalid GUI horizontal types: %u %u %u", c->width.type,

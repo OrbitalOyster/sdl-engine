@@ -19,16 +19,19 @@ struct GUI_Button {
   struct GUI_Container *container;
 };
 
+/**
+ * _p means "padding", i.e. offset distance to according edge
+ */
 struct GUI_Container {
   SDL_Texture *texture;
   struct Stretchable *stretchable;
-  struct GUI_Unit top;
+  struct GUI_Unit top; // Distance to parent container's top edge
   struct GUI_Unit top_p;
-  struct GUI_Unit right;
+  struct GUI_Unit right; // Distance to parent container's right edge
   struct GUI_Unit right_p;
-  struct GUI_Unit bottom;
+  struct GUI_Unit bottom; // Distance to parent container's bottom edge
   struct GUI_Unit bottom_p;
-  struct GUI_Unit left;
+  struct GUI_Unit left; // Distance to parent container's left edge
   struct GUI_Unit left_p;
   struct GUI_Unit width;
   struct GUI_Unit height;
