@@ -2,9 +2,21 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+
+SDL_Texture *goose = NULL;
+
+SDL_Texture *load_png(SDL_Renderer *renderer, char *filename) {
+  SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
+  if (!texture) {
+    SDL_Log("Failed to load asset: %s", SDL_GetError());
+    return NULL;
+  }
+  return texture;
+}
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -16,6 +28,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
     return SDL_APP_FAILURE;
   }
+
+  goose = load_png(renderer, "assets/goose.png");
 
   SDL_Log("Started");
   return SDL_APP_CONTINUE;
@@ -36,6 +50,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 SDL_AppResult SDL_AppIterate(void *appstate) {
   SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
   SDL_RenderClear(renderer);
+
+  const SDL_FRect sourceRect = {0, 0, 512, 512};
+  const SDL_FRect destRect = {20, 30, 200, 200};
+  SDL_RenderTexture(renderer, goose, &sourceRect, &destRect);
+
   SDL_RenderPresent(renderer);
   return SDL_APP_CONTINUE;
 }
