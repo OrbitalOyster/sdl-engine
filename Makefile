@@ -11,8 +11,7 @@ EXE := engine
 
 # Compiler options
 OUTPUT := $(BIN_DIR)/$(EXE)
-WARNINGS := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Warith-conversion \
-						-Wformat -Wformat-signedness -Wfloat-equal -Werror
+WARNINGS := -W
 STANDART := -std=c11
 OPTIMIZATION := -O2
 # Debugging info
@@ -20,11 +19,11 @@ DEBUG := -ggdb3
 # Preprocessor flags (example -DDEBUG -DLOG)
 DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
 
-CC := gcc
+CC := clang
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
 					-I $(INCLUDE_DIR)
 # Linker libraries (example -lm)
-LDLIBS := -lm -lSDL2 -lSDL2_image -lSDL2_ttf
+LDLIBS := -lSDL3
 
 # All source subdirectories
 SRC_SDIRS := $(SRC_DIR)/ \
@@ -47,9 +46,6 @@ DEPS := $(OBJS:.o=.d)
 
 # Final result
 all: $(OUTPUT)
-
-# Testing
-include dtest/Makefile
 
 # Object subdirectories and files
 $(OUTPUT): $(OBJ_SDIRS) $(OBJS) $(BIN_DIR)

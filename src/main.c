@@ -1,146 +1,43 @@
-#include <stdio.h>
-#include <string.h>
+#define SDL_MAIN_USE_CALLBACKS 1
 
-#include "config.h"
-#include "core.h"
-#include "gui/gui.h"
-#include "input.h"
-#include "utils/debug.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
-int quit = 0;
+static SDL_Window *window = NULL;
+static SDL_Renderer *renderer = NULL;
 
-// Renderer
-SDL_Renderer *renderer = NULL;
-// GUI
-struct GUI *gui = NULL;
-
-void on_key_down(SDL_Scancode key) {
-  INFOF("Key pressed: %c [%u]", SDL_GetKeyFromScancode(key), key);
-  switch (key) {
-  case 20: // q
-    quit = 1;
-    break;
-  case 26: // w
-    break;
-  case 7: // d
-    break;
-  case 22: // s
-    break;
-  case 4: // a
-    break;
-  // Debug section
-  case 62: // F5
-    break;
-  case 63: // F6
-    break;
-  default:
-    break;
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
+    SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+    return SDL_APP_FAILURE;
   }
+
+  if (!SDL_CreateWindowAndRenderer("Engine", 640, 480, 0, &window, &renderer)) {
+    SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+    return SDL_APP_FAILURE;
+  }
+
+  SDL_Log("Started");
+  return SDL_APP_CONTINUE;
 }
 
-void on_key_up(SDL_Scancode key) {
-  INFOF("Key released: %c [%u]", SDL_GetKeyFromScancode(key), key);
-  switch (key) {
-  case 26: // w
-    break;
-  case 7: // d
-    break;
-  case 22: // s
-    break;
-  case 4: // a
-    break;
-  default:
-    break;
-  }
+SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
+  // Esc key
+  if (event->type == SDL_EVENT_KEY_DOWN && event->key.scancode == SDL_SCANCODE_ESCAPE)
+    return SDL_APP_SUCCESS;
+
+  // Quit event
+  if (event->type == SDL_EVENT_QUIT)
+    return SDL_APP_SUCCESS;
+
+  return SDL_APP_CONTINUE;
 }
 
-void render() {
-  // Render
+SDL_AppResult SDL_AppIterate(void *appstate) {
   SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
   SDL_RenderClear(renderer);
-  // GUI
-  render_gui(gui);
-  // Done
   SDL_RenderPresent(renderer);
+  return SDL_APP_CONTINUE;
 }
 
-void on_window_resize(int width, int height) {
-  INFO2F("Window resize (%i x %i)", width, height);
-}
-
-int main() {
-  // Load config
-  struct Config *config = load_config("config.json");
-  if (!config) {
-    ERR(1, "Failed to load config");
-  }
-
-  // Init core
-  struct Core *core = create_core(config->window_width, config->window_height,
-                                  config->window_title);
-  // Something went wrong
-  if (!core) {
-    WARN("Unable to start engine");
-    return 1;
-  }
-
-  gui = create_gui(core, "assets/gui/skin.json");
-  /*struct GUI_Container *c0 = calloc(1, sizeof(struct GUI_Container));*/
-  struct GUI_Container *c1 = calloc(1, sizeof(struct GUI_Container));
-  struct GUI_Container *c2 = calloc(1, sizeof(struct GUI_Container));
-
-  /* Centered (1/9) */
-  /**c0 = (struct GUI_Container){.top = {.type = GUT_RELATIVE, .f = .5},*/
-  /*                             .top_p = {.type = GUT_RELATIVE, .f = .5},*/
-  /*                             .left = {.type = GUT_RELATIVE, .f = .5},*/
-  /*                             .left_p = {.type = GUT_RELATIVE, .f = .5},*/
-  /*                             .width = {.type = GUT_RELATIVE, .f = .33},*/
-  /*                             .height = {.type = GUT_RELATIVE, .f = .33}};*/
-
-  /* Bottom right */
-  *c2 = (struct GUI_Container){.right = {.type = GUT_ABSOLUTE},
-                               .right_p = {.type = GUT_ABSOLUTE, .px = -5},
-                               .bottom = {.type = GUT_ABSOLUTE},
-                               .bottom_p = {.type = GUT_ABSOLUTE, .px = -5},
-                               .width = {.type = GUT_ABSOLUTE, .px = 100},
-                               .height = {.type = GUT_ABSOLUTE, .px = 50}};
-  struct GUI_Button b2 = (struct GUI_Button){.container = c2};
-
-  /* Top banner */
-  *c1 = (struct GUI_Container){.top = {.type = GUT_ABSOLUTE, .px = 5},
-                               .right = {.type = GUT_ABSOLUTE, .px = 5},
-                               .left = {.type = GUT_ABSOLUTE, .px = 5},
-                               .height = {.type = GUT_ABSOLUTE, .px = 150},
-                               /*.number_of_containers = 1,*/
-                               .number_of_containers = 0,
-                               .containers =
-                                   calloc(1, sizeof(struct GUI_Container *))};
-  /*c1->containers[0] = b2.container;*/
-  struct GUI_Window w1 = (struct GUI_Window){.container = c1};
-
-  /*add_gui_container(gui, c0);*/
-  add_gui_window(gui, NULL, &w1);
-  add_gui_button(gui, c1, &b2);
-
-  // Init input
-  reset_key_input();
-  register_on_key_down_func(on_key_down);
-  register_on_key_up_func(on_key_up);
-  register_on_window_resize_func(on_window_resize);
-
-  // Renderer
-  renderer = get_renderer(core);
-
-  // Main cycle
-  while (!quit) {
-    // Input
-    process_input(&quit);
-    // Render
-    render();
-    // Delay
-    SDL_Delay(10);
-  }
-  // Cleanup
-  destroy_core(core);
-  destroy_config(config);
-}
+void SDL_AppQuit(void *appstate, SDL_AppResult result) { SDL_Log("Finished"); }
