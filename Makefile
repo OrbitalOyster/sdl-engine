@@ -67,6 +67,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 
 # Run executable
 run: $(OUTPUT)
+	export LD_LIBRARY_PATH=/usr/local/lib:$$LD_LIBRARY_PATH; \
 	./$(OUTPUT)
 
 format:
