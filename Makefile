@@ -60,6 +60,8 @@ $(BIN_DIR):
 
 # Compile all .c files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
+	export CPATH=$$PWD/SDL3/include:$$CPATH; \
+	export CPATH=$$PWD/SDL_image/include:$$CPATH; \
 	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 # Header dependencies
@@ -67,6 +69,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
 
 # Run executable
 run: $(OUTPUT)
+	export LD_LIBRARY_PATH=/usr/local/lib:$$LD_LIBRARY_PATH; \
 	./$(OUTPUT)
 
 format:
