@@ -23,7 +23,7 @@ CC := clang
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
 					-I $(INCLUDE_DIR)
 # Linker libraries (example -lm)
-LDLIBS := -lSDL3 -lSDL3_image
+LDLIBS := -lSDL3 -lSDL3_image -lSDL3_ttf
 
 # All source subdirectories
 SRC_SDIRS := $(SRC_DIR)/ \
