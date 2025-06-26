@@ -1,4 +1,4 @@
-#define SDL_MAIN_USE_CALLBACKS 1
+#define SDL_MAIN_USE_CALLBACKS
 
 #include <stdlib.h>
 
@@ -12,7 +12,7 @@ static SDL_Renderer *renderer = NULL;
 
 SDL_Texture *goose = NULL;
 
-SDL_Texture *load_png(SDL_Renderer *renderer, char *filename) {
+SDL_Texture *load_png(SDL_Renderer *renderer, const char *filename) {
   SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
   if (!texture) {
     SDL_Log("Failed to load asset: %s", SDL_GetError());
@@ -22,19 +22,19 @@ SDL_Texture *load_png(SDL_Renderer *renderer, char *filename) {
 }
 
 struct Font {
-  char *filename;
+  const char *filename;
   TTF_Font *ttf;
   int size;
   TTF_Font *outline;
-  int outline_size;
+  float outline_size;
   // Must be set dynamically with SDL_QueryTexture
   unsigned int line_height;
 };
 
-struct Font *font = NULL;
+struct Font *font;
 
-struct Font *create_font(char *filename, int size, int outline_size) {
-  struct Font *font = calloc(1, sizeof(struct Font));
+struct Font *create_font(const char *filename, int size, int outline_size) {
+  struct Font *font = new struct Font;
   font->filename = filename;
   font->size = size;
 
@@ -60,7 +60,7 @@ struct Font *create_font(char *filename, int size, int outline_size) {
 }
 
 SDL_Texture *create_caption_texture(SDL_Renderer *renderer, TTF_Font *font,
-                                    char *text, SDL_Color color) {
+                                    const char *text, SDL_Color color) {
   // Create surface from font
   SDL_Surface *tmp_surface = TTF_RenderText_Blended(font, text, 0, color);
   if (!tmp_surface) {
@@ -79,7 +79,7 @@ SDL_Texture *create_caption_texture(SDL_Renderer *renderer, TTF_Font *font,
   return font_texture;
 }
 
-SDL_Texture *create_outlined_caption_texture(SDL_Renderer *renderer, char *text,
+SDL_Texture *create_outlined_caption_texture(SDL_Renderer *renderer, const char *text,
                                              struct Font *font,
                                              SDL_Color color,
                                              SDL_Color outline_color) {

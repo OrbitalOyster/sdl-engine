@@ -12,14 +12,14 @@ EXE := engine
 # Compiler options
 OUTPUT := $(BIN_DIR)/$(EXE)
 WARNINGS := -W
-STANDART := -std=c11
+STANDART := -std=c++11
 OPTIMIZATION := -O2
 # Debugging info
 DEBUG := -ggdb3
 # Preprocessor flags (example -DDEBUG -DLOG)
 DFLAGS := -DDEBUG_MSG -DCOLOR_OUTPUT
 
-CC := clang
+CC := clang++
 CFLAGS := $(WARNINGS) $(STANDART) $(OPTIMIZATION) $(DFLAGS) $(DEBUG) \
 					-I $(INCLUDE_DIR)
 # Linker libraries (example -lm)
@@ -31,14 +31,14 @@ SRC_SDIRS := $(SRC_DIR)/ \
 INCLUDE_SDIRS := $(INCLUDE_DIR)/ \
 								 $(wildcard $(INCLUDE_DIR)/*/) $(wildcard $(INCLUDE_DIR)/**/*/)
 
-# All .c files
-C_FILES := $(foreach d, $(SRC_SDIRS), $(wildcard $(d)*.c))
+# All .cpp files
+CPP_FILES := $(foreach d, $(SRC_SDIRS), $(wildcard $(d)*.cpp))
 
 # All .h files
 H_FILES := $(foreach d, $(INCLUDE_SDIRS), $(wildcard $(d)*.h))
 
 # All .o files
-OBJS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(C_FILES:.c=.o))
+OBJS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(CPP_FILES:.cpp=.o))
 OBJ_SDIRS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(SRC_SDIRS))
 
 # All .d files
@@ -58,8 +58,8 @@ $(OBJ_SDIRS):
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-# Compile all .c files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c Makefile
+# Compile all .cpp files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp Makefile
 	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<
 
 # Header dependencies
@@ -70,7 +70,7 @@ run: $(OUTPUT)
 	./$(OUTPUT)
 
 format:
-	clang-format $(C_FILES) -i
+	clang-format $(CPP_FILES) -i
 	clang-format $(H_FILES) -i
 
 valgrind:
