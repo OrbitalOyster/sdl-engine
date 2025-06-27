@@ -41,7 +41,7 @@ struct Font *create_font(const char *filename, int size, int outline_size) {
   font->ttf = TTF_OpenFont(filename, font->size);
   if (!font->ttf) {
     SDL_Log("Unable to open font %s\n", filename);
-    SDL_Log("%s",SDL_GetError());
+    SDL_Log("%s", SDL_GetError());
     return NULL;
   }
   font->outline_size = outline_size;
@@ -79,9 +79,9 @@ SDL_Texture *create_caption_texture(SDL_Renderer *renderer, TTF_Font *font,
   return font_texture;
 }
 
-SDL_Texture *create_outlined_caption_texture(SDL_Renderer *renderer, const char *text,
-                                             struct Font *font,
-                                             SDL_Color color,
+SDL_Texture *create_outlined_caption_texture(SDL_Renderer *renderer,
+                                             const char *text,
+                                             struct Font *font, SDL_Color color,
                                              SDL_Color outline_color) {
   SDL_Texture *result;
   // Outline text on background
@@ -116,6 +116,7 @@ SDL_Texture *create_outlined_caption_texture(SDL_Renderer *renderer, const char 
   SDL_DestroyTexture(fg);
   // Done
   return result;
+  bool f = true;
 }
 
 void destroy_font(struct Font *font) {
@@ -127,31 +128,13 @@ void destroy_font(struct Font *font) {
 SDL_Texture *hello = NULL;
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
-  if (!SDL_Init(SDL_INIT_VIDEO)) {
-    SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
-    return SDL_APP_FAILURE;
-  }
 
-  if (!SDL_CreateWindowAndRenderer("Engine", 640, 480, 0, &window, &renderer)) {
-    SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
-    return SDL_APP_FAILURE;
-  }
-
-  goose = load_png(renderer, "assets/goose.png");
-
-  TTF_Init();
-  font = create_font("assets/fonts/PressStart2P-Regular.ttf", 24, 3);
-  SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
-  SDL_Color black = {0x00, 0x00, 0x00, 0xFF};
-  hello = create_outlined_caption_texture(renderer, "Hello, World!", font, white, black);
-
-  SDL_Log("Started");
-  return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   // Esc key
-  if (event->type == SDL_EVENT_KEY_DOWN && event->key.scancode == SDL_SCANCODE_ESCAPE)
+  if (event->type == SDL_EVENT_KEY_DOWN &&
+      event->key.scancode == SDL_SCANCODE_ESCAPE)
     return SDL_APP_SUCCESS;
 
   // Quit event

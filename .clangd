@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - "-I/home/user/sdl-engine/include"
+    - "-Wall"
+    - "-Wextra"
+    - "-pedantic-errors"

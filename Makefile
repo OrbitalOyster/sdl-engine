@@ -11,7 +11,7 @@ EXE := engine
 
 # Compiler options
 OUTPUT := $(BIN_DIR)/$(EXE)
-WARNINGS := -W
+WARNINGS := -Wall -Wextra -pedantic-errors
 STANDART := -std=c++11
 OPTIMIZATION := -O2
 # Debugging info
@@ -34,8 +34,8 @@ INCLUDE_SDIRS := $(INCLUDE_DIR)/ \
 # All .cpp files
 CPP_FILES := $(foreach d, $(SRC_SDIRS), $(wildcard $(d)*.cpp))
 
-# All .h files
-H_FILES := $(foreach d, $(INCLUDE_SDIRS), $(wildcard $(d)*.h))
+# All .hpp files
+HPP_FILES := $(foreach d, $(INCLUDE_SDIRS), $(wildcard $(d)*.hpp))
 
 # All .o files
 OBJS := $(patsubst $(SRC_DIR)%, $(OBJ_DIR)%, $(CPP_FILES:.cpp=.o))
@@ -71,7 +71,7 @@ run: $(OUTPUT)
 
 format:
 	clang-format $(CPP_FILES) -i
-	clang-format $(H_FILES) -i
+	clang-format $(HPP_FILES) -i
 
 valgrind:
 	valgrind --leak-check=full --leak-resolution=high --show-leak-kinds=all \
