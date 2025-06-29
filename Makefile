@@ -12,7 +12,7 @@ EXE := engine
 # Compiler options
 OUTPUT := $(BIN_DIR)/$(EXE)
 WARNINGS := -Wall -Wextra -pedantic-errors
-STANDART := -std=c++11
+STANDART := -std=c++20
 OPTIMIZATION := -O2
 # Debugging info
 DEBUG := -ggdb3

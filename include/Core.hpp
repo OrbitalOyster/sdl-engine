@@ -11,6 +11,9 @@ class Core {
     SDL_Renderer *renderer;
   public:
     Core();
+    void iterate();
+    SDL_AppResult on_event(SDL_Event *event);
+    ~Core();
 };
 
 #endif

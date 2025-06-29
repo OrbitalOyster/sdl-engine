@@ -13,7 +13,10 @@ class Font {
     // Must be set dynamically with SDL_QueryTexture
     unsigned int line_height;
   public:
-    Font();
+    Font(const char *filename, int size, int outline_size);
+    SDL_Texture *render_text(SDL_Renderer *renderer, const char *text, SDL_Color color);
+    SDL_Texture *render_outline_text(SDL_Renderer *renderer, const char *text, SDL_Color color, SDL_Color outline_color);
+    ~Font();
 };
 
 #endif
