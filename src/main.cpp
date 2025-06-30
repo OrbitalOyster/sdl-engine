@@ -2,7 +2,6 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_image/SDL_image.h>
 #include <stdlib.h>
 
 #include "Core.hpp"
@@ -10,27 +9,24 @@
 
 SDL_Texture *goose = NULL;
 
-SDL_Texture *load_png(SDL_Renderer *renderer, const char *filename) {
-  SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
-  if (!texture) {
-    SDL_Log("Failed to load asset: %s", SDL_GetError());
-    return NULL;
-  }
-  return texture;
-}
-
-Font *font;
-
-SDL_Texture *hello = NULL;
-
 struct AppState {
   Core *core;
+  Font *font;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+  Core *core = new Core();
+  Font *font = new Font(core->renderer, "assets/fonts/PressStart2P-Regular.ttf", 24, 2);
+
+  SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
+  SDL_Color black = {0x00, 0x00, 0x00, 0xFF};
+  core->hello = font->render_text("Hello, World!", white, black);
+
   *appstate = new AppState{
-      .core = new Core(),
+      .core = core,
+      .font = font,
   };
+
   return SDL_APP_CONTINUE;
 }
 

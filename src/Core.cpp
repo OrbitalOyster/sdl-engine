@@ -22,10 +22,10 @@ void Core::iterate() {
 
   // const SDL_FRect sourceRect = {0, 0, 512, 512};
   // const SDL_FRect destRect = {20, 30, 200, 200};
-  // SDL_RenderTexture(this->renderer, goose, &sourceRect, &destRect);
-  //
-  // SDL_FRect dstRect = {100, 100, 318, 30};
-  // SDL_RenderTexture(renderer, hello, NULL, &dstRect);
+  // SDL_RenderTexture(this->renderer, this->hello, &sourceRect, &destRect);
+  
+  SDL_FRect dstRect = {100, 100, 316, 28};
+  SDL_RenderTexture(this->renderer, this->hello, NULL, &dstRect);
 
   SDL_RenderPresent(renderer);
 }
@@ -41,6 +41,15 @@ SDL_AppResult Core::on_event(SDL_Event *event) {
     return SDL_APP_SUCCESS;
 
   return SDL_APP_CONTINUE;
+}
+
+SDL_Texture *Core::load_png(const char *filename) {
+  SDL_Texture *texture = IMG_LoadTexture(this->renderer, filename);
+  if (!texture) {
+    SDL_Log("Failed to load asset: %s", SDL_GetError());
+    return NULL;
+  }
+  return texture;
 }
 
 Core::~Core() { SDL_Log("Finished"); }
