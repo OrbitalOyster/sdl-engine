@@ -1,6 +1,7 @@
 CompileFlags:
   Add:
     - "-I/home/user/sdl-engine/include"
+    - "-std=c++20"
     - "-Wall"
     - "-Wextra"
     - "-pedantic-errors"
