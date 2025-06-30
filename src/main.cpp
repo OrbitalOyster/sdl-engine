@@ -1,12 +1,12 @@
-#include "Core.hpp"
-#include "Font.hpp"
+#define SDL_MAIN_USE_CALLBACKS
 
 #include <stdlib.h>
 #include <SDL3/SDL.h>
-// #include <SDL3/SDL_init.h>
-#define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+
+#include "Core.hpp"
+#include "Font.hpp"
 
 SDL_Texture *goose = NULL;
 
@@ -27,7 +27,7 @@ struct AppState {
   Core core;
 };
 
-SDL_AppResult SDL_AppInit(void **appstate) {
+SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   Core core;
   *appstate = new AppState{
       .core = core,
