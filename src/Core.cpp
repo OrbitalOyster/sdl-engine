@@ -1,5 +1,6 @@
-#include <stdexcept>
 #include "Core.hpp"
+#include <SDL3/SDL_log.h>
+#include <stdexcept>
 
 Core::Core() {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -42,6 +43,4 @@ SDL_AppResult Core::on_event(SDL_Event *event) {
   return SDL_APP_CONTINUE;
 }
 
-Core::~Core() {
-  SDL_Log("Finished"); 
-}
+Core::~Core() { SDL_Log("Finished"); }

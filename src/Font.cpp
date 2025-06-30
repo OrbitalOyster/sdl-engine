@@ -15,7 +15,7 @@ Font::Font(const char *filename, int size, int outline_size) {
   this->outline = TTF_OpenFont(filename, size);
   if (!this->outline) {
     SDL_Log("Unable to open font %s\n", filename);
-    //return NULL;
+    // return NULL;
   }
   TTF_SetFontOutline(this->outline, this->outline_size);
 
@@ -33,7 +33,8 @@ Font::Font(const char *filename, int size, int outline_size) {
   */
 }
 
-SDL_Texture *Font::render_text(SDL_Renderer *renderer, const char *text, SDL_Color color) {
+SDL_Texture *Font::render_text(SDL_Renderer *renderer, const char *text,
+                               SDL_Color color) {
   // Create surface from font
   SDL_Surface *tmp_surface = TTF_RenderText_Blended(this->ttf, text, 0, color);
   if (!tmp_surface) {
@@ -52,11 +53,12 @@ SDL_Texture *Font::render_text(SDL_Renderer *renderer, const char *text, SDL_Col
   return font_texture;
 }
 
-SDL_Texture *Font::render_outline_text(SDL_Renderer *renderer, const char *text, SDL_Color color, SDL_Color outline_color) {
+SDL_Texture *Font::render_outline_text(SDL_Renderer *renderer, const char *text,
+                                       SDL_Color color,
+                                       SDL_Color outline_color) {
   SDL_Texture *result;
   // Outline text on background
-  SDL_Texture *bg =
-      this->render_text(renderer, text, outline_color);
+  SDL_Texture *bg = this->render_text(renderer, text, outline_color);
   // Actual text on foreground
   SDL_Texture *fg = this->render_text(renderer, text, color);
   // Get bg dimensions
@@ -86,7 +88,6 @@ SDL_Texture *Font::render_outline_text(SDL_Renderer *renderer, const char *text,
   SDL_DestroyTexture(fg);
   // Done
   return result;
-
 }
 
 Font::~Font() {

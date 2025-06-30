@@ -1,9 +1,9 @@
 #define SDL_MAIN_USE_CALLBACKS
 
-#include <stdlib.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include <stdlib.h>
 
 #include "Core.hpp"
 #include "Font.hpp"
@@ -24,28 +24,28 @@ Font *font;
 SDL_Texture *hello = NULL;
 
 struct AppState {
-  Core core;
+  Core *core;
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
-  Core core;
   *appstate = new AppState{
-      .core = core,
+      .core = new Core(),
   };
   return SDL_APP_CONTINUE;
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   auto a = (struct AppState *)appstate;
-  a->core.on_event(event);
-  //((struct AppState*) appstate)->core.on_event(event);
-  return SDL_APP_CONTINUE;
+  return a->core->on_event(event);
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
   auto a = (struct AppState *)appstate;
-  a->core.iterate();
+  a->core->iterate();
   return SDL_APP_CONTINUE;
 }
 
-void SDL_AppQuit(void *appstate, SDL_AppResult result) {}
+void SDL_AppQuit(void *appstate, SDL_AppResult result) {
+  auto a = (struct AppState *)appstate;
+  delete a->core;
+}
