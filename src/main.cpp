@@ -5,6 +5,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <stdlib.h>
+#include <yaml-cpp/yaml.h>
 
 #include "Core.hpp"
 #include "Font.hpp"
@@ -17,8 +18,18 @@ struct AppState {
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
+  
+  std::cout << "Loading config..." << std::endl;
+  YAML::Node config = YAML::LoadFile("config.yaml");
+  YAML::Node window = config["window"];
+
+  std::string title = window["title"].as<std::string>();
+  int width = window["width"].as<int>();
+  int height = window["height"].as<int>();
+  std::cout << width << " x " << height << std::endl;
+
   try {
-    Core *core = new Core();
+    Core *core = new Core(title, width, height);
     Font *font = new Font(core->renderer,
                           "assets/fonts/Tektur-Bold.ttf", 32, 4);
 

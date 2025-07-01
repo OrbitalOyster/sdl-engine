@@ -2,13 +2,13 @@
 #include <SDL3/SDL_log.h>
 #include <stdexcept>
 
-Core::Core() {
+Core::Core(std::string title, int window_width, int window_height):title(title) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
-    throw std::runtime_error("Unable to initialize SDL");
+    throw std::runtime_error("Unable to initialize SDL (" + std::string(SDL_GetError()) + " )");
   }
 
-  if (!SDL_CreateWindowAndRenderer("Engine", 640, 480, 0, &window, &renderer)) {
-    throw std::runtime_error("Unable to initialize renderer");
+  if (!SDL_CreateWindowAndRenderer(title.c_str(), window_width, window_height, 0, &window, &renderer)) {
+    throw std::runtime_error("Unable to initialize renderer (" + std::string(SDL_GetError()) + " )");
   }
 
   // goose = load_png(renderer, "assets/goose.png");
