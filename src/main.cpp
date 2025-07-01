@@ -16,7 +16,8 @@ struct AppState {
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   Core *core = new Core();
-  Font *font = new Font(core->renderer, "assets/fonts/PressStart2P-Regular.ttf", 24, 2);
+  Font *font =
+      new Font(core->renderer, "assets/fonts/PressStart2P-Regular.ttf", 24, 2);
 
   SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
   SDL_Color black = {0x00, 0x00, 0x00, 0xFF};

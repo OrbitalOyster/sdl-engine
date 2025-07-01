@@ -15,9 +15,11 @@ private:
   unsigned int line_height;
 
 public:
-  Font(SDL_Renderer *renderer, const char *filename, int size, int outline_size);
+  Font(SDL_Renderer *renderer, const char *filename, float size,
+       float outline_size);
   SDL_Texture *render_text(const char *text, bool is_outline, SDL_Color color);
-  SDL_Texture *render_text(const char *text, SDL_Color color, SDL_Color outline_color);
+  SDL_Texture *render_text(const char *text, SDL_Color color,
+                           SDL_Color outline_color);
   ~Font();
 };
 

@@ -7,6 +7,7 @@
 class Core {
 private:
   SDL_Window *window;
+
 public:
   Core();
   void iterate();
