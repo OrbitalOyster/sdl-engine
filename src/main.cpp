@@ -1,3 +1,5 @@
+#include <iostream>
+#include <stdexcept>
 #define SDL_MAIN_USE_CALLBACKS
 
 #include <SDL3/SDL.h>
@@ -15,20 +17,24 @@ struct AppState {
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
-  Core *core = new Core();
-  Font *font =
-      new Font(core->renderer, "assets/fonts/PressStart2P-Regular.ttf", 24, 2);
+  try {
+    Core *core = new Core();
+    Font *font = new Font(core->renderer,
+                          "assets/fonts/Tektur-Bold.ttf", 32, 4);
 
-  SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
-  SDL_Color black = {0x00, 0x00, 0x00, 0xFF};
-  core->hello = font->render_text("Hello, World!", white, black);
+    SDL_Color white = {0xEE, 0xEE, 0xEE, 0xFF};
+    SDL_Color black = {0x44, 0x44, 0x44, 0xFF};
+    core->hello = font->render_text("Hello, World!", white, black);
 
-  *appstate = new AppState{
-      .core = core,
-      .font = font,
-  };
-
-  return SDL_APP_CONTINUE;
+    *appstate = new AppState{
+        .core = core,
+        .font = font,
+    };
+    return SDL_APP_CONTINUE;
+  } catch (const std::runtime_error err) {
+    std::cerr << err.what() << std::endl;
+    return SDL_APP_FAILURE;
+  }
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {

@@ -19,12 +19,7 @@ Core::Core() {
 void Core::iterate() {
   SDL_SetRenderDrawColor(renderer, 0x88, 0x88, 0xCC, 0xFF);
   SDL_RenderClear(renderer);
-
-  // const SDL_FRect sourceRect = {0, 0, 512, 512};
-  // const SDL_FRect destRect = {20, 30, 200, 200};
-  // SDL_RenderTexture(this->renderer, this->hello, &sourceRect, &destRect);
-
-  SDL_FRect dstRect = {100, 100, 316, 28};
+  SDL_FRect dstRect = {32, 32, 198, 50};
   SDL_RenderTexture(renderer, hello, NULL, &dstRect);
 
   SDL_RenderPresent(renderer);

@@ -1,38 +1,28 @@
 #include "Font.hpp"
 #include <stdexcept>
 
-Font::Font(SDL_Renderer *renderer, const char *filename, float size,
+Font::Font(SDL_Renderer *renderer, const std::string filename, float size,
            float outline_size)
     : renderer(renderer), filename(filename), size(size),
       outline_size(outline_size) {
   // TODO: Not here
   TTF_Init();
-
-  ttf = TTF_OpenFont(filename, size);
-  if (!ttf) {
-    SDL_Log("Unable to open font %s\n", filename);
-    SDL_Log("%s", SDL_GetError());
-    // return NULL;
-  }
-
-  outline = TTF_OpenFont(filename, size);
-  if (!outline) {
-    SDL_Log("Unable to open font %s\n", filename);
-    // return NULL;
+  ttf = TTF_OpenFont(filename.c_str(), size);
+  outline = TTF_OpenFont(filename.c_str(), size);
+  if (!ttf || !outline) {
+    throw std::runtime_error("Unable to open font " + filename + " (" +
+                             SDL_GetError() + ")");
   }
   TTF_SetFontOutline(outline, outline_size);
-
-  line_height = 0;
-
-  SDL_Log("Loaded font \"%s\", size %f, outline %f", filename, size,
+  SDL_Log("Loaded font \"%s\", size %f, outline %f", filename.c_str(), size,
           outline_size);
 }
 
-SDL_Texture *Font::render_text(const char *text, bool is_outline,
+SDL_Texture *Font::render_text(const std::string text, bool is_outline,
                                SDL_Color color) {
   // Create surface from font
-  SDL_Surface *tmp_surface =
-      TTF_RenderText_Blended(is_outline ? outline : ttf, text, 0, color);
+  SDL_Surface *tmp_surface = TTF_RenderText_Blended(is_outline ? outline : ttf,
+                                                    text.c_str(), 0, color);
   if (!tmp_surface) {
     SDL_Log("Unable to create surface from font: %s\n", SDL_GetError());
     // return NULL;
@@ -49,7 +39,7 @@ SDL_Texture *Font::render_text(const char *text, bool is_outline,
   return font_texture;
 }
 
-SDL_Texture *Font::render_text(const char *text, SDL_Color color,
+SDL_Texture *Font::render_text(const std::string text, SDL_Color color,
                                SDL_Color outline_color) {
   SDL_Texture *result;
   // Outline text on background
