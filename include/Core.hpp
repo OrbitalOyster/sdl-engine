@@ -1,9 +1,9 @@
 #ifndef CORE_HPP_
 #define CORE_HPP_
 
-#include <string>
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
+#include <string>
 
 class Core {
 private:

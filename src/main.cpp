@@ -1,12 +1,13 @@
+#include <SDL3/SDL_log.h>
+#define SDL_MAIN_USE_CALLBACKS
 #include <iostream>
 #include <stdexcept>
-#define SDL_MAIN_USE_CALLBACKS
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <stdlib.h>
-#include <yaml-cpp/yaml.h>
 
+#include "Config.hpp"
 #include "Core.hpp"
 #include "Font.hpp"
 
@@ -18,32 +19,23 @@ struct AppState {
 };
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
-  
-  std::cout << "Loading config..." << std::endl;
-  YAML::Node config = YAML::LoadFile("config.yaml");
-  YAML::Node window = config["window"];
-
-  std::string title = window["title"].as<std::string>();
-  int width = window["width"].as<int>();
-  int height = window["height"].as<int>();
-  std::cout << width << " x " << height << std::endl;
-
   try {
-    Core *core = new Core(title, width, height);
-    Font *font = new Font(core->renderer,
-                          "assets/fonts/Tektur-Bold.ttf", 32, 4);
-
+    SDL_Log("Loading config...");
+    const Config config("config.yaml");
+    Core *core = new Core(config.get_title(), config.get_window_width(),
+                          config.get_window_height());
+    Font *font =
+        new Font(core->renderer, "assets/fonts/Tektur-Bold.ttf", 32, 4);
     SDL_Color white = {0xEE, 0xEE, 0xEE, 0xFF};
     SDL_Color black = {0x44, 0x44, 0x44, 0xFF};
     core->hello = font->render_text("Hello, World!", white, black);
-
     *appstate = new AppState{
         .core = core,
         .font = font,
     };
     return SDL_APP_CONTINUE;
   } catch (const std::runtime_error err) {
-    std::cerr << err.what() << std::endl;
+    SDL_LogError(1, "Unable to init engine: %s", err.what());
     return SDL_APP_FAILURE;
   }
 }
