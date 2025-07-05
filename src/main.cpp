@@ -41,17 +41,19 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 }
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
-  auto a = (struct AppState *)appstate;
-  return a->core->on_event(event);
+  auto app = (struct AppState *)appstate;
+  return app->core->on_event(event);
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-  auto a = (struct AppState *)appstate;
-  a->core->iterate();
+  auto app = (struct AppState *)appstate;
+  app->core->iterate();
   return SDL_APP_CONTINUE;
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
-  auto a = (struct AppState *)appstate;
-  delete a->core;
+  auto app = (struct AppState *)appstate;
+  if (app) {
+    delete app->core;
+  }
 }

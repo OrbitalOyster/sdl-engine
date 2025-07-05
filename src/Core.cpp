@@ -51,4 +51,10 @@ SDL_Texture *Core::load_png(const char *filename) {
   return texture;
 }
 
-Core::~Core() { SDL_Log("Finished"); }
+Core::~Core() {
+  if (renderer)
+    SDL_DestroyRenderer(renderer);
+  if (window)
+    SDL_DestroyWindow(window);
+  SDL_Log("Core destroyed");
+}
